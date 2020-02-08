@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Layout from './components/UI/Layout/Layout';
-import Authenticate from './components/Auth/Authenticate';
-// import Login from './components/Auth/Login/Login';
 import Home from './components/Home/Home';
 import { Toolbar } from './components/Navigation/Toolbar/Toolbar';
+import Register from './components/Auth/Register/Register';
+import Login from './components/Auth/Login/Login';
 
 function App() {
   return (
@@ -13,8 +13,8 @@ function App() {
         <Toolbar />
         <Switch>
           <Route path='/' exact component={Home} />
-          <Route path='/register' render={() => <Authenticate isLogin={false} />} />
-          <Route path='/login' render={() => <Authenticate isLogin={true} />} />
+          <Route path='/register' component={Register} />
+          <Route path='/login' component={Login} />
         </Switch>
       </Layout>
     </BrowserRouter>
