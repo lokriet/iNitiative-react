@@ -23,7 +23,11 @@ const authController = require('../controllers/auth');
  * body: {
  *  responseCode: SUCCESS
  *  message: 'User created'
- *  userId
+ *  user: {
+ *    username
+ *    email
+ *    id
+ *  }
  *  token
  * }
  * 
@@ -72,5 +76,20 @@ router.post(
 
   authController.createUser
 );
+
+
+router.post('/signin',
+[
+  body('password')
+  .exists()
+  .notEmpty()
+  .withMessage('Password is required'),
+
+  body('email')
+  .exists()
+  .withMessage('Email is required')
+],
+
+authController.login);
 
 module.exports = router;

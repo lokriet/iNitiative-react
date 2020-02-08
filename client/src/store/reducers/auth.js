@@ -11,8 +11,10 @@ const initialState = {
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
     case ActionTypes.auth.REGISTER_START:
+    case ActionTypes.auth.LOGIN_START:
       return { ...state, error: null, loading: true };
     case ActionTypes.auth.REGISTER_SUCCESS:
+    case ActionTypes.auth.LOGIN_SUCCESS:
       return {
         ...state,
         loading: false,
@@ -21,6 +23,7 @@ const authReducer = (state = initialState, action) => {
         user: action.authData.user
       };
     case ActionTypes.auth.REGISTER_FAILED:
+    case ActionTypes.auth.LOGIN_FAILED:
       return {
         ...state,
         token: null,
@@ -28,12 +31,14 @@ const authReducer = (state = initialState, action) => {
         error: action.error,
         loading: false
       };
-    case ActionTypes.auth.LOGOUT_SUCCESS:
+    case ActionTypes.auth.LOGOUT_SUCCESS: 
       return {
         ...state,
         token: null,
-        userId: null
-      };
+        userId: null,
+        error: null,
+        loading: false
+      }
     case ActionTypes.auth.SET_AUTH_REDIRECT_PATH:
       return {
         ...state,

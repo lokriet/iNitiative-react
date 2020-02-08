@@ -51,10 +51,8 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  if (!err.statusCode) {    
-    console.log(err);
-  }
-
+  console.log(err);
+  
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 

@@ -8,8 +8,8 @@ export const AuthActionTypes = {
   LOGIN_SUCCESS: 'LOGIN_SUCCESS',
   LOGIN_FAILED: 'LOGIN_FAILED',
 
-  LOGOUT: 'AUTH_INITIATE_LOGOUT',
-  LOGOUT_SUCCESS: 'AUTH_LOGOUT_SUCCESS',
+  LOGOUT: 'LOGOUT',
+  LOGOUT_SUCCESS: 'LOGOUT_SUCCESS',
 
   AUTH_CHECK_INITIAL_STATE: 'AUTH_CHECK_INITIAL_STATE',
   SET_AUTH_REDIRECT_PATH: 'SET_AUTH_REDIRECT_PATH'
@@ -55,15 +55,17 @@ export const loginStart = () => {
   };
 };
 
-export const loginSuccess = () => {
+export const loginSuccess = authData => {
   return {
-    type: AuthActionTypes.LOGIN_SUCCESS
+    type: AuthActionTypes.LOGIN_SUCCESS,
+    authData
   };
 };
 
-export const loginFailed = () => {
+export const loginFailed = (error) => {
   return {
-    type: AuthActionTypes.LOGIN_FAILED
+    type: AuthActionTypes.LOGIN_FAILED,
+    error
   };
 };
 
