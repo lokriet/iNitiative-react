@@ -1,41 +1,76 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const helmet = require('helmet');
+const compression = require('compression');
+const http = require('http');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const database = require('./database');
+const connectionUtils = require('./util/connectionUtils');
 
-var app = express();
+const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+const responseCodes = require('./controllers/response-codes');
 
-app.use(logger('dev'));
+const app = express();
+
+const isDev = process.env.NODE_ENV === 'development';
+const isProd = process.env.NODE_ENV === 'production';
+
+if (isProd) {
+  console.log("I'm in production!");
+  app.use(compression());
+  app.use(helmet());
+}
+if (isDev) {
+  console.log('Running dev server');
+  app.use(logger('dev'));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/auth', authRouter);
 
-// catch 404 and forward to error handler
+
 app.use(function(req, res, next) {
-  next(createError(404));
+  // TODO 404
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  if (!err.statusCode) {    
+    console.log(err);
+  }
+
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    statusCode,
+    responseCode: err.responseCode || responseCodes.INTERNAL_SERVER_ERROR,
+    message: err.message,
+    data: err.data
+  });
 });
 
-module.exports = app;
+const port = connectionUtils.normalizePort(process.env.PORT || '3001');
+app.set('port', port);
+
+const server = http.createServer(app);
+server.listen(port);
+server.on('error', connectionUtils.onError);
+server.on('listening', connectionUtils.onListening(server));

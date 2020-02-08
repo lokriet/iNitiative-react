@@ -1,0 +1,6 @@
+module.exports.SUCCESS = 'SUCCESS';
+
+module.exports.VALIDATION_ERROR = 'VALIDATION_ERROR';
+module.exports.INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR';
+
+module.exports.SUCCESS = 'SUCCESS';
