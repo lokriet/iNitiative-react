@@ -1,7 +1,11 @@
 import React from 'react';
+import NavigationItems from '../NavigationItems/NavigationItems';
 import classes from './Toolbar.module.css';
 
 export const Toolbar = () => {
-  console.log('rendering');
-  return <div className={classes.Toolbar}>I didn't do anything!</div>;
+  return <header className={classes.Toolbar}>
+  <nav className={classes.Navigation}>
+    <NavigationItems />
+  </nav>
+</header>;
 };

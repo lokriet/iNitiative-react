@@ -77,7 +77,51 @@ router.post(
   authController.createUser
 );
 
-
+/**
+ * http://localhost:3001/auth/signup POST 
+ * 
+ * ==Request==
+ * data: {
+ *  username
+ *  email: required
+ *  password: minLength 6
+ * }
+ * 
+ * ==Response==
+ * Success:
+ * status: 200
+ * body: {
+ *  responseCode: SUCCESS
+ *  message: 'Login successful'
+ *  user: {
+ *    username
+ *    email
+ *    id
+ *  }
+ *  token
+ * }
+ * 
+ * Error: 
+ * status 422 - validation error
+ * body: {
+ *  responseCode: VALIDATION_ERROR
+ *  message: 'Validation failed'
+ *  data: [ (array of them!) {
+ *    value: '12345',
+ *    msg: 'Password should be at least 6 characters long',
+ *    param: 'password'
+ *  }]
+ * }
+ * 
+ * status 401 - wrong credentials
+ * body: {
+ *  responseCode: AUTHENTICATION_FAILED
+ *  message: 'Wrong username or password'
+ * }
+ * 
+ * status 500 - internal server error
+ * no body (?)
+ */
 router.post('/signin',
 [
   body('password')

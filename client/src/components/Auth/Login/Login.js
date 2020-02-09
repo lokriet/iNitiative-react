@@ -1,13 +1,13 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useDispatch, connect } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { Formik, Field, ErrorMessage, Form } from 'formik';
+import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
 import * as actions from '../../../store/actions/index';
 import classes from './Login.module.css';
-import ServerValidationError from '../../UI/ServerValidationError/ServerValidationError';
 import ErrorType from '../../../util/error';
+import Input from '../../UI/Form/Input/Input';
 
 const Login = props => {
   const [redirectPath, setRedirectPath] = useState('/');
@@ -20,10 +20,12 @@ const Login = props => {
 
   const submitHandler = useCallback(
     formValues => {
+      console.log('submitting form', formValues);
       dispatch(
         actions.login({
           email: formValues.email,
-          password: formValues.password
+          password: formValues.password,
+          rememberMe: formValues.rememberMe
         })
       );
     },
@@ -40,9 +42,14 @@ const Login = props => {
 
     form = (
       <Formik
+        // initialValues={{
+        //   email: '',
+        //   password: ''
+        // }}
         initialValues={{
           email: '1@1.com',
-          password: '1111111'
+          password: '1111111',
+          rememberMe: true
         }}
         validationSchema={Yup.object({
           email: Yup.string()
@@ -58,13 +65,28 @@ const Login = props => {
       >
         {formProps => (
           <Form className={classes.LoginForm}>
-            <Field name="email" type="text" placeholder="E-mail" />
-            <ErrorMessage name="email" />
-            <ServerValidationError for="email" serverError={props.error} />
+            <Field
+              name="email"
+              type="text"
+              placeholder="E-mail"
+              autoComplete="username"
+              serverError={props.error}
+              component={Input}
+            />
 
-            <Field name="password" type="password" placeholder="Password" />
-            <ErrorMessage name="password" />
-            <ServerValidationError for="password" serverError={props.error} />
+            <Field
+              name="password"
+              type="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              serverError={props.error}
+              component={Input}
+            />
+
+            <label>
+              <Field name="rememberMe" type="checkbox" />
+              Remember me
+            </label>
 
             {operationErrorMessage}
 

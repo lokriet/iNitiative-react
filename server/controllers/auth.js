@@ -1,10 +1,10 @@
 const { validationResult } = require('express-validator');
-const JSRSASign = require('jsrsasign');
 const bcrypt = require('bcrypt');
 const User = require('../model/user');
 
+const jwtUtils = require('../util/jwtUtils');
 const responseCodes = require('./response-codes');
-const constants = require('../constants');
+
 
 module.exports.createUser = (req, res, next) => {
   const errors = validationResult(req);
@@ -36,19 +36,11 @@ module.exports.createUser = (req, res, next) => {
     })
     .then(savedUser => {
       const claims = {
-        Username: savedUser.username,
+        userId: savedUser._id,
         Admin: false
       };
-      const header = {
-        alg: 'HS512',
-        typ: 'JWT'
-      };
-      const token = JSRSASign.jws.JWS.sign(
-        'HS512',
-        JSON.stringify(header),
-        JSON.stringify(claims),
-        constants.JWT_KEY
-      );
+
+      const token = jwtUtils.generateJWT(claims);
 
       return res.status(201).json({
         message: 'User created',
@@ -56,18 +48,15 @@ module.exports.createUser = (req, res, next) => {
         responseCode: responseCodes.SUCCESS,
         data: {
           user: {
-            id: user._id,
-            username: user.username,
-            email: user.email
+            id: savedUser._id,
+            username: savedUser.username,
+            email: savedUser.email
           },
           token
         }
       });
     })
     .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
       next(err);
     });
 };
@@ -110,19 +99,11 @@ module.exports.login = (req, res, next) => {
       }
 
       const claims = {
-        Username: loadedUser.username,
+        userId: loadedUser._id,
         Admin: false
       };
-      const header = {
-        alg: 'HS512',
-        typ: 'JWT'
-      };
-      const token = JSRSASign.jws.JWS.sign(
-        'HS512',
-        JSON.stringify(header),
-        JSON.stringify(claims),
-        constants.JWT_KEY
-      );
+      
+      const token = jwtUtils.generateJWT(claims);
 
       return res.status(200).json({
         message: 'Login successful',
@@ -139,9 +120,6 @@ module.exports.login = (req, res, next) => {
       });
     })
     .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
       next(err);
     });
 };

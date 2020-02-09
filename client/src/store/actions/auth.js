@@ -1,44 +1,23 @@
 export const AuthActionTypes = {
   REGISTER: 'REGISTER',
-  REGISTER_START: 'REGISTER_START',
-  REGISTER_SUCCESS: 'REGISTER_SUCCESS',
-  REGISTER_FAILED: 'REGISTER_FAILED',
   LOGIN: 'LOGIN',
-  LOGIN_START: 'LOGIN_START',
-  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
-  LOGIN_FAILED: 'LOGIN_FAILED',
+  AUTH_START: 'AUTH_START',
+  AUTH_SUCCESS: 'AUTH_SUCCESS',
+  AUTH_FAILED: 'AUTH_FAILED',
 
   LOGOUT: 'LOGOUT',
   LOGOUT_SUCCESS: 'LOGOUT_SUCCESS',
 
   AUTH_CHECK_INITIAL_STATE: 'AUTH_CHECK_INITIAL_STATE',
+  AUTH_CHECK_INITIAL_STATE_DONE: 'AUTH_CHECK_INITIAL_STATE_DONE',
   SET_AUTH_REDIRECT_PATH: 'SET_AUTH_REDIRECT_PATH'
 };
+
 
 export const register = payload => {
   return {
     type: AuthActionTypes.REGISTER,
     payload
-  };
-};
-
-export const registerStart = () => {
-  return {
-    type: AuthActionTypes.REGISTER_START
-  };
-};
-
-export const registerSuccess = authData => {
-  return {
-    type: AuthActionTypes.REGISTER_SUCCESS,
-    authData
-  };
-};
-
-export const registerFailed = (error) => {
-  return {
-    type: AuthActionTypes.REGISTER_FAILED,
-    error
   };
 };
 
@@ -49,22 +28,22 @@ export const login = payload => {
   };
 };
 
-export const loginStart = () => {
+export const authStart = () => {
   return {
-    type: AuthActionTypes.LOGIN_START
+    type: AuthActionTypes.AUTH_START
   };
 };
 
-export const loginSuccess = authData => {
+export const authSuccess = authData => {
   return {
-    type: AuthActionTypes.LOGIN_SUCCESS,
+    type: AuthActionTypes.AUTH_SUCCESS,
     authData
   };
 };
 
-export const loginFailed = (error) => {
+export const authFailed = (error) => {
   return {
-    type: AuthActionTypes.LOGIN_FAILED,
+    type: AuthActionTypes.AUTH_FAILED,
     error
   };
 };
@@ -84,6 +63,12 @@ export const logoutSuccess = () => {
 export const authCheckInitialState = () => {
   return {
     type: AuthActionTypes.AUTH_CHECK_INITIAL_STATE
+  };
+};
+
+export const authCheckInitialStateDone = () => {
+  return {
+    type: AuthActionTypes.AUTH_CHECK_INITIAL_STATE_DONE
   };
 };
 

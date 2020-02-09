@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import ErrorType from '../../../util/error';
+import ErrorType from '../../../../util/error';
 
 const ServerValidationError = props => {
   let errors = null;

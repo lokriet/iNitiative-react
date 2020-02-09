@@ -5,16 +5,15 @@ const initialState = {
   loading: false,
   token: null,
   userId: null,
-  redirectPath: '/'
+  redirectPath: '/',
+  initialAuthCheckDone: false
 };
 
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
-    case ActionTypes.auth.REGISTER_START:
-    case ActionTypes.auth.LOGIN_START:
+    case ActionTypes.auth.AUTH_START:
       return { ...state, error: null, loading: true };
-    case ActionTypes.auth.REGISTER_SUCCESS:
-    case ActionTypes.auth.LOGIN_SUCCESS:
+    case ActionTypes.auth.AUTH_SUCCESS:
       return {
         ...state,
         loading: false,
@@ -22,8 +21,7 @@ const authReducer = (state = initialState, action) => {
         token: action.authData.token,
         user: action.authData.user
       };
-    case ActionTypes.auth.REGISTER_FAILED:
-    case ActionTypes.auth.LOGIN_FAILED:
+    case ActionTypes.auth.AUTH_FAILED:
       return {
         ...state,
         token: null,
@@ -44,6 +42,11 @@ const authReducer = (state = initialState, action) => {
         ...state,
         redirectPath: action.redirectPath
       };
+    case ActionTypes.auth.AUTH_CHECK_INITIAL_STATE_DONE:
+      return {
+        ...state,
+        initialAuthCheckDone: true
+      }
     default:
       return state;
   }

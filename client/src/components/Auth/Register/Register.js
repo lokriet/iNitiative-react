@@ -6,8 +6,9 @@ import * as Yup from 'yup';
 
 import * as actions from '../../../store/actions/index';
 import classes from './Register.module.css';
-import ServerValidationError from '../../UI/ServerValidationError/ServerValidationError';
+import ServerValidationError from '../../UI/Form/ServerValidationError/ServerValidationError';
 import ErrorType from '../../../util/error';
+import Input from '../../UI/Form/Input/Input';
 
 const Register = props => {
   const [redirectPath, setRedirectPath] = useState('/');
@@ -24,7 +25,8 @@ const Register = props => {
         actions.register({
           username: formValues.username,
           email: formValues.email,
-          password: formValues.password
+          password: formValues.password,
+          rememberMe: formValues.rememberMe
         })
       );
     },
@@ -35,6 +37,7 @@ const Register = props => {
     return Yup.mixed().test({
       name: 'equalTo',
       exclusive: false,
+      // eslint-disable-next-line no-template-curly-in-string
       message: msg || '${path} must be the same as ${reference}',
       params: {
         reference: ref.path
@@ -60,7 +63,8 @@ const Register = props => {
           username: '',
           email: '1@1.com',
           password: '1111111',
-          confirmPassword: '1111111'
+          confirmPassword: '1111111',
+          rememberMe: true
         }}
         validationSchema={Yup.object({
           username: Yup.string(),
@@ -80,24 +84,41 @@ const Register = props => {
       >
         {formProps => (
           <Form className={classes.RegisterForm}>
-            <Field name="username" type="text" placeholder="Username" />
-            <ErrorMessage name="username" />
-            <ServerValidationError for="username" serverError={props.error} />
+            <Field
+              name="username"
+              type="text"
+              placeholder="Username"
+              serverError={props.error}
+              component={Input}
+            />
 
-            <Field name="email" type="text" placeholder="E-mail" />
-            <ErrorMessage name="email" />
-            <ServerValidationError for="email" serverError={props.error} />
+            <Field
+              name="email"
+              type="text"
+              placeholder="E-mail"
+              serverError={props.error}
+              component={Input}
+            />
 
-            <Field name="password" type="password" placeholder="Password" />
-            <ErrorMessage name="password" />
-            <ServerValidationError for="password" serverError={props.error} />
+            <Field
+              name="password"
+              type="password"
+              placeholder="Password"
+              serverError={props.error}
+              component={Input}
+            />
 
             <Field
               name="confirmPassword"
               type="password"
               placeholder="Confirm password"
+              component={Input}
             />
-            <ErrorMessage name="confirmPassword" />
+
+            <label>
+              <Field name="rememberMe" type="checkbox" />
+              Remember me
+            </label>
 
             {operationErrorMessage}
 

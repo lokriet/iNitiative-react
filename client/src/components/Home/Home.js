@@ -15,6 +15,7 @@ const Home = props => {
       {props.isAuthenticated ? 
         <button onClick={() => dispatch(actions.logout())}>Logout</button>
       : <div><Link to='/register'>Register</Link> <Link to='/login'>Login</Link></div>}
+      <Link to='/admin'>Admin console</Link>
     </Fragment>
   );
 };

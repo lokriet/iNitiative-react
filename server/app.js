@@ -10,6 +10,7 @@ const connectionUtils = require('./util/connectionUtils');
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
+const usersRouter = require('./routes/users');
 
 const responseCodes = require('./controllers/response-codes');
 
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
+app.use('/users', usersRouter);
 
 
 app.use(function(req, res, next) {
