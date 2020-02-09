@@ -16,7 +16,7 @@ const NavigationItems = props => {
   return (
     <ul className={classes.NavigationItems}>
       <NavigationItem link="/">Home</NavigationItem>
-      {props.isAuthenticated ? (
+      {props.isAdmin ? (
         <NavigationItem link="/admin">Admin</NavigationItem>
       ) : null}
       {auth}
@@ -26,7 +26,8 @@ const NavigationItems = props => {
 
 const mapStateToProps = state => {
   return {
-    isAuthenticated: state.auth.token !== null
+    isAuthenticated: state.auth.token !== null,
+    isAdmin: state.auth.user && state.auth.user.isAdmin
   };
 };
 

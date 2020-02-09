@@ -27,6 +27,7 @@ const authController = require('../controllers/auth');
  *    username
  *    email
  *    id
+ *    isAdmin
  *  }
  *  token
  * }
@@ -97,6 +98,7 @@ router.post(
  *    username
  *    email
  *    id
+ *    isAdmin
  *  }
  *  token
  * }

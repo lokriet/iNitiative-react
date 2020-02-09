@@ -6,7 +6,8 @@ module.exports.getUserInfo = (req, res, next) => {
     return res.status(200).json({
       id: user._id,
       username: user.username,
-      email: user.email
+      email: user.email,
+      isAdmin: user.isAdmin
     });
   }).catch(error => {
     next(error);

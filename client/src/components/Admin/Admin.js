@@ -12,11 +12,11 @@ const Admin = props => {
 
 const mapStateToProps = state => {
   return {
-    isAuthenticated: state.auth.token != null,
-    initialAuthCheckDone: state.auth.initialAuthCheckDone
+    isAuthenticated: state.auth.token != null
   };
 };
 
 Admin.propTypes = {};
+
 
 export default connect(mapStateToProps)(Admin);

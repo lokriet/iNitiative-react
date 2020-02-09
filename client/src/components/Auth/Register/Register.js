@@ -1,12 +1,11 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useDispatch, connect } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { Formik, Field, ErrorMessage, Form } from 'formik';
+import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
 import * as actions from '../../../store/actions/index';
 import classes from './Register.module.css';
-import ServerValidationError from '../../UI/Form/ServerValidationError/ServerValidationError';
 import ErrorType from '../../../util/error';
 import Input from '../../UI/Form/Input/Input';
 

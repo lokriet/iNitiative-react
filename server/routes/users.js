@@ -6,6 +6,24 @@ const isAuth = require('../middleware/auth');
 
 /**
  * Get logged in user info
+ * 
+ * ==Response==
+ * Success:
+ * status: 200
+ * body: {
+ *  username
+ *  email
+ *  id
+ *  isAdmin
+ * }
+ * 
+ * Failure:
+ * status: 401
+ * message: Not Authenticated
+ * 
+ * internal server error:
+ * status: 500
+ * message
  */
 router.get('/userinfo', isAuth, userController.getUserInfo);
 

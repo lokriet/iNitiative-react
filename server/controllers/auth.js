@@ -29,7 +29,8 @@ module.exports.createUser = (req, res, next) => {
       const user = new User({
         email,
         password: hashedPassword,
-        username
+        username,
+        isAdmin: false
       });
 
       return user.save();
@@ -37,7 +38,7 @@ module.exports.createUser = (req, res, next) => {
     .then(savedUser => {
       const claims = {
         userId: savedUser._id,
-        Admin: false
+        isAdmin: savedUser.isAdmin
       };
 
       const token = jwtUtils.generateJWT(claims);
@@ -50,7 +51,8 @@ module.exports.createUser = (req, res, next) => {
           user: {
             id: savedUser._id,
             username: savedUser.username,
-            email: savedUser.email
+            email: savedUser.email,
+            isAdmin: savedUser.isAdmin
           },
           token
         }
@@ -100,7 +102,7 @@ module.exports.login = (req, res, next) => {
 
       const claims = {
         userId: loadedUser._id,
-        Admin: false
+        isAdmin: loadedUser.isAdmin
       };
       
       const token = jwtUtils.generateJWT(claims);
@@ -113,7 +115,8 @@ module.exports.login = (req, res, next) => {
           user: {
             id: loadedUser._id,
             username: loadedUser.username,
-            email: loadedUser.email
+            email: loadedUser.email,
+            isAdmin: loadedUser.isAdmin
           },
           token
         }
