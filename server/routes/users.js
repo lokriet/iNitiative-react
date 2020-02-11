@@ -5,6 +5,7 @@ const isAuth = require('../middleware/auth');
 
 
 /**
+ * Get user info about auth token owner
  * http://localhost:3001/users/userinfo GET 
  * 
  * Get logged in user info

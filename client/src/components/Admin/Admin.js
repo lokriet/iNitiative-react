@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {useRouteMatch, Switch, Route, Redirect} from 'react-router-dom';
 import useAuthCheck from '../../hooks/useAuthCheck';
@@ -24,7 +23,7 @@ const Admin = props => {
           <Redirect to={`${url}/damage-types`} />
         </Route>
         <Route path={`${path}/damage-types`}>
-          <DamageTypes />
+          <DamageTypes isHomebrew={false} />
         </Route>
         <Route path={`${path}/conditions`}>
           <div>I'll be conditions admin</div>
@@ -42,8 +41,5 @@ const mapStateToProps = state => {
     isAuthenticated: state.auth.token != null
   };
 };
-
-Admin.propTypes = {};
-
 
 export default connect(mapStateToProps)(Admin);

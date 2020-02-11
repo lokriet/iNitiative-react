@@ -15,7 +15,7 @@ const NavigationItems = props => {
 
   return (
     <ul className={classes.NavigationItems}>
-      <NavigationItem link="/">Home</NavigationItem>
+      <NavigationItem link="/" exact>Home</NavigationItem>
       {props.isAdmin ? (
         <NavigationItem link="/admin">Admin</NavigationItem>
       ) : null}

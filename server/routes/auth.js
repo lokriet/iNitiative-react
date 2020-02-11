@@ -8,6 +8,7 @@ const authController = require('../controllers/auth');
 
 
 /**
+ * Register a new user
  * http://localhost:3001/auth/signup POST 
  * 
  * ==Request==
@@ -79,7 +80,8 @@ router.post(
 );
 
 /**
- * http://localhost:3001/auth/signup POST 
+ * Login
+ * http://localhost:3001/auth/signin POST 
  * 
  * ==Request==
  * data: {

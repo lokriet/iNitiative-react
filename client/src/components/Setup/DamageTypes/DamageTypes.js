@@ -1,76 +1,69 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import classes from './DamageTypes.module.css';
+import { connect, useDispatch } from 'react-redux';
+
+import * as actions from '../../../store/actions/index';
 import DamageType from './DamageType/DamageType';
 
 const DamageTypes = props => {
-  const damageType = { name: 'Poison', description: 'Poisonous', _id: '1' };
-  const damageType2 = {
-    name: 'Poison2',
-    description: 'Poisonous too',
-    _id: '2'
-  };
-  const [allDamageTypes, setAllDamageTypes] = useState([damageType, damageType2]);
+  const dispatch = useDispatch();
+  const allDamageTypes = props.isHomebrew
+    ? props.homebrewDamageTypes
+    : props.sharedDamageTypes;
 
-  const saveDamageTypeHandler = useCallback(
-    (values, setSubmitting) => {
-      console.log('updating damage type', values);
+  useEffect(() => {
+    dispatch(actions.getSharedDamageTypes());
+  }, [dispatch]);
 
-      const promise = new Promise((resolve, reject) => {
-        setTimeout(() => {
-          setAllDamageTypes(allDamageTypes.map(item => item._id === values._id ? values : item));
-          resolve(true);
-        }, 1000);
-      });
-
-      promise.then(result => {
-        setSubmitting(false);
-      });
-
+  const validateName = useCallback(
+    (_id, name) => {
+      return !allDamageTypes.some(
+        item => (_id == null || item._id !== _id) && item.name === name
+      );
     },
     [allDamageTypes]
   );
 
-  const addDamageTypeHandler = useCallback(
-    (values, setSubmitting) => {
-      // const promise = new Promise((resolve, reject) => {
-      //   setTimeout(() => {
-      //     const newItem = { ...values, _id: allDamageTypes.length.toString() };
-      //     setAllDamageTypes(allDamageTypes.concat(newItem));
-      //     resolve(true);
-      //   }, 1000);
-      // });
-
-      // promise.then(result => {
-      //   setSubmitting(false);
-      //   return result;
-      // });
-
+  const handleUpdateDamageType = useCallback(
+    (_id, name, setSubmitting) => {
+      dispatch(
+        actions.updateDamageType(
+          { _id, name },
+          props.isHomebrew,
+          props.token,
+          setSubmitting
+        )
+      );
     },
-    [allDamageTypes]
+    [dispatch, props.isHomebrew, props.token]
   );
-
-  // const 
 
   return (
-    <div className={classes.DamageTypes}>
-      <DamageType
-        allDamageTypes={allDamageTypes}
-        onSave={addDamageTypeHandler}
-      />
-
-      {allDamageTypes.map((item, index) => (
+    <div>
+      {allDamageTypes.map(damageType => (
         <DamageType
-          key={index}
-          damageType={item}
-          allDamageTypes={allDamageTypes}
-          onSave={saveDamageTypeHandler}
+          key={damageType._id}
+          damageType={damageType}
+          onSave={handleUpdateDamageType}
+          onValidateName={validateName}
+          serverError={props.errors[damageType._id]}
         />
       ))}
     </div>
   );
 };
 
-DamageTypes.propTypes = {};
+DamageTypes.propTypes = {
+  isHomebrew: PropTypes.bool.isRequired
+};
 
-export default DamageTypes;
+const mapStateToProps = state => {
+  return {
+    homebrewDamageTypes: state.damageType.homebrewDamageTypes,
+    sharedDamageTypes: state.damageType.sharedDamageTypes,
+    errors: state.damageType.errors,
+    token: state.auth.token
+  };
+};
+
+export default connect(mapStateToProps)(DamageTypes);

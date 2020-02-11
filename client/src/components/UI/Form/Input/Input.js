@@ -1,6 +1,6 @@
 import React from 'react';
 import {ErrorMessage} from 'formik';
-import ServerValidationError from '../ServerValidationError/ServerValidationError';
+import ServerValidationError from '../../ServerValidationError/ServerValidationError';
 import classes from './Input.module.css';
 
 const Input =  ({

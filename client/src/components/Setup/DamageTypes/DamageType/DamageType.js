@@ -1,85 +1,80 @@
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Formik, Field } from 'formik';
-import * as Yup from 'yup';
 
-import InlineForm from '../../../UI/InlineForm/InlineForm';
-import Input from '../../../UI/Form/Input/Input';
-import InlineFormInput from '../../../UI/InlineForm/InlineFormInput/InlineFormInput';
+import ServerValidationError from '../../../UI/ServerValidationError/ServerValidationError';
+import ServerError from '../../../UI/ServerError/ServerError';
+import classes from './DamageType.module.css';
+import { CSSTransition } from 'react-transition-group';
 
 const DamageType = ({
-  allDamageTypes,
   damageType,
-  onSave
+  onSave,
+  onValidateName,
+  serverError
 }) => {
-  const [otherDamageTypeNames] = useState(
-    allDamageTypes
-      ? allDamageTypes
-          .filter(item => item !== damageType)
-          .map(item => item.name)
-      : []
-  );
+  const [isNameValid, setIsNameValid] = useState(true);
+  const [showSavedBadge, setShowSavedBadge] = useState(false);
 
-  const nameExists = useCallback(
-    name => {
-      return otherDamageTypeNames.includes(name);
-    },
-    [otherDamageTypeNames]
-  );
+  const setSubmitting = useCallback(submitting => {
+    setShowSavedBadge(true);
+    setTimeout(() => {
+      setShowSavedBadge(false);
+    }, 2000);
+  }, []);
 
-  const submitHandler = useCallback(
-    (values, setSubmitting) => {
-      console.log(values);
-      if (damageType != null) {
-        onSave({...values, _id: damageType._id}, setSubmitting)
+  const handleKeyPress = useCallback((event) => {
+    if(event.key === 'Enter'){
+      event.target.blur();
+    }
+  }, []);
+
+  const handleBlur = useCallback((event) => {
+    const value = event.target.value;
+    if (!damageType || damageType.name !== value) {
+      if (onValidateName(damageType ? damageType._id : null, value)) {
+        setIsNameValid(true);
+        onSave(damageType._id, event.target.value, setSubmitting);
       } else {
-        onSave(values, setSubmitting);
+        setIsNameValid(false);
       }
-    },
-    [onSave, damageType],
-  );
+    }
+  }, [damageType, setSubmitting, onSave, onValidateName]);
 
   return (
-    <div>
-      <Formik
-        initialValues={{
-          name: damageType ? damageType.name : '',
-          description: damageType ? damageType.description : ''
-        }}
-        validationSchema={Yup.object({
-          name: Yup.string().required('Required').test(
-            'exists',
-            'Item with this name already exists',
-            value => !nameExists(value)
-          )
-        })}
-        onSubmit={(values, {setSubmitting}) => submitHandler(values, setSubmitting)}
-      >
-        {formik => (
-        <InlineForm isAddNew={damageType == null}>
-          <Field
-            name="name"
-            type="text"
-            placeholder="Name"
-            component={InlineFormInput}
-          />
-          <Field
-            name="description"
-            type="textarea"
-            placeholder="Name"
-            component={InlineFormInput}
-          />
-        </InlineForm>
-        )}
-      </Formik>
+    <div className={classes.DamageType}>
+      <div className={classes.InputRow}>
+        <input
+          type="text"
+          name="name"
+          defaultValue={damageType ? damageType.name : ''}
+          className={classes.Input}
+          onKeyPress={handleKeyPress}
+          onBlur={handleBlur}
+        />
+        <button type="button" className={classes.Button}>X</button>
+        
+          <CSSTransition timeout={500} in={showSavedBadge} unmountOnExit classNames={{
+            enter: classes.SavedBadgeEnter,
+            enterActive: classes.SavedBadgeEnterActive,
+            exit: classes.SavedBadgeExit,
+            exitActive: classes.SavedBadgeExitActive
+            }}>
+            <span className={classes.SavedBadge}>Saved</span>
+          </CSSTransition>
+        
+      </div>
+      {isNameValid ? null : <div className={classes.Error}>Damage type already exists</div>}
+      {serverError ? <ServerValidationError serverError={serverError} /> : null}
+      {serverError ? <ServerError serverError={serverError} /> : null}
     </div>
   );
 };
 
 DamageType.propTypes = {
-  allDamageTypes: PropTypes.array,
-  damageType: PropTypes.object,
-  onSave: PropTypes.func
+  damageType: PropTypes.object, 
+  onSave: PropTypes.func,
+  onValidateName: PropTypes.func,
+  serverError: PropTypes.object
 };
 
 export default DamageType;
