@@ -5,10 +5,13 @@ import ServerValidationError from '../../../UI/ServerValidationError/ServerValid
 import ServerError from '../../../UI/ServerError/ServerError';
 import classes from './DamageType.module.css';
 import { CSSTransition } from 'react-transition-group';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const DamageType = ({
   damageType,
   onSave,
+  onDelete,
   onValidateName,
   serverError
 }) => {
@@ -22,23 +25,26 @@ const DamageType = ({
     }, 2000);
   }, []);
 
-  const handleKeyPress = useCallback((event) => {
-    if(event.key === 'Enter'){
+  const handleKeyPress = useCallback(event => {
+    if (event.key === 'Enter') {
       event.target.blur();
     }
   }, []);
 
-  const handleBlur = useCallback((event) => {
-    const value = event.target.value;
-    if (!damageType || damageType.name !== value) {
-      if (onValidateName(damageType ? damageType._id : null, value)) {
-        setIsNameValid(true);
-        onSave(damageType._id, event.target.value, setSubmitting);
-      } else {
-        setIsNameValid(false);
+  const handleBlur = useCallback(
+    event => {
+      const value = event.target.value;
+      if (!damageType || damageType.name !== value) {
+        if (onValidateName(damageType ? damageType._id : null, value)) {
+          setIsNameValid(true);
+          onSave(damageType._id, event.target.value, setSubmitting);
+        } else {
+          setIsNameValid(false);
+        }
       }
-    }
-  }, [damageType, setSubmitting, onSave, onValidateName]);
+    },
+    [damageType, setSubmitting, onSave, onValidateName]
+  );
 
   return (
     <div className={classes.DamageType}>
@@ -51,19 +57,31 @@ const DamageType = ({
           onKeyPress={handleKeyPress}
           onBlur={handleBlur}
         />
-        <button type="button" className={classes.Button}>X</button>
-        
-          <CSSTransition timeout={500} in={showSavedBadge} unmountOnExit classNames={{
+        <button
+          type="button"
+          className={classes.Button}
+          onClick={() => onDelete(damageType._id)}
+        >
+          <FontAwesomeIcon icon={faTimes}></FontAwesomeIcon>
+        </button>
+
+        <CSSTransition
+          timeout={500}
+          in={showSavedBadge}
+          unmountOnExit
+          classNames={{
             enter: classes.SavedBadgeEnter,
             enterActive: classes.SavedBadgeEnterActive,
             exit: classes.SavedBadgeExit,
             exitActive: classes.SavedBadgeExitActive
-            }}>
-            <span className={classes.SavedBadge}>Saved</span>
-          </CSSTransition>
-        
+          }}
+        >
+          <span className={classes.SavedBadge}>Saved</span>
+        </CSSTransition>
       </div>
-      {isNameValid ? null : <div className={classes.Error}>Damage type already exists</div>}
+      {isNameValid ? null : (
+        <div className={classes.Error}>Damage type already exists</div>
+      )}
       {serverError ? <ServerValidationError serverError={serverError} /> : null}
       {serverError ? <ServerError serverError={serverError} /> : null}
     </div>
@@ -71,8 +89,9 @@ const DamageType = ({
 };
 
 DamageType.propTypes = {
-  damageType: PropTypes.object, 
+  damageType: PropTypes.object,
   onSave: PropTypes.func,
+  onDelete: PropTypes.func,
   onValidateName: PropTypes.func,
   serverError: PropTypes.object
 };

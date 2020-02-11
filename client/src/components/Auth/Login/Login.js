@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import * as actions from '../../../store/actions/index';
 import classes from './Login.module.css';
 import ErrorType from '../../../util/error';
-import Input from '../../UI/Form/Input/Input';
+import FormikInput from '../../UI/Form/FormikInput/FormikInput';
 
 const Login = props => {
   const [redirectPath, setRedirectPath] = useState('/');
@@ -70,7 +70,7 @@ const Login = props => {
             placeholder="E-mail"
             autoComplete="username"
             serverError={props.error}
-            component={Input}
+            component={FormikInput}
           />
 
           <Field
@@ -79,7 +79,7 @@ const Login = props => {
             placeholder="Password"
             autoComplete="current-password"
             serverError={props.error}
-            component={Input}
+            component={FormikInput}
           />
 
           <label>

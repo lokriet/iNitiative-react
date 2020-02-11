@@ -138,6 +138,38 @@ module.exports.updateDamageType = async (req, res, next) => {
   }
 };
 
+
+module.exports.deleteDamageType = async (req, res, next) => {
+  const damageTypeId = req.params.damageTypeId;
+  const userId = req.userId;
+
+  const damageType = await DamageType.findById(damageTypeId);
+  if (!damageType) {
+    next(httpErrors.pageNotFoundError());
+    return;
+  }
+
+  if (damageType.isHomebrew && damageType.creator.toString() !== userId.toString()) {
+    next(httpErrors.notAuthorizedError());
+    return;
+  }
+
+  if (damageType.isHomebrew) {
+    const user = await User.findById(userId);
+    if (!user.isAdmin) {
+      next(httpErrors.notAuthorizedError());
+      return;
+    }
+  }
+
+  await DamageType.deleteOne({_id: damageTypeId});
+  res.status(200).json({
+    statusCode: 200,
+    responseCode: responseCodes.SUCCESS,
+    message: 'Damage type deleted'
+  });
+}
+
 module.exports.getSharedDamageTypes = async (req, res, next) => {
   try {
     const damageTypes = await DamageType.find({ isHomebrew: false }).sort({

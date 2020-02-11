@@ -1,7 +1,7 @@
 import React from 'react';
 import {ErrorMessage} from 'formik';
 import ServerValidationError from '../../ServerValidationError/ServerValidationError';
-import classes from './Input.module.css';
+import classes from './FormikInput.module.css';
 
 const Input =  ({
   field, // { name, value, onChange, onBlur }

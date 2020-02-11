@@ -1,5 +1,4 @@
 import * as ActionTypes from '../actions/actionTypes';
-
 const initialState = {
   errors: {}, // errors for individual damage types operations. property keys are ids, for new one - ADD
   error: null, // error for collective damage types operations
@@ -15,6 +14,9 @@ const damageTypesReducer = (state = initialState, action) => {
 
     case ActionTypes.damageType.UPDATE_DAMAGE_TYPE_SUCCESS:
       return updateDamageTypeSuccess(state, action);
+
+    case ActionTypes.damageType.DELETE_DAMAGE_TYPE_SUCCESS:
+      return deleteDamageTypeSuccess(state, action);
 
     case ActionTypes.damageType.DAMAGE_TYPE_OPERATION_FAILED:
       return damageTypeOperationFailed(state, action);
@@ -36,16 +38,7 @@ const damageTypesReducer = (state = initialState, action) => {
 };
 
 const addDamageTypeSuccess = (state, action) => {
-  let newErrors;
-  if (state.errors.ADD != null) {
-    newErrors = { ...state.errors };
-    delete newErrors.ADD;
-    if (newErrors == null) {
-      newErrors = {};
-    }
-  } else {
-    newErrors = state.errors;
-  }
+  const newErrors = removeErrorFromStateErrors(state.errors, null)
 
   if (action.damageType.isHomebrew) {
     return {
@@ -63,16 +56,7 @@ const addDamageTypeSuccess = (state, action) => {
 };
 
 const updateDamageTypeSuccess = (state, action) => {
-  let newErrors;
-  if (state.errors[action.damageType._id] != null) {
-    newErrors = { ...state.errors };
-    delete newErrors[action.damageType._id];
-    if (newErrors == null) {
-      newErrors = {};
-    }
-  } else {
-    newErrors = state.errors;
-  }
+  const newErrors = removeErrorFromStateErrors(state.errors, action.damageType._d)
 
   if (action.damageType.isHomebrew) {
     const newDamageTypes = state.homebrewDamageTypes.map(item =>
@@ -97,6 +81,17 @@ const updateDamageTypeSuccess = (state, action) => {
   }
 };
 
+const deleteDamageTypeSuccess = (state, action) => {
+  const newErrors = removeErrorFromStateErrors(state.errors, action.damageTypeId);
+
+  return {
+    ...state,
+    errors: newErrors,
+    sharedDamageTypes: state.sharedDamageTypes.filter(item => item._id !== action.damageTypeId),
+    homebrewDamageTypes: state.homebrewDamageTypes.filter(item => item._id !== action.damageTypeId)
+  }
+}
+
 const damageTypeOperationFailed = (state, action) => {
   const damageTypeId = action.damageTypeId || 'ADD';
   return {
@@ -106,22 +101,9 @@ const damageTypeOperationFailed = (state, action) => {
 };
 
 const removeError = (state, action) => {
-  let newErrors;
-  const errorId = action.damageTypeId || 'ADD';
-  if (state.errors[errorId] != null) {
-    console.log('gonna remove error', state.errors[errorId], errorId);
-    newErrors = { ...state.errors };
-    delete newErrors[errorId];
-    if (newErrors == null) {
-      newErrors = {};
-    }
-  } else {
-    newErrors = state.errors;
-  }
-
   return {
     ...state,
-    errors: newErrors
+    errors: removeErrorFromStateErrors(state.errors, action.damageTypeId)
   };
 };
 
@@ -148,5 +130,21 @@ const fetchDamageTypesFailed = (state, action) => {
     error: action.error
   };
 };
+
+
+const removeErrorFromStateErrors = (errors, damageTypeId) => {
+  let newErrors;
+  const errorId = damageTypeId || 'ADD';
+  if (errors[errorId] != null) {
+    newErrors = { ...errors };
+    delete newErrors[errorId];
+    if (newErrors == null) {
+      newErrors = {};
+    }
+  } else {
+    newErrors = errors;
+  }
+  return newErrors;
+}
 
 export default damageTypesReducer;

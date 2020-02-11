@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import * as actions from '../../../store/actions/index';
 import classes from './Register.module.css';
 import ErrorType from '../../../util/error';
-import Input from '../../UI/Form/Input/Input';
+import FormikInput from '../../UI/Form/FormikInput/FormikInput';
 
 const Register = props => {
   const [redirectPath, setRedirectPath] = useState('/');
@@ -87,7 +87,7 @@ const Register = props => {
             type="text"
             placeholder="Username"
             serverError={props.error}
-            component={Input}
+            component={FormikInput}
           />
 
           <Field
@@ -95,7 +95,7 @@ const Register = props => {
             type="text"
             placeholder="E-mail"
             serverError={props.error}
-            component={Input}
+            component={FormikInput}
           />
 
           <Field
@@ -103,14 +103,14 @@ const Register = props => {
             type="password"
             placeholder="Password"
             serverError={props.error}
-            component={Input}
+            component={FormikInput}
           />
 
           <Field
             name="confirmPassword"
             type="password"
             placeholder="Confirm password"
-            component={Input}
+            component={FormikInput}
           />
 
           <label>

@@ -136,6 +136,27 @@ router.put(
 );
 
 /**
+ * Delete damage type
+ * http://localhost:3001/damageTypes/damageType/:damageTypeId DELETE
+ * 
+ * ==Response==
+ * Success:
+ * status: 200
+ * message: 'Damage type deleted'
+ * 
+ * Failure:
+ * status: 404
+ * message: 'Page not found'
+ * 
+ * status: 403
+ * message: 'Not authorized'
+ * 
+ * status: 401
+ * message: 'Not authenticated'
+ */
+router.delete('/damageType/:damageTypeId', isAuth, damageTypeController.deleteDamageType);
+
+/**
  * Get all shared (not homebrew) damage types
  * http://localhost:3001/damageTypes/shared GET
  * 

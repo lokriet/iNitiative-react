@@ -1,0 +1,37 @@
+.AddDamageType {
+  padding-bottom: 2rem;
+  margin: 2rem auto;
+  border-bottom: 2px solid #aaa;
+  width: 15rem;
+}
+
+.Input {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid transparent;
+  border-bottom-color: #ccc;
+}
+
+.Input:hover,
+.Input:focus {
+  border-color: #ccc;
+  border-radius: 4px;
+}
+
+.Button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.AddIcon {
+  color: #ccc;
+  margin-right: 0.5rem;
+}
+
+.Button:hover .AddIcon {
+  color: #aaa;
+}
+
+.Error {
+  color: #791010;
+}

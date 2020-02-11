@@ -4,6 +4,7 @@ import { connect, useDispatch } from 'react-redux';
 
 import * as actions from '../../../store/actions/index';
 import DamageType from './DamageType/DamageType';
+import AddDamageType from './AddDamageType/AddDamageType';
 
 const DamageTypes = props => {
   const dispatch = useDispatch();
@@ -24,6 +25,20 @@ const DamageTypes = props => {
     [allDamageTypes]
   );
 
+  const handleAddDamageType = useCallback(
+    (name, setSubmitting) => {
+      dispatch(
+        actions.addDamageType(
+          { name },
+          props.isHomebrew,
+          props.token,
+          setSubmitting
+        )
+      );
+    },
+    [dispatch, props.isHomebrew, props.token]
+  );
+
   const handleUpdateDamageType = useCallback(
     (_id, name, setSubmitting) => {
       dispatch(
@@ -38,14 +53,33 @@ const DamageTypes = props => {
     [dispatch, props.isHomebrew, props.token]
   );
 
+  const handleDeleteDamageType = useCallback(
+    damageTypeId => {
+      dispatch(actions.deleteDamageType(damageTypeId, props.token));
+    },
+    [dispatch, props.token]
+  );
+
+  const handleCancelAddingDamageType = useCallback(() => {
+    dispatch(actions.removeError(null));
+  }, [dispatch]);
+
   return (
     <div>
+      <AddDamageType
+        onValidateName={validateName}
+        onSave={handleAddDamageType}
+        onCancel={handleCancelAddingDamageType}
+        serverError={props.errors.ADD}
+      />
+
       {allDamageTypes.map(damageType => (
         <DamageType
           key={damageType._id}
           damageType={damageType}
           onSave={handleUpdateDamageType}
           onValidateName={validateName}
+          onDelete={handleDeleteDamageType}
           serverError={props.errors[damageType._id]}
         />
       ))}
