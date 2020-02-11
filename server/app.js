@@ -7,12 +7,13 @@ const http = require('http');
 
 const database = require('./database');
 const connectionUtils = require('./util/connectionUtils');
+const httpErrors = require('./util/httpErrors');
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 
-const responseCodes = require('./controllers/response-codes');
+const responseCodes = require('./util/responseCodes');
 
 const app = express();
 
@@ -48,7 +49,7 @@ app.use('/users', usersRouter);
 
 
 app.use(function(req, res, next) {
-  // TODO 404
+  throw httpErrors.pageNotFoundError();
 });
 
 // error handler

@@ -22,7 +22,7 @@ const Login = props => {
     formValues => {
       console.log('submitting form', formValues);
       dispatch(
-        actions.login({
+        actions.authenticate(false, {
           email: formValues.email,
           password: formValues.password,
           rememberMe: formValues.rememberMe
@@ -63,43 +63,41 @@ const Login = props => {
           submitHandler(values, setSubmitting)
         }
       >
-        {formProps => (
-          <Form className={classes.LoginForm}>
-            <Field
-              name="email"
-              type="text"
-              placeholder="E-mail"
-              autoComplete="username"
-              serverError={props.error}
-              component={Input}
-            />
+        <Form className={classes.LoginForm}>
+          <Field
+            name="email"
+            type="text"
+            placeholder="E-mail"
+            autoComplete="username"
+            serverError={props.error}
+            component={Input}
+          />
 
-            <Field
-              name="password"
-              type="password"
-              placeholder="Password"
-              autoComplete="current-password"
-              serverError={props.error}
-              component={Input}
-            />
+          <Field
+            name="password"
+            type="password"
+            placeholder="Password"
+            autoComplete="current-password"
+            serverError={props.error}
+            component={Input}
+          />
 
-            <label>
-              <Field name="rememberMe" type="checkbox" />
-              Remember me
-            </label>
+          <label>
+            <Field name="rememberMe" type="checkbox" />
+            Remember me
+          </label>
 
-            {operationErrorMessage}
+          {operationErrorMessage}
 
-            <button type="submit" disabled={props.loading}>
-              Login
-            </button>
+          <button type="submit" disabled={props.loading}>
+            Login
+          </button>
 
-            <div>
-              Don't have an account?
-              <Link to={'/register'}>{'Register'}</Link>
-            </div>
-          </Form>
-        )}
+          <div>
+            Don't have an account?
+            <Link to={'/register'}>{'Register'}</Link>
+          </div>
+        </Form>
       </Formik>
     );
   }

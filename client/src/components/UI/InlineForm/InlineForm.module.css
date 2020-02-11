@@ -1,0 +1,20 @@
+.InlineForm {
+  border-bottom: 1px solid #ccc;
+  padding: 1rem;
+}
+
+.InlineForm.Active {
+  background-color: #ccc;
+}
+
+.Fields {
+  display: flex;
+}
+
+.Fields>* {
+  margin-right: 1rem;
+}
+
+.Fields>*:last-child {
+  margin-right: 0;
+}

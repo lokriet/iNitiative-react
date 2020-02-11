@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import {ErrorMessage} from 'formik';
 import ServerValidationError from '../ServerValidationError/ServerValidationError';
 import classes from './Input.module.css';
@@ -10,11 +10,11 @@ const Input =  ({
 })  => {
   const {serverError, ...htmlProps} = {...props}
   return (
-    <Fragment>
+    <div className={classes.InputContainer}>
       <input className={classes.Input} {...htmlProps}  {...field}  />
       <ErrorMessage name={field.name} />
       {serverError ? <ServerValidationError for={field.name} serverError={serverError} /> : null }
-    </Fragment>
+    </div>
   );
 };
 

@@ -7,21 +7,27 @@ import * as actions from '../actions/index';
 // import createHistory from 'history/createBrowserHistory';
 // const history = createHistory();
 
-export function* registerSaga(action) {
+export function* authSaga(action) {
   console.log("I'm in saga!");
   yield put(actions.authStart());
 
   try {
-    const response = yield fetch('http://localhost:3001/auth/signup', {
+    const url = action.isRegister ? 'http://localhost:3001/auth/signup' : 'http://localhost:3001/auth/signin';
+
+    const body = {
+      email: action.payload.email,
+      password: action.payload.password
+    }
+    if (action.isRegister) {
+      body.username = action.payload.username;
+    }
+
+    const response = yield fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        username: action.payload.username,
-        email: action.payload.email,
-        password: action.payload.password
-      })
+      body: JSON.stringify(body)
     });
 
     console.log(response);
@@ -29,103 +35,33 @@ export function* registerSaga(action) {
     const responseData = yield response.json();
     console.log(responseData);
 
-    if (response.status === 201 || response.status === 422) {
-      if (responseData.statusCode === 422) {
-        yield put(
-          actions.authFailed({
-            type: ErrorType.VALIDATION_ERROR,
-            data: responseData.data
-          })
-        );
-      } else if (responseData.statusCode === 201) {
-        if (action.payload.rememberMe) {
-          yield localStorage.setItem('token', responseData.data.token);
-        } else {
-          yield localStorage.removeItem('token');
-        }
-        yield put(actions.authSuccess(responseData.data));
-      }
-    } else {
+    if (response.status === 500 || response.status === 401) {
       yield put(
         actions.authFailed({
-          type: ErrorType.INTERNAL_ERROR,
+          type: ErrorType[response.status],
           message: responseData.message
         })
       );
+    } else if (response.status === 422) {
+      yield put(
+        actions.authFailed({
+          type: ErrorType[response.status],
+          data: responseData.data
+        })
+      );
+    } else if (response.status === 200 || response.status === 201) {
+      if (action.payload.rememberMe) {
+        yield localStorage.setItem('token', responseData.data.token);
+      } else {
+        yield localStorage.removeItem('token');
+      }
+      yield put(actions.authSuccess(responseData.data));
     }
   } catch (error) {
     console.log(error);
     yield put(
       actions.authFailed({
-        type: ErrorType.INTERNAL_ERROR,
-        message:
-          'Internal server error occured while authenticating. Please try again.'
-      })
-    );
-  }
-}
-
-export function* loginSaga(action) {
-  console.log("I'm in saga!");
-  yield put(actions.authStart());
-
-  try {
-    const response = yield fetch('http://localhost:3001/auth/signin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: action.payload.email,
-        password: action.payload.password
-      })
-    });
-
-    console.log(response);
-
-    const responseData = yield response.json();
-    console.log(responseData);
-
-    if (
-      response.status === 200 ||
-      response.status === 422 ||
-      response.status === 401
-    ) {
-      if (responseData.statusCode === 422) {
-        yield put(
-          actions.authFailed({
-            type: ErrorType.VALIDATION_ERROR,
-            data: responseData.data
-          })
-        );
-      } else if (responseData.statusCode === 401) {
-        yield put(
-          actions.authFailed({
-            type: ErrorType.AUTHENTICATION_FAILED,
-            message: responseData.message
-          })
-        );
-      } else if (responseData.statusCode === 200) {
-        if (action.payload.rememberMe) {
-          yield localStorage.setItem('token', responseData.data.token);
-        } else {
-          yield localStorage.removeItem('token');
-        }
-        yield put(actions.authSuccess(responseData.data));
-      }
-    } else {
-      yield put(
-        actions.authFailed({
-          type: ErrorType.INTERNAL_ERROR,
-          message: responseData.message
-        })
-      );
-    }
-  } catch (error) {
-    console.log(error);
-    yield put(
-      actions.authFailed({
-        type: ErrorType.INTERNAL_ERROR,
+        type: ErrorType.INTERNAL_CLIENT_ERROR,
         message:
           'Internal server error occured while authenticating. Please try again.'
       })

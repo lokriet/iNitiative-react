@@ -1,6 +1,5 @@
 export const AuthActionTypes = {
-  REGISTER: 'REGISTER',
-  LOGIN: 'LOGIN',
+  AUTHENTICATE: 'AUTHENTICATE',
   AUTH_START: 'AUTH_START',
   AUTH_SUCCESS: 'AUTH_SUCCESS',
   AUTH_FAILED: 'AUTH_FAILED',
@@ -13,17 +12,10 @@ export const AuthActionTypes = {
   SET_AUTH_REDIRECT_PATH: 'SET_AUTH_REDIRECT_PATH'
 };
 
-
-export const register = payload => {
+export const authenticate = (isRegister, payload) => {
   return {
-    type: AuthActionTypes.REGISTER,
-    payload
-  };
-};
-
-export const login = payload => {
-  return {
-    type: AuthActionTypes.LOGIN,
+    type: AuthActionTypes.AUTHENTICATE,
+    isRegister,
     payload
   };
 };

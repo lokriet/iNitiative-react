@@ -10,7 +10,7 @@ import * as actions from './store/actions';
 import Admin from './components/Admin/Admin';
 import Logout from './components/Auth/Logout/Logout';
 import PageNotFound from './components/PageNotFound/PageNotFound';
-import { Spinner } from './components/UI/Spinner/Spinner';
+import Spinner from './components/UI/Spinner/Spinner';
 
 const App = props => {
   const dispatch = useDispatch();

@@ -13,7 +13,7 @@ const ServerValidationError = props => {
   ) {
     const myErrors = props.serverError.data.filter(
       error => error.param === props.for
-    );
+      );
     if (myErrors.length > 0) {
       errors = (
         <Fragment>

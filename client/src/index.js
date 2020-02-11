@@ -9,6 +9,8 @@ import createSagaMiddleware from 'redux-saga';
 import { Provider } from 'react-redux';
 import { watchAll } from './store/sagas';
 import authReducer from './store/reducers/auth';
+import thunk from 'redux-thunk';
+import damageTypesReducer from './store/reducers/damageType';
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
@@ -16,14 +18,15 @@ const composeEnhancers =
     : compose;
 
 const rootReducer = combineReducers({
-  auth: authReducer
+  auth: authReducer,
+  damageTypes: damageTypesReducer
 });
 
 const sagaMiddleware = createSagaMiddleware();
 
 const store = createStore(
   rootReducer,
-  composeEnhancers(applyMiddleware(sagaMiddleware))
+  composeEnhancers(applyMiddleware(sagaMiddleware, thunk))
 );
 
 sagaMiddleware.run(watchAll);

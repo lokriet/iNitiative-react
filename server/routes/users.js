@@ -5,8 +5,10 @@ const isAuth = require('../middleware/auth');
 
 
 /**
- * Get logged in user info
+ * http://localhost:3001/users/userinfo GET 
  * 
+ * Get logged in user info
+ *  
  * ==Response==
  * Success:
  * status: 200

@@ -21,7 +21,7 @@ const Register = props => {
   const submitHandler = useCallback(
     formValues => {
       dispatch(
-        actions.register({
+        actions.authenticate(true, {
           username: formValues.username,
           email: formValues.email,
           password: formValues.password,
@@ -81,56 +81,54 @@ const Register = props => {
           submitHandler(values, setSubmitting)
         }
       >
-        {formProps => (
-          <Form className={classes.RegisterForm}>
-            <Field
-              name="username"
-              type="text"
-              placeholder="Username"
-              serverError={props.error}
-              component={Input}
-            />
+        <Form className={classes.RegisterForm}>
+          <Field
+            name="username"
+            type="text"
+            placeholder="Username"
+            serverError={props.error}
+            component={Input}
+          />
 
-            <Field
-              name="email"
-              type="text"
-              placeholder="E-mail"
-              serverError={props.error}
-              component={Input}
-            />
+          <Field
+            name="email"
+            type="text"
+            placeholder="E-mail"
+            serverError={props.error}
+            component={Input}
+          />
 
-            <Field
-              name="password"
-              type="password"
-              placeholder="Password"
-              serverError={props.error}
-              component={Input}
-            />
+          <Field
+            name="password"
+            type="password"
+            placeholder="Password"
+            serverError={props.error}
+            component={Input}
+          />
 
-            <Field
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirm password"
-              component={Input}
-            />
+          <Field
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirm password"
+            component={Input}
+          />
 
-            <label>
-              <Field name="rememberMe" type="checkbox" />
-              Remember me
-            </label>
+          <label>
+            <Field name="rememberMe" type="checkbox" />
+            Remember me
+          </label>
 
-            {operationErrorMessage}
+          {operationErrorMessage}
 
-            <button type="submit" disabled={props.loading}>
-              Register
-            </button>
+          <button type="submit" disabled={props.loading}>
+            Register
+          </button>
 
-            <div>
-              Already have an account?
-              <Link to="/login">Login</Link>
-            </div>
-          </Form>
-        )}
+          <div>
+            Already have an account?
+            <Link to="/login">Login</Link>
+          </div>
+        </Form>
       </Formik>
     );
   }

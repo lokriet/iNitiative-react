@@ -1,11 +1,10 @@
 const jwtUtils = require('../util/jwtUtils');
+const httpErrors = require('../util/httpErrors');
 
 module.exports = (req, res, next) => {
   const header = req.get('Authorization');
   if (!header) {
-    const err = new Error('Not authenticated');
-    err.statusCode = 401;
-    throw err;
+    throw httpErrors.notAuthenticatedError();
   }
 
   const token = header.split(' ')[1]; // value after 'Bearer '
@@ -13,15 +12,12 @@ module.exports = (req, res, next) => {
   try {
     const isValid = jwtUtils.validateJWT(token);
     if (!isValid) {
-      const err = new Error('Not authenticated');
-      err.statusCode = 401;
-      throw err;
+      throw httpErrors.notAuthenticatedError();
     }
 
     decodedToken = jwtUtils.decodeJWT(token);
     req.userId = decodedToken.userId;
   } catch (err) {
-    err.statusCode = 500;
     throw err;
   }
 

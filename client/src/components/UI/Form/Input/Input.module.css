@@ -1,3 +1,9 @@
+.InputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .Input {
   padding: 0.5rem 1rem;
   margin: 0.25rem 0;
