@@ -1,0 +1,16 @@
+.AddButton {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.AddIcon {
+  color: #ccc;
+  margin-right: 0.5rem;
+}
+
+.AddButton:hover .AddIcon,
+.AddButton:active .AddIcon,
+.AddButton:focus .AddIcon {
+  color: #aaa;
+}

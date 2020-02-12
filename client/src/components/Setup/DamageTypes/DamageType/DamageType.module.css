@@ -1,40 +1,17 @@
 .DamageType {
-  width: 15rem;
+  width: 20rem;
   margin: 1rem auto;
+  padding-left: 2rem;
 }
 
 .InputRow {
   position: relative;
+  display: flex;
 }
 
-.Input {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid transparent;
-  border-bottom-color: #ccc;
-}
-
-.Input:hover,
-.Input:focus {
-  border-color: #ccc;
-  border-radius: 4px;
-}
-
-.Button {
-  margin-left: 1rem;
-  background-color: transparent;
-  border: none;
-  font-weight: bold;
-  color: #ccc;
-  cursor: pointer;
-}
-
-.Button:hover,
-.Button:active {
-  color: #aaa;
-}
-
-.Error {
-  color: #791010;
+.Placeholder {
+  width: 2rem;
+  height: 1px;
 }
 
 .SavedBadge {

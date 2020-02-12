@@ -1,34 +1,37 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import ServerValidationError from '../../../UI/ServerValidationError/ServerValidationError';
-import ServerError from '../../../UI/ServerError/ServerError';
-import classes from './DamageType.module.css';
 import { CSSTransition } from 'react-transition-group';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
+import { faTimes, faUndoAlt } from '@fortawesome/free-solid-svg-icons';
+
+import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
+import ServerError from '../../../UI/Errors/ServerError/ServerError';
+import Error from '../../../UI/Errors/Error/Error';
+import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
+import IconButton from '../../../UI/Form/IconButton/IconButton';
+
+import classes from './DamageType.module.css';
 
 const DamageType = ({
   damageType,
   onSave,
   onDelete,
+  onCancel,
   onValidateName,
   serverError
 }) => {
   const [isNameValid, setIsNameValid] = useState(true);
   const [showSavedBadge, setShowSavedBadge] = useState(false);
+  const [showCancelButton, setShowCancelButton] = useState(false);
+
+  const nameRef = useRef();
 
   const setSubmitting = useCallback(submitting => {
     setShowSavedBadge(true);
     setTimeout(() => {
       setShowSavedBadge(false);
     }, 2000);
-  }, []);
-
-  const handleKeyPress = useCallback(event => {
-    if (event.key === 'Enter') {
-      event.target.blur();
-    }
   }, []);
 
   const handleBlur = useCallback(
@@ -46,24 +49,49 @@ const DamageType = ({
     [damageType, setSubmitting, onSave, onValidateName]
   );
 
+  const handleCancel = useCallback(() => {
+    nameRef.current.value = damageType.name;
+    setIsNameValid(true);
+    onCancel(damageType._id);
+  }, [damageType, onCancel]);
+
+  const handleKeyDown = useCallback(event => {
+    if (event.keyCode === 13) {
+      // enter
+      event.target.blur();
+    } else if (event.keyCode === 27) {
+      // escape
+      handleCancel();
+      event.target.blur();
+    }
+  }, [handleCancel]);
+
+  useEffect(() => {
+    if (serverError || !isNameValid) {
+      setShowCancelButton(true);
+    } else {
+      setShowCancelButton(false);
+    }
+  }, [serverError, isNameValid]);
+
   return (
     <div className={classes.DamageType}>
       <div className={classes.InputRow}>
-        <input
+        <InlineInput
           type="text"
           name="name"
           defaultValue={damageType ? damageType.name : ''}
-          className={classes.Input}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           onBlur={handleBlur}
+          ref={nameRef}
         />
-        <button
-          type="button"
-          className={classes.Button}
-          onClick={() => onDelete(damageType._id)}
-        >
-          <FontAwesomeIcon icon={faTimes}></FontAwesomeIcon>
-        </button>
+        <IconButton onClick={() => onDelete(damageType._id)} icon={faTimes} />
+
+        {showCancelButton ? (
+          <IconButton onClick={handleCancel} icon={faUndoAlt} />
+        ) : (
+          <div className={classes.Placeholder}></div>
+        )}
 
         <CSSTransition
           timeout={500}
@@ -79,9 +107,7 @@ const DamageType = ({
           <span className={classes.SavedBadge}>Saved</span>
         </CSSTransition>
       </div>
-      {isNameValid ? null : (
-        <div className={classes.Error}>Damage type already exists</div>
-      )}
+      {isNameValid ? null : <Error>Damage type already exists</Error>}
       {serverError ? <ServerValidationError serverError={serverError} /> : null}
       {serverError ? <ServerError serverError={serverError} /> : null}
     </div>
@@ -92,6 +118,7 @@ DamageType.propTypes = {
   damageType: PropTypes.object,
   onSave: PropTypes.func,
   onDelete: PropTypes.func,
+  onCancel: PropTypes.func,
   onValidateName: PropTypes.func,
   serverError: PropTypes.object
 };

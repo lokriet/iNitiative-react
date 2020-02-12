@@ -1,11 +1,13 @@
 import React, { useState, useCallback, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
-import ServerValidationError from '../../../UI/ServerValidationError/ServerValidationError';
-import ServerError from '../../../UI/ServerError/ServerError';
+import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
+import ServerError from '../../../UI/Errors/ServerError/ServerError';
+import Error from '../../../UI/Errors/Error/Error';
+import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
+
 import classes from './AddDamageType.module.css';
+import { AddButton } from '../../../UI/Form/AddButton/AddButton';
 
 const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
   const [adding, setAdding] = useState(false);
@@ -21,7 +23,8 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
 
   const handleKeyDown = useCallback(
     event => {
-      if (event.keyCode === 13) { // enter
+      if (event.keyCode === 13) {
+        // enter
         const value = event.target.value;
         if (value !== '') {
           if (onValidateName(null, value)) {
@@ -31,10 +34,11 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
             setIsNameValid(false);
           }
         }
-      } else if (event.keyCode === 27) { //esc
+      } else if (event.keyCode === 27) {
+        //esc
         setAdding(false);
         setIsNameValid(true);
-        onCancel();
+        onCancel(null);
       }
     },
     [onValidateName, onSave, setSubmitting, onCancel]
@@ -45,31 +49,21 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
       {adding ? (
         <Fragment>
           <div>
-            <input
+            <InlineInput
               type="text"
-              className={classes.Input}
               onKeyDown={handleKeyDown}
               defaultValue=""
               ref={inputRef => inputRef && inputRef.focus()}
             />
           </div>
-          {isNameValid ? null : (
-            <div className={classes.Error}>Damage type already exists</div>
-          )}
+          {isNameValid ? null : <Error>Damage type already exists</Error>}
           {serverError ? (
             <ServerValidationError serverError={serverError} />
           ) : null}
           {serverError ? <ServerError serverError={serverError} /> : null}
         </Fragment>
       ) : (
-        <button
-          type="button"
-          className={classes.Button}
-          onClick={startAddingHandler}
-        >
-          <FontAwesomeIcon icon={faPlus} className={classes.AddIcon} />
-          Add new
-        </button>
+        <AddButton onClick={startAddingHandler} />
       )}
     </div>
   );

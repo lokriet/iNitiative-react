@@ -60,8 +60,8 @@ const DamageTypes = props => {
     [dispatch, props.token]
   );
 
-  const handleCancelAddingDamageType = useCallback(() => {
-    dispatch(actions.removeError(null));
+  const handleCancelChangingDamageType = useCallback((damageTypeId) => {
+    dispatch(actions.removeError(damageTypeId));
   }, [dispatch]);
 
   return (
@@ -69,7 +69,7 @@ const DamageTypes = props => {
       <AddDamageType
         onValidateName={validateName}
         onSave={handleAddDamageType}
-        onCancel={handleCancelAddingDamageType}
+        onCancel={handleCancelChangingDamageType}
         serverError={props.errors.ADD}
       />
 
@@ -80,6 +80,7 @@ const DamageTypes = props => {
           onSave={handleUpdateDamageType}
           onValidateName={validateName}
           onDelete={handleDeleteDamageType}
+          onCancel={handleCancelChangingDamageType}
           serverError={props.errors[damageType._id]}
         />
       ))}
