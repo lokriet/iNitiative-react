@@ -1,9 +1,9 @@
 .FilterInput {
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0;
   border: 1px solid #aaa;
   border-radius: 4px;
-  width: 15rem;
-  margin: 0 auto;
+  width: 16rem;
+  margin: 0 auto 2rem auto;
 }
 
 .Icon {

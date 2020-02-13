@@ -1,0 +1,71 @@
+.Feature {
+  width: 100%;
+}
+
+.InputFieldsRow {
+  width: 100%;
+}
+
+.Description {
+  min-width: 20rem;
+  flex-grow: 1;
+}
+
+.Name {
+  width: 12rem;
+}
+
+.Fish {
+  margin: 0 1rem;
+  color: #aaa;
+}
+
+:global .FeatureTypeContainer {
+  width: 12rem;
+}
+
+:global .FeatureTypeContainer .FeatureType__control {
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-bottom: 1px solid #ccc;
+  box-shadow: none;
+  outline: none;
+}
+
+:global .FeatureTypeContainer:hover .FeatureType__control,
+:global .FeatureTypeContainer:focus .FeatureType__control,
+:global .FeatureTypeContainer:active .FeatureType__control {
+  outline: none;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+:global .FeatureTypeContainer .FeatureType__indicators {
+  visibility: hidden;
+}
+
+:global .FeatureTypeContainer:hover .FeatureType__indicators,
+:global .FeatureTypeContainer:focus .FeatureType__indicators,
+:global .FeatureTypeContainer:active .FeatureType__indicators {
+  visibility: visible;
+}
+
+:global .FeatureType__option.FeatureType__option--is-selected {
+  background-color: #999;
+  color: white;
+}
+
+:global .FeatureType__option.FeatureType__option--is-focused {
+  background-color: #eee;
+  color: black;
+}
+
+:global .FeatureType__indicator.FeatureType__clear-indicator,
+:global .FeatureType__indicator.FeatureType__dropdown-indicator {
+  color: #ccc;
+}
+
+:global .FeatureType__indicator.FeatureType__clear-indicator:hover,
+:global .FeatureType__indicator.FeatureType__dropdown-indicator:hover {
+  color: #aaa;
+}

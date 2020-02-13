@@ -9,11 +9,13 @@ try {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
+  mongoose.set('useCreateIndex', true);
 } catch (err) {
   mongoose.createConnection(constants.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
+  mongoose.set('useCreateIndex', true);
 }
 mongoose.connection
   .once('open', () => console.log('MongoDB Running'))

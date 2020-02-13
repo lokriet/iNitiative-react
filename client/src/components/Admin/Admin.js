@@ -6,6 +6,7 @@ import TabbedNavigation from '../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
 import DamageTypes from '../Setup/DamageTypes/DamageTypes';
 import Conditions from '../Setup/Conditions/Conditions';
+import Features from '../Setup/Features/Features';
 
 const Admin = props => {
   useAuthCheck(props);
@@ -30,7 +31,7 @@ const Admin = props => {
           <Conditions isHomebrew={false} />
         </Route>
         <Route path={`${path}/features`}>
-          <div>I'll be features admin</div>
+          <Features isHomebrew={false} />
         </Route>
       </Switch>
     </Fragment>

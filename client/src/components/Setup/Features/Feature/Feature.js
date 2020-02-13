@@ -1,7 +1,14 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { faTimes, faCheck, faUndoAlt, faFish } from '@fortawesome/free-solid-svg-icons';
+import {
+  faTimes,
+  faCheck,
+  faUndoAlt,
+  faFish
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import CreatableSelect from 'react-select/creatable';
+import { connect } from 'react-redux';
 
 import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
 import IconButton from '../../../UI/Form/IconButton/IconButton';
@@ -9,15 +16,14 @@ import ServerValidationError from '../../../UI/Errors/ServerValidationError/Serv
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
 import SavedBadge from '../../../UI/SavedBadge/SavedBadge';
-
-import classes from './Condition.module.css';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import * as actions from '../../../../store/actions/index';
-import { connect } from 'react-redux';
 
-class Condition extends Component {
+import classes from './Feature.module.css';
+
+class Feature extends Component {
   static propTypes = {
-    condition: PropTypes.object,
+    feature: PropTypes.object,
     serverError: PropTypes.object,
     onValidateName: PropTypes.func,
     onSave: PropTypes.func,
@@ -26,19 +32,23 @@ class Condition extends Component {
   };
 
   state = {
-    nameValue: this.props.condition.name,
-    descriptionValue: this.props.condition.description,
+    nameValue: this.props.feature.name,
+    descriptionValue: this.props.feature.description,
+    typeValue:
+      this.props.feature.type == null || this.props.feature.type.length === 0
+        ? null
+        : { label: this.props.feature.type, value: this.props.feature.type },
     nameError: null,
     showSavedBadge: false,
     showSaveButtons: false
   };
 
   componentDidMount() {
-    this.props.registerSaveCallback(this.props.condition._id, this.handleSave);
+    this.props.registerSaveCallback(this.props.feature._id, this.handleSave);
   }
 
   componentWillUnmount() {
-    this.props.unregisterSaveCallback(this.props.condition._id);
+    this.props.unregisterSaveCallback(this.props.feature._id);
   }
 
   setSubmitted = success => {
@@ -51,12 +61,17 @@ class Condition extends Component {
     this.setState({ showSavedBadge: false });
   };
 
+  getTypeValueValue = typeValue => {
+    return typeValue == null ? null : typeValue.value;
+  };
+
   handleNameChanged = event => {
     this.setState({ nameValue: event.target.value });
 
     if (
-      event.target.value !== this.props.condition.name ||
-      this.state.descriptionValue !== this.props.condition.description
+      event.target.value !== this.props.feature.name ||
+      this.state.descriptionValue !== this.props.feature.description ||
+      this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
     ) {
       this.setState({ showSaveButtons: true });
     } else if (!this.props.serverError) {
@@ -68,8 +83,24 @@ class Condition extends Component {
     this.setState({ descriptionValue: event.target.value });
 
     if (
-      this.state.nameValue !== this.props.condition.name ||
-      event.target.value !== this.props.condition.description
+      this.state.nameValue !== this.props.feature.name ||
+      event.target.value !== this.props.feature.description ||
+      this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
+    ) {
+      this.setState({ showSaveButtons: true });
+    } else {
+      this.setState({ showSaveButtons: false });
+    }
+  };
+
+  handleTypeChanged = (newValue, action) => {
+    console.log('type changed... :(', newValue, action);
+    this.setState({ typeValue: newValue });
+
+    if (
+      this.state.nameValue !== this.props.feature.name ||
+      this.state.descriptionValue !== this.props.feature.description ||
+      this.getTypeValueValue(newValue) !== this.props.feature.type
     ) {
       this.setState({ showSaveButtons: true });
     } else {
@@ -87,18 +118,19 @@ class Condition extends Component {
       return;
     }
     if (
-      !this.props.onValidateName(this.props.condition._id, this.state.nameValue)
+      !this.props.onValidateName(this.props.feature._id, this.state.nameValue)
     ) {
-      this.setState({ nameError: 'Condition already exists' });
+      this.setState({ nameError: 'Feature already exists' });
       return;
     }
 
     this.setState({ nameError: null });
     this.props.onSave(
       {
-        _id: this.props.condition._id,
+        _id: this.props.feature._id,
         name: this.state.nameValue,
-        description: this.state.descriptionValue
+        description: this.state.descriptionValue,
+        type: this.getTypeValueValue(this.state.typeValue)
       },
       this.setSubmitted
     );
@@ -108,17 +140,36 @@ class Condition extends Component {
     this.setState({
       nameError: null,
       showSaveButtons: false,
-      nameValue: this.props.condition.name,
-      descriptionValue: this.props.condition.description
+      nameValue: this.props.feature.name,
+      typeValue:
+        this.props.feature.type == null || this.props.feature.type.length === 0
+          ? null
+          : { label: this.props.feature.type, value: this.props.feature.type },
+      descriptionValue: this.props.feature.description
     });
 
-    this.props.onCancel(this.props.condition._id);
+    this.props.onCancel(this.props.feature._id);
   };
 
   render() {
+    const featureTypeOptions = this.props.featureTypes.map(item => ({
+      label: item,
+      value: item
+    }));
+
     return (
-      <div className={classes.Condition}>
+      <div className={classes.Feature}>
         <ItemsRow className={classes.InputFieldsRow}>
+          <CreatableSelect
+            options={featureTypeOptions}
+            onChange={this.handleTypeChanged}
+            isClearable={true}
+            placeholder="Type"
+            className="FeatureTypeContainer"
+            classNamePrefix="FeatureType"
+            value={this.state.typeValue}
+          />
+
           <InlineInput
             type="text"
             name="name"
@@ -136,7 +187,7 @@ class Condition extends Component {
           />
           <IconButton
             icon={faTimes}
-            onClick={() => this.props.onDelete(this.props.condition._id)}
+            onClick={() => this.props.onDelete(this.props.feature._id)}
           />
           {this.state.showSaveButtons ? (
             <Fragment>
@@ -158,19 +209,38 @@ class Condition extends Component {
         ) : null}
 
         <br />
-        <FontAwesomeIcon icon={faFish} className={classes.Fish}></FontAwesomeIcon>
-        <FontAwesomeIcon icon={faFish} className={classes.Fish}></FontAwesomeIcon>
-        <FontAwesomeIcon icon={faFish} flip={'horizontal'} className={classes.Fish}></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          flip={'horizontal'}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          flip={'horizontal'}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
       </div>
     );
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    featureTypes: state.feature.featureTypes
+  };
+};
+
 const mapActionsToProps = dispatch => {
   return {
-    registerSaveCallback: (conditionId, callback) => dispatch(actions.registerSaveConditionCallback(conditionId, callback)),
-    unregisterSaveCallback: (conditionId) => dispatch(actions.unregisterSaveConditionCallback(conditionId))
-  }
-}
+    registerSaveCallback: (featureId, callback) =>
+      dispatch(actions.registerSaveFeatureCallback(featureId, callback)),
+    unregisterSaveCallback: featureId =>
+      dispatch(actions.unregisterSaveFeatureCallback(featureId))
+  };
+};
 
-export default connect(null, mapActionsToProps)(Condition);
+export default connect(mapStateToProps, mapActionsToProps)(Feature);

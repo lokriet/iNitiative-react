@@ -1,6 +1,6 @@
 import * as ActionTypes from '../actions/actionTypes';
 const initialState = {
-  errors: {}, // errors for individual condision operations. property keys are ids, for new one - ADD
+  errors: {}, // errors for individual condition operations. property keys are ids, for new one - ADD
   error: null, // error for collective conditions operations
   fetching: false,
   sharedConditions: [],
@@ -22,8 +22,8 @@ const conditionsReducer = (state = initialState, action) => {
     case ActionTypes.condition.CONDITION_OPERATION_FAILED:
       return conditionOperationFailed(state, action);
 
-    case ActionTypes.condition.REMOVE_ERROR:
-      return removeError(state, action);
+    case ActionTypes.condition.REMOVE_CONDITION_ERROR:
+      return removeConditionError(state, action);
 
     case ActionTypes.condition.START_FETCHING_CONDITIONS:
       return startFetchingConditions(state, action);
@@ -34,11 +34,11 @@ const conditionsReducer = (state = initialState, action) => {
     case ActionTypes.condition.FETCH_CONDITIONS_FAILED:
       return fetchConditionsFailed(state, action);
 
-    case ActionTypes.condition.REGISTER_SAVE_CALLBACK:
-      return registerSaveCallback(state, action);
+    case ActionTypes.condition.REGISTER_SAVE_CONDITION_CALLBACK:
+      return registerSaveConditionCallback(state, action);
 
-    case ActionTypes.condition.UNREGISTER_SAVE_CALLBACK:
-      return unregisterSaveCallback(state, action);
+    case ActionTypes.condition.UNREGISTER_SAVE_CONDITION_CALLBACK:
+      return unregisterSaveConditionCallback(state, action);
 
     default:
       return state;
@@ -126,7 +126,7 @@ const conditionOperationFailed = (state, action) => {
   };
 };
 
-const removeError = (state, action) => {
+const removeConditionError = (state, action) => {
   return {
     ...state,
     errors: removeErrorFromStateErrors(state.errors, action.conditionId)
@@ -172,7 +172,7 @@ const removeErrorFromStateErrors = (errors, conditionId) => {
   return newErrors;
 };
 
-const registerSaveCallback = (state, action) => {
+const registerSaveConditionCallback = (state, action) => {
   return {
     ...state,
     saveAllCallbacks: state.saveAllCallbacks.concat({
@@ -182,8 +182,8 @@ const registerSaveCallback = (state, action) => {
   };
 };
 
-const unregisterSaveCallback = (state, action) => {
-  return {
+const unregisterSaveConditionCallback = (state, action) => {
+  return  {
     ...state,
     saveAllCallbacks: state.saveAllCallbacks.filter(
       item => item.conditionId !== action.conditionId

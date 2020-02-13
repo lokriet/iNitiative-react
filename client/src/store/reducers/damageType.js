@@ -21,8 +21,8 @@ const damageTypesReducer = (state = initialState, action) => {
     case ActionTypes.damageType.DAMAGE_TYPE_OPERATION_FAILED:
       return damageTypeOperationFailed(state, action);
 
-    case ActionTypes.damageType.REMOVE_ERROR:
-      return removeError(state, action);
+    case ActionTypes.damageType.REMOVE_DAMAGE_TYPE_ERROR:
+      return removeDamageTypeError(state, action);
 
     case ActionTypes.damageType.START_FETCHING_DAMAGE_TYPES:
       return startFetchingDamageTypes(state, action);
@@ -100,7 +100,7 @@ const damageTypeOperationFailed = (state, action) => {
   };
 };
 
-const removeError = (state, action) => {
+const removeDamageTypeError = (state, action) => {
   return {
     ...state,
     errors: removeErrorFromStateErrors(state.errors, action.damageTypeId)

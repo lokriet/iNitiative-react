@@ -1,0 +1,65 @@
+.AddFeature {
+  padding-bottom: 2rem;
+  margin: 2rem auto;
+  border-bottom: 2px solid #aaa;
+  width: 40rem;
+  text-align: center;
+}
+
+:global .AddFeatureTypeContainer {
+  width: 12rem;
+}
+
+:global .AddFeatureTypeContainer .AddFeatureType__control {
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-bottom: 1px solid #ccc;
+  box-shadow: none;
+  outline: none;
+}
+
+:global .AddFeatureTypeContainer:hover .AddFeatureType__control,
+:global .AddFeatureTypeContainer:focus .AddFeatureType__control,
+:global .AddFeatureTypeContainer:active .AddFeatureType__control {
+  outline: none;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+:global .AddFeatureTypeContainer .AddFeatureType__indicators {
+  visibility: hidden;
+}
+
+:global .AddFeatureTypeContainer:hover .AddFeatureType__indicators,
+:global .AddFeatureTypeContainer:focus .AddFeatureType__indicators,
+:global .AddFeatureTypeContainer:active .AddFeatureType__indicators {
+  visibility: visible;
+}
+
+:global .AddFeatureType__option.AddFeatureType__option--is-selected {
+  background-color: #999;
+  color: white;
+}
+
+:global .AddFeatureType__option.AddFeatureType__option--is-focused {
+  background-color: #eee;
+  color: black;
+}
+
+:global .AddFeatureType__indicator.AddFeatureType__clear-indicator,
+:global .AddFeatureType__indicator.AddFeatureType__dropdown-indicator {
+  color: #ccc;
+}
+
+:global .AddFeatureType__indicator.AddFeatureType__clear-indicator:hover,
+:global .AddFeatureType__indicator.AddFeatureType__dropdown-indicator:hover {
+  color: #aaa;
+}
+
+.Name {
+  width: 12rem;
+}
+
+.Description {
+  width: 20rem;
+}

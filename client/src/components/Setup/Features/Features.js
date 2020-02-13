@@ -4,41 +4,41 @@ import { connect, useDispatch } from 'react-redux';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import * as actions from '../../../store/actions/index';
-import AddCondition from './AddCondition/AddCondition';
-import Condition from './Condition/Condition';
+import AddFeature from './AddFeature/AddFeature';
+import Feature from './Feature/Feature';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Spinner from '../../UI/Spinner/Spinner';
 import IconButton from '../../UI/Form/IconButton/IconButton';
 import FilterInput from '../../UI/FilterInput/FilterInput';
-import classes from './Conditions.module.css';
+import classes from './Features.module.css';
 
-const Conditions = props => {
+const Features = props => {
   const dispatch = useDispatch();
-  const allConditions = props.isHomebrew
-    ? props.homebrewConditions
-    : props.sharedConditions;
+  const allFeatures = props.isHomebrew
+    ? props.homebrewFeatures
+    : props.sharedFeatures;
 
-  const [filteredConditions, setFilteredConditions] = useState(allConditions);
+  const [filteredFeatures, setFilteredFeatures] = useState(allFeatures);
 
   useEffect(() => {
-    dispatch(actions.getSharedConditions());
+    dispatch(actions.getSharedFeatures());
   }, [dispatch]);
 
   const validateName = useCallback(
     (_id, name) => {
-      const result = !allConditions.some(
+      const result = !allFeatures.some(
         item => (_id == null || item._id !== _id) && item.name === name
       );
       return result;
     },
-    [allConditions]
+    [allFeatures]
   );
 
-  const handleAddCondition = useCallback(
-    (condition, setSubmitted) => {
+  const handleAddFeature = useCallback(
+    (feature, setSubmitted) => {
       dispatch(
-        actions.addCondition(
-          condition,
+        actions.addFeature(
+          feature,
           props.isHomebrew,
           props.token,
           setSubmitted
@@ -48,11 +48,11 @@ const Conditions = props => {
     [dispatch, props.isHomebrew, props.token]
   );
 
-  const handleUpdateCondition = useCallback(
-    (condition, setSubmitted) => {
+  const handleUpdateFeature = useCallback(
+    (feature, setSubmitted) => {
       dispatch(
-        actions.updateCondition(
-          condition,
+        actions.updateFeature(
+          feature,
           props.isHomebrew,
           props.token,
           setSubmitted
@@ -62,16 +62,16 @@ const Conditions = props => {
     [dispatch, props.isHomebrew, props.token]
   );
 
-  const handleDeleteCondition = useCallback(
-    conditionId => {
-      dispatch(actions.deleteCondition(conditionId, props.token));
+  const handleDeleteFeature = useCallback(
+    featureId => {
+      dispatch(actions.deleteFeature(featureId, props.token));
     },
     [dispatch, props.token]
   );
 
-  const handleCancelChangingCondition = useCallback(
-    conditionId => {
-      dispatch(actions.removeConditionError(conditionId));
+  const handleCancelChangingFeature = useCallback(
+    featureId => {
+      dispatch(actions.removeFeatureError(featureId));
     },
     [dispatch]
   );
@@ -82,7 +82,7 @@ const Conditions = props => {
 
   const handleItemsFiltered = useCallback(
     (filteredItems) => {
-      setFilteredConditions(filteredItems);
+      setFilteredFeatures(filteredItems);
     },
     [],
   )
@@ -94,55 +94,57 @@ const Conditions = props => {
     view = <ServerError serverError={props.fetchingError} />;
   } else {
     view = (
-      <div className={classes.Conditions}>
-        <AddCondition
+      <div className={classes.Features}>
+        <AddFeature
           serverError={props.errors.ADD}
           onValidateName={validateName}
-          onSave={handleAddCondition}
-          onCancel={handleCancelChangingCondition}
+          onSave={handleAddFeature}
+          onCancel={handleCancelChangingFeature}
         />
 
         <FilterInput
-          allItems={allConditions}
+          allItems={allFeatures}
           searchField='name'
           onItemsFiltered={handleItemsFiltered}
         />
 
-        {filteredConditions.map(condition => (
-          <Condition
-            key={condition._id}
-            condition={condition}
-            onSave={handleUpdateCondition}
+        {filteredFeatures.map(feature => (
+          <Feature
+            key={feature._id}
+            feature={feature}
+            onSave={handleUpdateFeature}
             onValidateName={validateName}
-            onDelete={handleDeleteCondition}
-            onCancel={handleCancelChangingCondition}
-            serverError={props.errors[condition._id]}
+            onDelete={handleDeleteFeature}
+            onCancel={handleCancelChangingFeature}
+            serverError={props.errors[feature._id]}
           />
         ))}
         <br />
         <IconButton icon={faCheck} onClick={handleSaveAll}>
           Save all
         </IconButton>
+        <br />
+        <br />
       </div>
     );
   }
   return view;
 };
 
-Conditions.propTypes = {
+Features.propTypes = {
   isHomebrew: PropTypes.bool
 };
 
 const mapStateToProps = state => {
   return {
-    homebrewConditions: state.condition.homebrewConditions,
-    sharedConditions: state.condition.sharedConditions,
-    errors: state.condition.errors,
-    fetchingError: state.condition.error,
-    fetching: state.condition.fetching,
-    saveAllCallbacks: state.condition.saveAllCallbacks,
+    homebrewFeatures: state.feature.homebrewFeatures,
+    sharedFeatures: state.feature.sharedFeatures,
+    errors: state.feature.errors,
+    fetchingError: state.feature.error,
+    fetching: state.feature.fetching,
+    saveAllCallbacks: state.feature.saveAllCallbacks,
     token: state.auth.token
   };
 };
 
-export default connect(mapStateToProps)(Conditions);
+export default connect(mapStateToProps)(Features);

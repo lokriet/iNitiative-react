@@ -1,37 +1,37 @@
 import ErrorType from '../../util/error';
 
-export const ConditionActionTypes = {
-  ADD_CONDITION_SUCCESS: 'ADD_CONDITION_SUCCESS',
-  UPDATE_CONDITION_SUCCESS: 'UPDATE_CONDITION_SUCCESS',
-  DELETE_CONDITION_SUCCESS: 'DELETE_CONDITION_SUCCESS',
-  CONDITION_OPERATION_FAILED: 'ADD_CONDITION_FAILED',
-  REMOVE_CONDITION_ERROR: 'REMOVE_CONDITION_ERROR',
+export const FeatureActionTypes = {
+  ADD_FEATURE_SUCCESS: 'ADD_FEATURE_SUCCESS',
+  UPDATE_FEATURE_SUCCESS: 'UPDATE_FEATURE_SUCCESS',
+  DELETE_FEATURE_SUCCESS: 'DELETE_FEATURE_SUCCESS',
+  FEATURE_OPERATION_FAILED: 'ADD_FEATURE_FAILED',
+  REMOVE_FEATURE_ERROR: 'REMOVE_FEATURE_ERROR',
 
-  START_FETCHING_CONDITIONS: 'START_FETCHING_CONDITIONS',
-  SET_SHARED_CONDITIONS: 'SET_SHARED_CONDITIONS',
-  FETCH_CONDITIONS_FAILED: 'FETCH_CONDITIONS_FAILED',
+  START_FETCHING_FEATURES: 'START_FETCHING_FEATURES',
+  SET_SHARED_FEATURES: 'SET_SHARED_FEATURES',
+  FETCH_FEATURES_FAILED: 'FETCH_FEATURES_FAILED',
 
-  REGISTER_SAVE_CONDITION_CALLBACK: 'REGISTER_SAVE_CONDITION_CALLBACK',
-  UNREGISTER_SAVE_CONDITION_CALLBACK: 'UNREGISTER_SAVE_CONDITION_CALLBACK'
+  REGISTER_SAVE_FEATURE_CALLBACK: 'REGISTER_SAVE_FEATURE_CALLBACK',
+  UNREGISTER_SAVE_FEATURE_CALLBACK: 'UNREGISTER_SAVE_FEATURE_CALLBACK'
 };
 
-export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
+export const addFeature = (feature, isHomebrew, token, setSubmitted) => {
   return async dispatch => {
     try {
       const response = await fetch(
-        'http://localhost:3001/conditions/condition',
+        'http://localhost:3001/features/feature',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ condition, isHomebrew })
+          body: JSON.stringify({ feature, isHomebrew })
         }
       );
 
       const responseData = await response.json();
-      console.log('got response for condition creation', responseData);
+      console.log('got response for feature creation', responseData);
 
       if (
         response.status === 500 ||
@@ -39,7 +39,7 @@ export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
         response.status === 403
       ) {
         dispatch(
-          conditionOperationFailed(null, {
+          featureOperationFailed(null, {
             type: ErrorType[response.status],
             message: responseData.message
           })
@@ -47,7 +47,7 @@ export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
         setSubmitted(false);
       } else if (response.status === 422) {
         dispatch(
-          conditionOperationFailed(null, {
+          featureOperationFailed(null, {
             type: ErrorType.VALIDATION_ERROR,
             data: responseData.data
           })
@@ -55,12 +55,12 @@ export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
         setSubmitted(false);
       } else if (response.status === 201) {
         console.log(responseData.data);
-        dispatch(addConditionSuccess(responseData.data));
+        dispatch(addFeatureSuccess(responseData.data));
         setSubmitted(true);
       } else {
         console.log('Unexpected response status');
         dispatch(
-          conditionOperationFailed(null, {
+          featureOperationFailed(null, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Internal error occured. Please try again.'
           })
@@ -69,7 +69,7 @@ export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
       }
     } catch (error) {
       dispatch(
-        conditionOperationFailed(null, {
+        featureOperationFailed(null, {
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Internal error occured. Please try again.'
         })
@@ -79,8 +79,8 @@ export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const updateCondition = (
-  condition,
+export const updateFeature = (
+  feature,
   isHomebrew,
   token,
   setSubmitted
@@ -88,14 +88,14 @@ export const updateCondition = (
   return async dispatch => {
     try {
       const response = await fetch(
-        `http://localhost:3001/conditions/condition/${condition._id}`,
+        `http://localhost:3001/features/feature/${feature._id}`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ condition, isHomebrew })
+          body: JSON.stringify({ feature, isHomebrew })
         }
       );
 
@@ -106,7 +106,7 @@ export const updateCondition = (
         response.status === 403
       ) {
         dispatch(
-          conditionOperationFailed(condition._id, {
+          featureOperationFailed(feature._id, {
             type: ErrorType[response.status],
             message: responseData.message
           })
@@ -114,7 +114,7 @@ export const updateCondition = (
         setSubmitted(false);
       } else if (response.status === 422) {
         dispatch(
-          conditionOperationFailed(condition._id, {
+          featureOperationFailed(feature._id, {
             type: ErrorType.VALIDATION_ERROR,
             data: responseData.data
           })
@@ -122,12 +122,12 @@ export const updateCondition = (
         setSubmitted(false);
       } else if (response.status === 200) {
         console.log(responseData);
-        dispatch(updateConditionSuccess(responseData.data));
+        dispatch(updateFeatureSuccess(responseData.data));
         setSubmitted(true);
       } else {
         console.log('Unexpected response status');
         dispatch(
-          conditionOperationFailed(condition._id, {
+          featureOperationFailed(feature._id, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Internal error occured. Please try again.'
           })
@@ -136,7 +136,7 @@ export const updateCondition = (
       }
     } catch (error) {
       dispatch(
-        conditionOperationFailed(condition._id, {
+        featureOperationFailed(feature._id, {
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Internal error occured. Please try again.'
         })
@@ -146,11 +146,11 @@ export const updateCondition = (
   };
 };
 
-export const deleteCondition = (conditionId, token) => {
+export const deleteFeature = (featureId, token) => {
   return async dispatch => {
     try {
       const response = await fetch(
-        `http://localhost:3001/conditions/condition/${conditionId}`,
+        `http://localhost:3001/features/feature/${featureId}`,
         {
           method: 'DELETE',
           headers: {
@@ -167,17 +167,17 @@ export const deleteCondition = (conditionId, token) => {
         response.status === 403
       ) {
         dispatch(
-          conditionOperationFailed(conditionId, {
+          featureOperationFailed(featureId, {
             type: ErrorType[response.status],
             message: responseData.message
           })
         );
       } else if (response.status === 200) {
-        dispatch(deleteConditionSuccess(conditionId));
+        dispatch(deleteFeatureSuccess(featureId));
       } else {
         console.log('Unexpected response status');
         dispatch(
-          conditionOperationFailed(conditionId, {
+          featureOperationFailed(featureId, {
             type: ErrorType.INTERNAL_CLIENT_ERROR,
             message: 'Internal error occured. Please try again.'
           })
@@ -185,7 +185,7 @@ export const deleteCondition = (conditionId, token) => {
       }
     } catch (error) {
       dispatch(
-        conditionOperationFailed(conditionId, {
+        featureOperationFailed(featureId, {
           type: ErrorType.INTERNAL_SERVER_ERROR,
           message: 'Internal error occured. Please try again.'
         })
@@ -194,100 +194,100 @@ export const deleteCondition = (conditionId, token) => {
   };
 };
 
-export const getSharedConditions = () => {
+export const getSharedFeatures = () => {
   return async dispatch => {
     try {
-      dispatch(startFetchingConditions());
-      const response = await fetch('http://localhost:3001/conditions/shared');
+      dispatch(startFetchingFeatures());
+      const response = await fetch('http://localhost:3001/features/shared');
       if (response.status === 200) {
-        const conditions = await response.json();
-        dispatch(setSharedConditions(conditions));
+        const features = await response.json();
+        dispatch(setSharedFeatures(features));
       } else {
         dispatch(
-          fetchConditionsFailed({
+          fetchFeaturesFailed({
             type: ErrorType.INTERNAL_SERVER_ERROR,
-            message: 'Fetching shared conditions failed'
+            message: 'Fetching shared features failed'
           })
         );
       }
     } catch (error) {
       dispatch(
-        fetchConditionsFailed({
+        fetchFeaturesFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
-          message: 'Fetching shared conditions failed'
+          message: 'Fetching shared features failed'
         })
       );
     }
   };
 };
 
-export const addConditionSuccess = condition => {
+export const addFeatureSuccess = feature => {
   return {
-    type: ConditionActionTypes.ADD_CONDITION_SUCCESS,
-    condition
+    type: FeatureActionTypes.ADD_FEATURE_SUCCESS,
+    feature
   };
 };
 
-export const updateConditionSuccess = condition => {
+export const updateFeatureSuccess = feature => {
   return {
-    type: ConditionActionTypes.UPDATE_CONDITION_SUCCESS,
-    condition
+    type: FeatureActionTypes.UPDATE_FEATURE_SUCCESS,
+    feature
   };
 };
 
-export const deleteConditionSuccess = conditionId => {
+export const deleteFeatureSuccess = featureId => {
   return {
-    type: ConditionActionTypes.DELETE_CONDITION_SUCCESS,
-    conditionId
+    type: FeatureActionTypes.DELETE_FEATURE_SUCCESS,
+    featureId
   };
 };
 
-export const conditionOperationFailed = (conditionId, error) => {
+export const featureOperationFailed = (featureId, error) => {
   return {
-    type: ConditionActionTypes.CONDITION_OPERATION_FAILED,
-    conditionId,
+    type: FeatureActionTypes.FEATURE_OPERATION_FAILED,
+    featureId,
     error
   };
 };
 
-export const removeConditionError = conditionId => {
+export const removeFeatureError = featureId => {
   return {
-    type: ConditionActionTypes.REMOVE_CONDITION_ERROR,
-    conditionId
+    type: FeatureActionTypes.REMOVE_FEATURE_ERROR,
+    featureId
   };
 };
 
-export const startFetchingConditions = () => {
+export const startFetchingFeatures = () => {
   return {
-    type: ConditionActionTypes.START_FETCHING_CONDITIONS
+    type: FeatureActionTypes.START_FETCHING_FEATURES
   };
 };
 
-export const setSharedConditions = conditions => {
+export const setSharedFeatures = features => {
   return {
-    type: ConditionActionTypes.SET_SHARED_CONDITIONS,
-    conditions
+    type: FeatureActionTypes.SET_SHARED_FEATURES,
+    features
   };
 };
 
-export const fetchConditionsFailed = error => {
+export const fetchFeaturesFailed = error => {
   return {
-    type: ConditionActionTypes.FETCH_CONDITIONS_FAILED,
+    type: FeatureActionTypes.FETCH_FEATURES_FAILED,
     error
   };
 };
 
-export const registerSaveConditionCallback = (conditionId, callback) => {
+export const registerSaveFeatureCallback = (featureId, callback) => {
   return {
-    type: ConditionActionTypes.REGISTER_SAVE_CONDITION_CALLBACK,
-    conditionId,
+    type: FeatureActionTypes.REGISTER_SAVE_FEATURE_CALLBACK,
+    featureId,
     callback
   };
 };
 
-export const unregisterSaveConditionCallback = (conditionId) => {
+export const unregisterSaveFeatureCallback = (featureId) => {
   return {
-    type: ConditionActionTypes.UNREGISTER_SAVE_CONDITION_CALLBACK,
-    conditionId
+    type: FeatureActionTypes.UNREGISTER_SAVE_FEATURE_CALLBACK,
+    featureId
   };
 };

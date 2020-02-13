@@ -6,41 +6,45 @@ import classes from './FilterInput.module.css';
 
 import useDebounce from '../../../hooks/useDebounce';
 
-const FilterInput = ({allItems, onItemsFiltered, searchField}) => {
+const FilterInput = ({ allItems, onItemsFiltered, searchField }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const filterItems = useCallback(debouncedSearchTerm => {
-    const results = allItems.filter(item =>
-      item[searchField]
-        .toLowerCase()
-        .includes(debouncedSearchTerm.toLowerCase())
-    );
-
-    onItemsFiltered(results);
-  }, [allItems, searchField, onItemsFiltered]);
+  const filterItems = useCallback(
+    debouncedSearchTerm => {
+      const results = allItems.filter(item =>
+        item[searchField]
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase())
+      );
+      onItemsFiltered(results);
+      setIsFiltering(false);
+    },
+    [allItems, searchField, onItemsFiltered]
+  );
 
   useEffect(() => {
     if (debouncedSearchTerm) {
-      setIsSearching(true);
-
+      setIsFiltering(true);
       filterItems(debouncedSearchTerm);
-      setIsSearching(false);
     } else {
       onItemsFiltered(allItems);
     }
-  }, [debouncedSearchTerm, allItems, onItemsFiltered , filterItems]);
+  }, [debouncedSearchTerm, allItems, onItemsFiltered, filterItems]);
 
   return (
     <div className={classes.FilterInput}>
-      <FontAwesomeIcon
-        className={classes.Icon}
-        icon={isSearching ? faSpinner : faSearch}
-        spin={isSearching}
+      {isFiltering ? (
+        <FontAwesomeIcon className={classes.Icon} icon={faSpinner} spin />
+      ) : (
+        <FontAwesomeIcon className={classes.Icon} icon={faSearch} />
+      )}
+
+      <input
+        type="text"
+        onChange={event => setSearchTerm(event.target.value)}
       />
-      <input type="text"
-        onChange={event => setSearchTerm(event.target.value)} />
     </div>
   );
 };

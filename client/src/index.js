@@ -12,6 +12,7 @@ import authReducer from './store/reducers/auth';
 import thunk from 'redux-thunk';
 import damageTypeReducer from './store/reducers/damageType';
 import conditionReducer from './store/reducers/condition';
+import featureReducer from './store/reducers/feature';
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
@@ -21,7 +22,8 @@ const composeEnhancers =
 const rootReducer = combineReducers({
   auth: authReducer,
   damageType: damageTypeReducer,
-  condition: conditionReducer
+  condition: conditionReducer,
+  feature: featureReducer
 });
 
 const sagaMiddleware = createSagaMiddleware();
