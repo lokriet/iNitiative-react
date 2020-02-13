@@ -23,7 +23,7 @@ const DamageType = ({ allDamageTypes, damageType, onSave, onCancel, onDelete, er
     [otherDamageTypeNames]
   );
 
-  const submitHandler = useCallback(
+  const handleSubmit = useCallback(
     (values, setSubmitting) => {
       console.log(values);
       if (damageType != null) {
@@ -53,7 +53,7 @@ const DamageType = ({ allDamageTypes, damageType, onSave, onCancel, onDelete, er
             )
         })}
         onSubmit={(values, { setSubmitting }) =>
-          submitHandler(values, setSubmitting)
+          handleSubmit(values, setSubmitting)
         }
       >
         {formik => (

@@ -1,20 +1,21 @@
 const express = require('express');
 const { body } = require('express-validator');
 
-const damageTypeController = require('../controllers/damageTypes');
+const conditionController = require('../controllers/conditions');
 const isAuth = require('../middleware/auth');
 
 const router = express.Router();
 
 /**
- * Create damage type
- * http://localhost:3001/damageTypes/damageType POST
+ * Create Condition
+ * http://localhost:3001/conditions/condition POST
  *
  * ==Request==
  * data: {
  *  isHomebrew: boolean
- *  damageType: {
+ *  condition: {
  *    name
+ *    description
  *  }
  * }
  *
@@ -22,9 +23,10 @@ const router = express.Router();
  * Success:
  * status: 201
  * body: {
- *  message: Damage Type created
+ *  message: Condition created
  *  data: {
  *    name
+ *    description
  *    isHomebrew
  *    creator
  *    _id
@@ -42,7 +44,7 @@ const router = express.Router();
  * message: 'Validation failed'
  *  data: [ (array of them!) {
  *    value: '111',
- *    msg: 'Damage type with this name already exists',
+ *    msg: 'Condition with this name already exists',
  *    param: 'name'
  *  }]
  *
@@ -52,26 +54,29 @@ const router = express.Router();
  *
  */
 router.post(
-  '/damageType',
+  '/condition',
   isAuth,
   [
-    body('damageType.name')
+    body('condition.name')
       .exists()
       .trim()
       .notEmpty()
-      .withMessage('Name is required')
+      .withMessage('Name is required'),
+
+    body('condition.description').trim()
   ],
-  damageTypeController.createDamageType
+  conditionController.createCondition
 );
 
 /**
- * Update damage type
- * http://localhost:3001/damageTypes/damageType/:damageTypeId POST
+ * Update condition
+ * http://localhost:3001/conditions/condition/:conditionId POST
  *
  * ==Request==
  * data: {
- *  damageType: {
+ *  condition: {
  *    name
+ *    description
  *    _id
  *  }
  *  isHomebrew
@@ -81,9 +86,10 @@ router.post(
  * Success:
  * status: 200
  * body: {
- *  message: Damage Type updated
+ *  message: Condition updated
  *  data: {
  *    name
+ *    description
  *    isHomebrew
  *    creator
  *    _id
@@ -101,7 +107,7 @@ router.post(
  * message: 'Validation failed'
  *  data: [ (array of them!) {
  *    value: '111',
- *    msg: 'Damage type with this name already exists',
+ *    msg: 'Condition with this name already exists',
  *    param: 'name'
  *  }]
  * 
@@ -114,26 +120,28 @@ router.post(
  *
  */
 router.put(
-  '/damageType/:damageTypeId',
+  '/condition/:conditionId',
   isAuth,
   [
-    body('damageType.name')
+    body('condition.name')
       .exists()
       .trim()
       .notEmpty()
-      .withMessage('Name is required')
+      .withMessage('Name is required'),
+
+    body('condition.description').trim()
   ],
-  damageTypeController.updateDamageType
+  conditionController.updateCondition
 );
 
 /**
- * Delete damage type
- * http://localhost:3001/damageTypes/damageType/:damageTypeId DELETE
+ * Delete condition
+ * http://localhost:3001/conditions/condition/:conditionId DELETE
  * 
  * ==Response==
  * Success:
  * status: 200
- * message: 'Damage type deleted'
+ * message: 'Condition deleted'
  * 
  * Failure:
  * status: 404
@@ -145,11 +153,11 @@ router.put(
  * status: 401
  * message: 'Not authenticated'
  */
-router.delete('/damageType/:damageTypeId', isAuth, damageTypeController.deleteDamageType);
+router.delete('/condition/:conditionId', isAuth, conditionController.deleteCondition);
 
 /**
- * Get all shared (not homebrew) damage types
- * http://localhost:3001/damageTypes/shared GET
+ * Get all shared (not homebrew) conditions
+ * http://localhost:3001/conditions/shared GET
  * 
  * ==Response==
  * Success:
@@ -157,6 +165,7 @@ router.delete('/damageType/:damageTypeId', isAuth, damageTypeController.deleteDa
  * data: [
  *  {
  *    name
+ *    description
  *    isHomebrew
  *    creator
  *    _id
@@ -164,6 +173,6 @@ router.delete('/damageType/:damageTypeId', isAuth, damageTypeController.deleteDa
  * ]
  * 
  */
-router.get('/shared', damageTypeController.getSharedDamageTypes);
+router.get('/shared', conditionController.getSharedConditions);
 
 module.exports = router;

@@ -18,7 +18,7 @@ const Login = props => {
     dispatch(actions.setAuthRedirectPath('/'));
   }, [props.redirectPath, dispatch]);
 
-  const submitHandler = useCallback(
+  const handleSubmit = useCallback(
     formValues => {
       console.log('submitting form', formValues);
       dispatch(
@@ -60,7 +60,7 @@ const Login = props => {
             .min(6, 'Must be at least 6 characters long')
         })}
         onSubmit={(values, { setSubmitting }) =>
-          submitHandler(values, setSubmitting)
+          handleSubmit(values, setSubmitting)
         }
       >
         <Form className={classes.LoginForm}>

@@ -1,34 +1,37 @@
 import ErrorType from '../../util/error';
 
-export const DamageTypeActionTypes = {
-  ADD_DAMAGE_TYPE_SUCCESS: 'ADD_DAMAGE_TYPE_SUCCESS',
-  UPDATE_DAMAGE_TYPE_SUCCESS: 'UPDATE_DAMAGE_TYPE_SUCCESS',
-  DELETE_DAMAGE_TYPE_SUCCESS: 'DELETE_DAMAGE_TYPE_SUCCESS',
-  DAMAGE_TYPE_OPERATION_FAILED: 'ADD_DAMAGE_TYPE_FAILED',
-  REMOVE_DAMAGE_TYPE_ERROR: 'REMOVE_DAMAGE_TYPE_ERROR',
+export const ConditionActionTypes = {
+  ADD_CONDITION_SUCCESS: 'ADD_CONDITION_SUCCESS',
+  UPDATE_CONDITION_SUCCESS: 'UPDATE_CONDITION_SUCCESS',
+  DELETE_CONDITION_SUCCESS: 'DELETE_CONDITION_SUCCESS',
+  CONDITION_OPERATION_FAILED: 'ADD_CONDITION_FAILED',
+  REMOVE_CONDITION_ERROR: 'REMOVE_CONDITION_ERROR',
 
-  START_FETCHING_DAMAGE_TYPES: 'START_FETCHING_DAMAGE_TYPES',
-  SET_SHARED_DAMAGE_TYPES: 'SET_SHARED_DAMAGE_TYPES',
-  FETCH_DAMAGE_TYPES_FAILED: 'FETCH_DAMAGE_TYPES_FAILED'
+  START_FETCHING_CONDITIONS: 'START_FETCHING_CONDITIONS',
+  SET_SHARED_CONDITIONS: 'SET_SHARED_CONDITIONS',
+  FETCH_CONDITIONS_FAILED: 'FETCH_CONDITIONS_FAILED',
+
+  REGISTER_SAVE_CALLBACK: 'REGISTER_SAVE_CALLBACK',
+  UNREGISTER_SAVE_CALLBACK: 'UNREGISTER_SAVE_CALLBACK'
 };
 
-export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
+export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
   return async dispatch => {
     try {
       const response = await fetch(
-        'http://localhost:3001/damageTypes/damageType',
+        'http://localhost:3001/conditions/condition',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ damageType, isHomebrew })
+          body: JSON.stringify({ condition, isHomebrew })
         }
       );
 
       const responseData = await response.json();
-      console.log('got response for damage type creation', responseData);
+      console.log('got response for condition creation', responseData);
 
       if (
         response.status === 500 ||
@@ -36,7 +39,7 @@ export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
         response.status === 403
       ) {
         dispatch(
-          damageTypeOperationFailed(null, {
+          conditionOperationFailed(null, {
             type: ErrorType[response.status],
             message: responseData.message
           })
@@ -44,7 +47,7 @@ export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
         setSubmitted(false);
       } else if (response.status === 422) {
         dispatch(
-          damageTypeOperationFailed(null, {
+          conditionOperationFailed(null, {
             type: ErrorType.VALIDATION_ERROR,
             data: responseData.data
           })
@@ -52,12 +55,12 @@ export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
         setSubmitted(false);
       } else if (response.status === 201) {
         console.log(responseData.data);
-        dispatch(addDamageTypeSuccess(responseData.data));
+        dispatch(addConditionSuccess(responseData.data));
         setSubmitted(true);
       } else {
         console.log('Unexpected response status');
         dispatch(
-          damageTypeOperationFailed(null, {
+          conditionOperationFailed(null, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Internal error occured. Please try again.'
           })
@@ -66,7 +69,7 @@ export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
       }
     } catch (error) {
       dispatch(
-        damageTypeOperationFailed(null, {
+        conditionOperationFailed(null, {
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Internal error occured. Please try again.'
         })
@@ -76,8 +79,8 @@ export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const updateDamageType = (
-  damageType,
+export const updateCondition = (
+  condition,
   isHomebrew,
   token,
   setSubmitted
@@ -85,14 +88,14 @@ export const updateDamageType = (
   return async dispatch => {
     try {
       const response = await fetch(
-        `http://localhost:3001/damageTypes/damageType/${damageType._id}`,
+        `http://localhost:3001/conditions/condition/${condition._id}`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ damageType, isHomebrew })
+          body: JSON.stringify({ condition, isHomebrew })
         }
       );
 
@@ -103,7 +106,7 @@ export const updateDamageType = (
         response.status === 403
       ) {
         dispatch(
-          damageTypeOperationFailed(damageType._id, {
+          conditionOperationFailed(condition._id, {
             type: ErrorType[response.status],
             message: responseData.message
           })
@@ -111,7 +114,7 @@ export const updateDamageType = (
         setSubmitted(false);
       } else if (response.status === 422) {
         dispatch(
-          damageTypeOperationFailed(damageType._id, {
+          conditionOperationFailed(condition._id, {
             type: ErrorType.VALIDATION_ERROR,
             data: responseData.data
           })
@@ -119,12 +122,12 @@ export const updateDamageType = (
         setSubmitted(false);
       } else if (response.status === 200) {
         console.log(responseData);
-        dispatch(updateDamageTypeSuccess(responseData.data));
+        dispatch(updateConditionSuccess(responseData.data));
         setSubmitted(true);
       } else {
         console.log('Unexpected response status');
         dispatch(
-          damageTypeOperationFailed(damageType._id, {
+          conditionOperationFailed(condition._id, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Internal error occured. Please try again.'
           })
@@ -133,7 +136,7 @@ export const updateDamageType = (
       }
     } catch (error) {
       dispatch(
-        damageTypeOperationFailed(damageType._id, {
+        conditionOperationFailed(condition._id, {
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Internal error occured. Please try again.'
         })
@@ -143,11 +146,11 @@ export const updateDamageType = (
   };
 };
 
-export const deleteDamageType = (damageTypeId, token) => {
+export const deleteCondition = (conditionId, token) => {
   return async dispatch => {
     try {
       const response = await fetch(
-        `http://localhost:3001/damageTypes/damageType/${damageTypeId}`,
+        `http://localhost:3001/conditions/condition/${conditionId}`,
         {
           method: 'DELETE',
           headers: {
@@ -164,17 +167,17 @@ export const deleteDamageType = (damageTypeId, token) => {
         response.status === 403
       ) {
         dispatch(
-          damageTypeOperationFailed(damageTypeId, {
+          conditionOperationFailed(conditionId, {
             type: ErrorType[response.status],
             message: responseData.message
           })
         );
       } else if (response.status === 200) {
-        dispatch(deleteDamageTypeSuccess(damageTypeId));
+        dispatch(deleteConditionSuccess(conditionId));
       } else {
         console.log('Unexpected response status');
         dispatch(
-          damageTypeOperationFailed(damageTypeId, {
+          conditionOperationFailed(conditionId, {
             type: ErrorType.INTERNAL_CLIENT_ERROR,
             message: 'Internal error occured. Please try again.'
           })
@@ -182,7 +185,7 @@ export const deleteDamageType = (damageTypeId, token) => {
       }
     } catch (error) {
       dispatch(
-        damageTypeOperationFailed(damageTypeId, {
+        conditionOperationFailed(conditionId, {
           type: ErrorType.INTERNAL_SERVER_ERROR,
           message: 'Internal error occured. Please try again.'
         })
@@ -191,85 +194,100 @@ export const deleteDamageType = (damageTypeId, token) => {
   };
 };
 
-export const getSharedDamageTypes = () => {
+export const getSharedConditions = () => {
   return async dispatch => {
     try {
-      dispatch(startFetchingDamageTypes());
-      const response = await fetch('http://localhost:3001/damageTypes/shared');
+      dispatch(startFetchingConditions());
+      const response = await fetch('http://localhost:3001/conditions/shared');
       if (response.status === 200) {
-        const damageTypes = await response.json();
-        dispatch(setSharedDamageTypes(damageTypes));
+        const conditions = await response.json();
+        dispatch(setSharedConditions(conditions));
       } else {
         dispatch(
-          fetchDamageTypesFailed({
+          fetchConditionsFailed({
             type: ErrorType.INTERNAL_SERVER_ERROR,
-            message: 'Fetching shared damage types failed'
+            message: 'Fetching shared conditions failed'
           })
         );
       }
     } catch (error) {
       dispatch(
-        fetchDamageTypesFailed({
+        fetchConditionsFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
-          message: 'Fetching shared damage types failed'
+          message: 'Fetching shared conditions failed'
         })
       );
     }
   };
 };
 
-export const addDamageTypeSuccess = damageType => {
+export const addConditionSuccess = condition => {
   return {
-    type: DamageTypeActionTypes.ADD_DAMAGE_TYPE_SUCCESS,
-    damageType
+    type: ConditionActionTypes.ADD_CONDITION_SUCCESS,
+    condition
   };
 };
 
-export const updateDamageTypeSuccess = damageType => {
+export const updateConditionSuccess = condition => {
   return {
-    type: DamageTypeActionTypes.UPDATE_DAMAGE_TYPE_SUCCESS,
-    damageType
+    type: ConditionActionTypes.UPDATE_CONDITION_SUCCESS,
+    condition
   };
 };
 
-export const deleteDamageTypeSuccess = damageTypeId => {
+export const deleteConditionSuccess = conditionId => {
   return {
-    type: DamageTypeActionTypes.DELETE_DAMAGE_TYPE_SUCCESS,
-    damageTypeId
+    type: ConditionActionTypes.DELETE_CONDITION_SUCCESS,
+    conditionId
   };
 };
 
-export const damageTypeOperationFailed = (damageTypeId, error) => {
+export const conditionOperationFailed = (conditionId, error) => {
   return {
-    type: DamageTypeActionTypes.DAMAGE_TYPE_OPERATION_FAILED,
-    damageTypeId,
+    type: ConditionActionTypes.CONDITION_OPERATION_FAILED,
+    conditionId,
     error
   };
 };
 
-export const removeDamageTypeError = damageTypeId => {
+export const removeConditionError = conditionId => {
   return {
-    type: DamageTypeActionTypes.REMOVE_DAMAGE_TYPE_ERROR,
-    damageTypeId
+    type: ConditionActionTypes.REMOVE_CONDITION_ERROR,
+    conditionId
   };
 };
 
-export const startFetchingDamageTypes = () => {
+export const startFetchingConditions = () => {
   return {
-    type: DamageTypeActionTypes.START_FETCHING_DAMAGE_TYPES
+    type: ConditionActionTypes.START_FETCHING_CONDITIONS
   };
 };
 
-export const setSharedDamageTypes = damageTypes => {
+export const setSharedConditions = conditions => {
   return {
-    type: DamageTypeActionTypes.SET_SHARED_DAMAGE_TYPES,
-    damageTypes
+    type: ConditionActionTypes.SET_SHARED_CONDITIONS,
+    conditions
   };
 };
 
-export const fetchDamageTypesFailed = error => {
+export const fetchConditionsFailed = error => {
   return {
-    type: DamageTypeActionTypes.FETCH_DAMAGE_TYPES_FAILED,
+    type: ConditionActionTypes.FETCH_CONDITIONS_FAILED,
     error
+  };
+};
+
+export const registerSaveCallback = (conditionId, callback) => {
+  return {
+    type: ConditionActionTypes.REGISTER_SAVE_CALLBACK,
+    conditionId,
+    callback
+  };
+};
+
+export const unregisterSaveCallback = (conditionId) => {
+  return {
+    type: ConditionActionTypes.UNREGISTER_SAVE_CALLBACK,
+    conditionId
   };
 };

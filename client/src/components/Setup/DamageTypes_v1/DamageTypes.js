@@ -18,7 +18,7 @@ const DamageTypes = props => {
   }, [dispatch, props.isHomebrew])
 
 
-  const saveDamageTypeHandler = useCallback(
+  const handleSaveDamageType = useCallback(
     (values, setSubmitting) => {
       dispatch(
         actions.updateDamageType(values, props.isHomebrew, props.token, setSubmitting)
@@ -27,7 +27,7 @@ const DamageTypes = props => {
     [dispatch, props.token, props.isHomebrew]
   );
 
-  const addDamageTypeHandler = useCallback(
+  const handleAddDamageType = useCallback(
     (values, setSubmitting) => {
       dispatch(
         actions.addDamageType(values, props.isHomebrew, props.token, setSubmitting)
@@ -36,7 +36,7 @@ const DamageTypes = props => {
     [dispatch, props.token, props.isHomebrew]
   );
 
-  const cancelEditHandler = useCallback((damageType) => {
+  const handleCancelEdit = useCallback((damageType) => {
     dispatch(actions.removeError(damageType ? damageType._id : null));
   }, [dispatch]);
 
@@ -51,8 +51,8 @@ const DamageTypes = props => {
       <div className={classes.DamageTypes}>
         <DamageType
           allDamageTypes={allDamageTypes}
-          onSave={addDamageTypeHandler}
-          onCancel={cancelEditHandler}
+          onSave={handleAddDamageType}
+          onCancel={handleCancelEdit}
         />
 
         {allDamageTypes.map((item, index) => (
@@ -60,8 +60,8 @@ const DamageTypes = props => {
             key={index}
             damageType={item}
             allDamageTypes={allDamageTypes}
-            onSave={saveDamageTypeHandler}
-            onCancel={cancelEditHandler}
+            onSave={handleSaveDamageType}
+            onCancel={handleCancelEdit}
           />
         ))}
       </div>

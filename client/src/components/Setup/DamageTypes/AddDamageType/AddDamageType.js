@@ -5,19 +5,21 @@ import ServerValidationError from '../../../UI/Errors/ServerValidationError/Serv
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
 import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
+import { AddButton } from '../../../UI/Form/AddButton/AddButton';
 
 import classes from './AddDamageType.module.css';
-import { AddButton } from '../../../UI/Form/AddButton/AddButton';
 
 const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
   const [adding, setAdding] = useState(false);
   const [isNameValid, setIsNameValid] = useState(true);
 
-  const setSubmitting = useCallback(() => {
-    setAdding(false);
+  const setSubmitted = useCallback((success) => {
+    if (success) {
+      setAdding(false);
+    }
   }, []);
 
-  const startAddingHandler = useCallback(() => {
+  const handleStartAdding = useCallback(() => {
     setAdding(true);
   }, []);
 
@@ -29,7 +31,7 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
         if (value !== '') {
           if (onValidateName(null, value)) {
             setIsNameValid(true);
-            onSave(value, setSubmitting);
+            onSave(value, setSubmitted);
           } else {
             setIsNameValid(false);
           }
@@ -41,7 +43,7 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
         onCancel(null);
       }
     },
-    [onValidateName, onSave, setSubmitting, onCancel]
+    [onValidateName, onSave, setSubmitted, onCancel]
   );
 
   return (
@@ -53,7 +55,8 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
               type="text"
               onKeyDown={handleKeyDown}
               defaultValue=""
-              ref={inputRef => inputRef && inputRef.focus()}
+              placeholder="Name"
+              autoFocus
             />
           </div>
           {isNameValid ? null : <Error>Damage type already exists</Error>}
@@ -63,7 +66,7 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
           {serverError ? <ServerError serverError={serverError} /> : null}
         </Fragment>
       ) : (
-        <AddButton onClick={startAddingHandler} />
+        <AddButton onClick={handleStartAdding} />
       )}
     </div>
   );

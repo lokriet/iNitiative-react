@@ -5,6 +5,7 @@ import useAuthCheck from '../../hooks/useAuthCheck';
 import TabbedNavigation from '../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
 import DamageTypes from '../Setup/DamageTypes/DamageTypes';
+import Conditions from '../Setup/Conditions/Conditions';
 
 const Admin = props => {
   useAuthCheck(props);
@@ -26,7 +27,7 @@ const Admin = props => {
           <DamageTypes isHomebrew={false} />
         </Route>
         <Route path={`${path}/conditions`}>
-          <div>I'll be conditions admin</div>
+          <Conditions isHomebrew={false} />
         </Route>
         <Route path={`${path}/features`}>
           <div>I'll be features admin</div>

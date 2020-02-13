@@ -18,7 +18,7 @@ const Register = props => {
     dispatch(actions.setAuthRedirectPath('/'));
   }, [props.redirectPath, dispatch]);
 
-  const submitHandler = useCallback(
+  const handleSubmit = useCallback(
     formValues => {
       dispatch(
         actions.authenticate(true, {
@@ -78,7 +78,7 @@ const Register = props => {
             .required('Required')
         })}
         onSubmit={(values, { setSubmitting }) =>
-          submitHandler(values, setSubmitting)
+          handleSubmit(values, setSubmitting)
         }
       >
         <Form className={classes.RegisterForm}>

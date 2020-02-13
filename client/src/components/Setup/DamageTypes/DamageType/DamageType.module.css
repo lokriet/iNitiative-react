@@ -4,37 +4,7 @@
   padding-left: 2rem;
 }
 
-.InputRow {
-  position: relative;
-  display: flex;
-}
-
 .Placeholder {
   width: 2rem;
   height: 1px;
-}
-
-.SavedBadge {
-  color: #0c640c;
-  position: absolute;
-  left: calc(100% + 1rem);
-  top: 0.25rem;
-}
-
-.SavedBadgeEnter {
-  opacity: 0;
-}
-
-.SavedBadgeEnterActive {
-  opacity: 1;
-  transition: all 500ms;
-}
-
-.SavedBadgeExit {
-  opacity: 1;
-}
-
-.SavedBadgeExitActive {
-  opacity: 0;
-  transition: all 500ms;
 }

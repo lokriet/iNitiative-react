@@ -1,10 +1,10 @@
 const { validationResult } = require('express-validator');
 const User = require('../model/user');
-const DamageType = require('../model/damageType');
+const Condition = require('../model/condition');
 const responseCodes = require('../util/responseCodes');
 const httpErrors = require('../util/httpErrors');
 
-module.exports.createDamageType = async (req, res, next) => {
+module.exports.createCondition = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -13,7 +13,7 @@ module.exports.createDamageType = async (req, res, next) => {
     }
 
     const isHomebrew = req.body.isHomebrew;
-    const damageTypeData = req.body.damageType;
+    const conditionData = req.body.condition;
 
     if (!isHomebrew) {
       const user = await User.findById(req.userId);
@@ -22,23 +22,23 @@ module.exports.createDamageType = async (req, res, next) => {
       }
     }
 
-    const conditions = isHomebrew
+    const searchConditions = isHomebrew
       ? {
           isHomebrew: true,
           creator: req.userId,
-          name: damageTypeData.name
+          name: conditionData.name
         }
       : {
           isHomebrew: false,
-          name: damageTypeData.name
+          name: conditionData.name
         };
-    const existingDamageType = await DamageType.findOne(conditions);
+    const existingCondition = await Condition.findOne(searchConditions);
 
-    if (existingDamageType) {
+    if (existingCondition) {
       const error = httpErrors.validationError([
         {
-          value: damageTypeData.name,
-          msg: 'Damage type with this name already exists',
+          value: conditionData.name,
+          msg: 'Condition with this name already exists',
           param: 'name'
         }
       ]);
@@ -46,27 +46,28 @@ module.exports.createDamageType = async (req, res, next) => {
       return;
     }
 
-    const damageType = new DamageType({
-      name: damageTypeData.name,
+    const condition = new Condition({
+      name: conditionData.name,
+      description: conditionData.description,
       creator: req.userId,
       isHomebrew: isHomebrew
     });
 
-    const savedDamageType = await damageType.save();
+    const savedCondition = await condition.save();
     res.status(201).json({
       statusCode: 201,
       responseCode: responseCodes.SUCCESS,
-      message: 'Damage Type created',
-      data: savedDamageType
+      message: 'Condition created',
+      data: savedCondition
     });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports.updateDamageType = async (req, res, next) => {
+module.exports.updateCondition = async (req, res, next) => {
   try {
-    console.log('updating damage type');
+    console.log('updating condition');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       next(httpErrors.validationError(errors.array()));
@@ -74,16 +75,16 @@ module.exports.updateDamageType = async (req, res, next) => {
     }
 
     const isHomebrew = req.body.isHomebrew;
-    const damageTypeData = req.body.damageType;
+    const conditionData = req.body.condition;
 
-    const damageType = await DamageType.findById(damageTypeData._id);
-    if (!damageType) {
+    const condition = await Condition.findById(conditionData._id);
+    if (!condition) {
       next(httpErrors.pageNotFoundError());
       return;
     }
 
     if (isHomebrew) {
-      if (req.userId.toString() !== damageType.creator.toString()) {
+      if (req.userId.toString() !== condition.creator.toString()) {
         next(httpErrors.notAuthorizedError());
         return;
       }
@@ -95,25 +96,25 @@ module.exports.updateDamageType = async (req, res, next) => {
       }
     }
 
-    if (damageType.name !== damageTypeData.name) {
-      const damageTypeConditions = isHomebrew
+    if (condition.name !== conditionData.name) {
+      const searchConditions = isHomebrew
         ? {
             isHomebrew: true,
             creator: req.userId,
-            name: damageTypeData.name
+            name: conditionData.name
           }
         : {
             isHomebrew: false,
-            name: damageTypeData.name
+            name: conditionData.name
           };
 
-      const existingDamageType = await DamageType.findOne(damageTypeConditions);
-      if (existingDamageType) {
+      const existingCondition = await Condition.findOne(searchConditions);
+      if (existingCondition) {
         next(
           httpErrors.validationError([
             {
-              value: damageTypeData.name,
-              msg: 'Damage type with this name already exists',
+              value: conditionData.name,
+              msg: 'Condition with this name already exists',
               param: 'name'
             }
           ])
@@ -122,14 +123,15 @@ module.exports.updateDamageType = async (req, res, next) => {
       }
     }
 
-    damageType.name = damageTypeData.name;
-    const savedDamageType = await damageType.save();
+    condition.name = conditionData.name;
+    condition.description = conditionData.description;
+    const savedCondition = await condition.save();
 
     res.status(200).json({
       statusCode: 200,
       responseCode: responseCodes.SUCCESS,
-      message: 'Damage type updated',
-      data: savedDamageType
+      message: 'Condition updated',
+      data: savedCondition
     });
   } catch (error) {
     next(error);
@@ -137,22 +139,22 @@ module.exports.updateDamageType = async (req, res, next) => {
 };
 
 
-module.exports.deleteDamageType = async (req, res, next) => {
-  const damageTypeId = req.params.damageTypeId;
+module.exports.deleteCondition = async (req, res, next) => {
+  const conditionId = req.params.conditionId;
   const userId = req.userId;
 
-  const damageType = await DamageType.findById(damageTypeId);
-  if (!damageType) {
+  const condition = await Condition.findById(conditionId);
+  if (!condition) {
     next(httpErrors.pageNotFoundError());
     return;
   }
 
-  if (damageType.isHomebrew && damageType.creator.toString() !== userId.toString()) {
+  if (condition.isHomebrew && condition.creator.toString() !== userId.toString()) {
     next(httpErrors.notAuthorizedError());
     return;
   }
 
-  if (damageType.isHomebrew) {
+  if (condition.isHomebrew) {
     const user = await User.findById(userId);
     if (!user.isAdmin) {
       next(httpErrors.notAuthorizedError());
@@ -160,20 +162,20 @@ module.exports.deleteDamageType = async (req, res, next) => {
     }
   }
 
-  await DamageType.deleteOne({_id: damageTypeId});
+  await Condition.deleteOne({_id: conditionId});
   res.status(200).json({
     statusCode: 200,
     responseCode: responseCodes.SUCCESS,
-    message: 'Damage type deleted'
+    message: 'Condition deleted'
   });
 }
 
-module.exports.getSharedDamageTypes = async (req, res, next) => {
+module.exports.getSharedConditions = async (req, res, next) => {
   try {
-    const damageTypes = await DamageType.find({ isHomebrew: false }).sort({
+    const conditions = await Condition.find({ isHomebrew: false }).sort({
       name: 1
     });
-    res.status(200).json(damageTypes);
+    res.status(200).json(conditions);
   } catch (error) {
     next(error);
   }

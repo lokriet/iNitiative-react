@@ -1,0 +1,17 @@
+.ItemsRow {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+.ItemsRow>* {
+  margin-right: 1rem;
+}
+
+.ItemsRow>*:last-child {
+  margin-right: 0;
+}
+
+.Centered {
+  justify-content: center;
+}

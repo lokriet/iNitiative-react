@@ -1,15 +1,15 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { CSSTransition } from 'react-transition-group';
-
 import { faTimes, faUndoAlt } from '@fortawesome/free-solid-svg-icons';
 
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
 import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
+import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import IconButton from '../../../UI/Form/IconButton/IconButton';
+import SavedBadge from '../../../UI/SavedBadge/SavedBadge';
 
 import classes from './DamageType.module.css';
 
@@ -27,12 +27,15 @@ const DamageType = ({
 
   const nameRef = useRef();
 
-  const setSubmitting = useCallback(submitting => {
-    setShowSavedBadge(true);
-    setTimeout(() => {
-      setShowSavedBadge(false);
-    }, 2000);
+  const setSubmitted = useCallback(success => {
+    if (success) {
+      setShowSavedBadge(true);
+    }
   }, []);
+
+  const handleHideSavedBadge = useCallback(() => {
+    setShowSavedBadge(false);
+  }, [])
 
   const handleBlur = useCallback(
     event => {
@@ -40,13 +43,13 @@ const DamageType = ({
       if (!damageType || damageType.name !== value) {
         if (onValidateName(damageType ? damageType._id : null, value)) {
           setIsNameValid(true);
-          onSave(damageType._id, event.target.value, setSubmitting);
+          onSave(damageType._id, event.target.value, setSubmitted);
         } else {
           setIsNameValid(false);
         }
       }
     },
-    [damageType, setSubmitting, onSave, onValidateName]
+    [damageType, setSubmitted, onSave, onValidateName]
   );
 
   const handleCancel = useCallback(() => {
@@ -76,11 +79,12 @@ const DamageType = ({
 
   return (
     <div className={classes.DamageType}>
-      <div className={classes.InputRow}>
+      <ItemsRow>
         <InlineInput
           type="text"
           name="name"
-          defaultValue={damageType ? damageType.name : ''}
+          placeholder="Name"
+          defaultValue={damageType ? damageType.name : ""}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           ref={nameRef}
@@ -93,20 +97,8 @@ const DamageType = ({
           <div className={classes.Placeholder}></div>
         )}
 
-        <CSSTransition
-          timeout={500}
-          in={showSavedBadge}
-          unmountOnExit
-          classNames={{
-            enter: classes.SavedBadgeEnter,
-            enterActive: classes.SavedBadgeEnterActive,
-            exit: classes.SavedBadgeExit,
-            exitActive: classes.SavedBadgeExitActive
-          }}
-        >
-          <span className={classes.SavedBadge}>Saved</span>
-        </CSSTransition>
-      </div>
+        <SavedBadge show={showSavedBadge} onHide={handleHideSavedBadge} />
+      </ItemsRow>
       {isNameValid ? null : <Error>Damage type already exists</Error>}
       {serverError ? <ServerValidationError serverError={serverError} /> : null}
       {serverError ? <ServerError serverError={serverError} /> : null}

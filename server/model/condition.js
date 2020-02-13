@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const damageTypeSchema = new Schema({
+const conditionSchema = new Schema({
   name: {
     type: String,
     required: true
+  },
+  description: {
+    type: String
   },
   creator: {
     type: Schema.Types.ObjectId,
@@ -17,4 +20,4 @@ const damageTypeSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('DamageType', damageTypeSchema);
+module.exports = mongoose.model('Condition', conditionSchema);

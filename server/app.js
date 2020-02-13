@@ -13,6 +13,7 @@ const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const damageTypesRouter = require('./routes/damageTypes');
+const conditionsRouter = require('./routes/conditions');
 
 const responseCodes = require('./util/responseCodes');
 
@@ -48,6 +49,7 @@ app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/damageTypes', damageTypesRouter);
+app.use('/conditions', conditionsRouter);
 
 
 app.use(function(req, res, next) {

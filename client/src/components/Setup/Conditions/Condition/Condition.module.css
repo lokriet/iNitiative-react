@@ -1,0 +1,26 @@
+.Condition {
+  min-width: 42rem;
+  max-width: 67rem;
+  margin: 2.5rem auto;
+  padding-left: 2rem;
+}
+
+.InputRow {
+  display: flex;
+  justify-content: center;
+}
+
+.Description {
+  min-width: 20rem;
+  max-width: 45rem;
+  flex-grow: 1;
+}
+
+.Name {
+  width: 12rem;
+}
+
+.Fish {
+  margin: 0 1rem;
+  color: #aaa;
+}

@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';
 
 import * as actions from '../../../store/actions/index';
+import ServerError from '../../UI/Errors/ServerError/ServerError';
 import DamageType from './DamageType/DamageType';
 import AddDamageType from './AddDamageType/AddDamageType';
+import Spinner from '../../UI/Spinner/Spinner';
 
 const DamageTypes = props => {
   const dispatch = useDispatch();
@@ -26,13 +28,13 @@ const DamageTypes = props => {
   );
 
   const handleAddDamageType = useCallback(
-    (name, setSubmitting) => {
+    (name, setSubmitted) => {
       dispatch(
         actions.addDamageType(
           { name },
           props.isHomebrew,
           props.token,
-          setSubmitting
+          setSubmitted
         )
       );
     },
@@ -40,13 +42,13 @@ const DamageTypes = props => {
   );
 
   const handleUpdateDamageType = useCallback(
-    (_id, name, setSubmitting) => {
+    (_id, name, setSubmitted) => {
       dispatch(
         actions.updateDamageType(
           { _id, name },
           props.isHomebrew,
           props.token,
-          setSubmitting
+          setSubmitted
         )
       );
     },
@@ -61,31 +63,40 @@ const DamageTypes = props => {
   );
 
   const handleCancelChangingDamageType = useCallback((damageTypeId) => {
-    dispatch(actions.removeError(damageTypeId));
+    dispatch(actions.removeDamageTypeError(damageTypeId));
   }, [dispatch]);
 
-  return (
-    <div>
-      <AddDamageType
-        onValidateName={validateName}
-        onSave={handleAddDamageType}
-        onCancel={handleCancelChangingDamageType}
-        serverError={props.errors.ADD}
-      />
-
-      {allDamageTypes.map(damageType => (
-        <DamageType
-          key={damageType._id}
-          damageType={damageType}
-          onSave={handleUpdateDamageType}
+  let view;
+  if (props.fetching) {
+    view = <Spinner />
+  } else if (props.fetchingError) {
+    view = <ServerError serverError={props.fetchingError} />
+  } else {
+    view = (
+      <div>
+        <AddDamageType
           onValidateName={validateName}
-          onDelete={handleDeleteDamageType}
+          onSave={handleAddDamageType}
           onCancel={handleCancelChangingDamageType}
-          serverError={props.errors[damageType._id]}
+          serverError={props.errors.ADD}
         />
-      ))}
-    </div>
-  );
+  
+        {allDamageTypes.map(damageType => (
+          <DamageType
+            key={damageType._id}
+            damageType={damageType}
+            onSave={handleUpdateDamageType}
+            onValidateName={validateName}
+            onDelete={handleDeleteDamageType}
+            onCancel={handleCancelChangingDamageType}
+            serverError={props.errors[damageType._id]}
+          />
+        ))}
+      </div>
+    );
+  }
+  
+  return view;
 };
 
 DamageTypes.propTypes = {
@@ -97,6 +108,8 @@ const mapStateToProps = state => {
     homebrewDamageTypes: state.damageType.homebrewDamageTypes,
     sharedDamageTypes: state.damageType.sharedDamageTypes,
     errors: state.damageType.errors,
+    fetchingError: state.damageType.error,
+    fetching: state.damageType.fetching,
     token: state.auth.token
   };
 };

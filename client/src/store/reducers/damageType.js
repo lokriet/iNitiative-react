@@ -43,25 +43,25 @@ const addDamageTypeSuccess = (state, action) => {
   if (action.damageType.isHomebrew) {
     return {
       ...state,
-      homebrewDamageTypes: state.homebrewDamageTypes.concat(action.damageType),
+      homebrewDamageTypes: state.homebrewDamageTypes.concat(action.damageType).sort((a, b) => a.name.localeCompare(b.name)),
       errors: newErrors
     };
   } else {
     return {
       ...state,
-      sharedDamageTypes: state.sharedDamageTypes.concat(action.damageType),
+      sharedDamageTypes: state.sharedDamageTypes.concat(action.damageType).sort((a, b) => a.name.localeCompare(b.name)),
       errors: newErrors
     };
   }
 };
 
 const updateDamageTypeSuccess = (state, action) => {
-  const newErrors = removeErrorFromStateErrors(state.errors, action.damageType._d)
+  const newErrors = removeErrorFromStateErrors(state.errors, action.damageType._id)
 
   if (action.damageType.isHomebrew) {
     const newDamageTypes = state.homebrewDamageTypes.map(item =>
       item._id === action.damageType._id ? action.damageType : item
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
     console.log('new damage types', newDamageTypes);
     return {
       ...state,
@@ -71,7 +71,7 @@ const updateDamageTypeSuccess = (state, action) => {
   } else {
     const newDamageTypes = state.sharedDamageTypes.map(item =>
       item._id === action.damageType._id ? action.damageType : item
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
     console.log('new damage types', newDamageTypes, action.damageType);
     return {
       ...state,

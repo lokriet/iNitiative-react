@@ -1,13 +1,20 @@
 .IconButton {
-  margin-left: 1rem;
   background-color: transparent;
+  padding: 0.25rem 0;
   border: none;
-  color: #ccc;
   cursor: pointer;
 }
 
-.IconButton:hover,
-.IconButton:active,
-.IconButton:focus {
+.PaddedIcon {
+  margin-right: 0.5rem;
+}
+
+.IconButton .Icon {
+  color: #ccc;
+}
+
+.IconButton:hover .Icon,
+.IconButton:active .Icon,
+.IconButton:focus .Icon {
   color: #aaa;
 }
