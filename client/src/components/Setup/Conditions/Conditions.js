@@ -1,6 +1,7 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import * as actions from '../../../store/actions/index';
 import AddCondition from './AddCondition/AddCondition';
@@ -8,13 +9,15 @@ import Condition from './Condition/Condition';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Spinner from '../../UI/Spinner/Spinner';
 import IconButton from '../../UI/Form/IconButton/IconButton';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import FilterInput from '../../UI/FilterInput/FilterInput';
 
 const Conditions = props => {
   const dispatch = useDispatch();
   const allConditions = props.isHomebrew
     ? props.homebrewConditions
     : props.sharedConditions;
+
+  const [filteredConditions, setFilteredConditions] = useState(allConditions);
 
   useEffect(() => {
     dispatch(actions.getSharedConditions());
@@ -74,7 +77,14 @@ const Conditions = props => {
 
   const handleSaveAll = useCallback(() => {
     props.saveAllCallbacks.forEach(item => item.callback());
-  }, [props.saveAllCallbacks])
+  }, [props.saveAllCallbacks]);
+
+  const handleItemsFiltered = useCallback(
+    (filteredItems) => {
+      setFilteredConditions(filteredItems);
+    },
+    [],
+  )
 
   let view;
   if (props.fetching) {
@@ -91,7 +101,13 @@ const Conditions = props => {
           onCancel={handleCancelChangingCondition}
         />
 
-        {allConditions.map(condition => (
+        <FilterInput
+          allItems={allConditions}
+          searchField='name'
+          onItemsFiltered={handleItemsFiltered}
+        />
+
+        {filteredConditions.map(condition => (
           <Condition
             key={condition._id}
             condition={condition}
@@ -103,7 +119,9 @@ const Conditions = props => {
           />
         ))}
         <br />
-        <IconButton icon={faCheck} onClick={handleSaveAll} >Save all</IconButton>
+        <IconButton icon={faCheck} onClick={handleSaveAll}>
+          Save all
+        </IconButton>
       </div>
     );
   }

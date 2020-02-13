@@ -1,0 +1,18 @@
+.FilterInput {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  width: 15rem;
+  margin: 0 auto;
+}
+
+.Icon {
+  margin-right: 0.5rem;
+  color: #aaa;
+}
+
+.FilterInput input {
+  border: none;
+  background-color: transparent;
+  width: 12rem;
+}
