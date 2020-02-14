@@ -14,13 +14,18 @@ const NavigationItems = props => {
   );
 
   return (
-    <ul className={classes.NavigationItems}>
-      <NavigationItem link="/" exact>Home</NavigationItem>
-      {props.isAdmin ? (
-        <NavigationItem link="/admin">Admin</NavigationItem>
-      ) : null}
-      {auth}
-    </ul>
+    <div className={classes.NavigationItemsBar}>
+      <ul className={classes.NavigationItems}>
+        <NavigationItem link="/" exact>Home</NavigationItem>
+        {props.isAdmin ? (
+          <NavigationItem link="/admin">Admin</NavigationItem>
+        ) : null}
+        {props.isAuthenticated ? <NavigationItem link="/homebrew">Homebrew</NavigationItem> : null}
+      </ul>
+      <ul className={classes.NavigationItems}>
+        {auth}
+      </ul>
+    </div>
   );
 };
 

@@ -9,6 +9,7 @@ export const DamageTypeActionTypes = {
 
   START_FETCHING_DAMAGE_TYPES: 'START_FETCHING_DAMAGE_TYPES',
   SET_SHARED_DAMAGE_TYPES: 'SET_SHARED_DAMAGE_TYPES',
+  SET_HOMEBREW_DAMAGE_TYPES: 'SET_HOMEBREW_DAMAGE_TYPES',
   FETCH_DAMAGE_TYPES_FAILED: 'FETCH_DAMAGE_TYPES_FAILED'
 };
 
@@ -218,6 +219,49 @@ export const getSharedDamageTypes = () => {
   };
 };
 
+export const getHomebrewDamageTypes = (token) => {
+  return async dispatch => {
+    try {
+      dispatch(startFetchingDamageTypes());
+      const response = await fetch('http://localhost:3001/damageTypes/homebrew', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (
+        response.status === 500 ||
+        response.status === 401
+      ) {
+        const responseData = await response.json();
+        dispatch(
+          fetchDamageTypesFailed({
+            type: ErrorType[response.status],
+            message: responseData.message
+          })
+        );
+      } else if (response.status === 200) {
+        const damageTypes = await response.json();
+        dispatch(setHomebrewDamageTypes(damageTypes));
+      } else {
+        dispatch(
+          fetchDamageTypesFailed({
+            type: ErrorType.INTERNAL_SERVER_ERROR,
+            message: 'Fetching homebrew damage types failed'
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        fetchDamageTypesFailed({
+          type: ErrorType.INTERNAL_CLIENT_ERROR,
+          message: 'Fetching homebrew damage types failed'
+        })
+      );
+    }
+  };
+}
+
 export const addDamageTypeSuccess = damageType => {
   return {
     type: DamageTypeActionTypes.ADD_DAMAGE_TYPE_SUCCESS,
@@ -263,6 +307,13 @@ export const startFetchingDamageTypes = () => {
 export const setSharedDamageTypes = damageTypes => {
   return {
     type: DamageTypeActionTypes.SET_SHARED_DAMAGE_TYPES,
+    damageTypes
+  };
+};
+
+export const setHomebrewDamageTypes = damageTypes => {
+  return {
+    type: DamageTypeActionTypes.SET_HOMEBREW_DAMAGE_TYPES,
     damageTypes
   };
 };

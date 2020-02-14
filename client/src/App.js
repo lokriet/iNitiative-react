@@ -7,7 +7,7 @@ import Register from './components/Auth/Register/Register';
 import Login from './components/Auth/Login/Login';
 import { useDispatch, connect } from 'react-redux';
 import * as actions from './store/actions';
-import Admin from './components/Admin/Admin';
+import MechanicsSetup from './components/MechanicsSetup/MechanicsSetup';
 import Logout from './components/Auth/Logout/Logout';
 import PageNotFound from './components/PageNotFound/PageNotFound';
 import Spinner from './components/UI/Spinner/Spinner';
@@ -29,7 +29,8 @@ const App = props => {
           <Route path="/" exact component={Home} />
           <Route path="/register" component={Register} />
           <Route path="/login" component={Login} />
-          {props.isAdmin ? <Route path="/admin" component={Admin} /> : null}
+          {props.isAdmin ? <Route path="/admin"><MechanicsSetup isHomebrew={false} /></Route> : null}
+          <Route path="/homebrew"><MechanicsSetup isHomebrew={true} /></Route>
           <Route path="/logout" component={Logout} />
           <Route path="/" component={PageNotFound} />
         </Switch>

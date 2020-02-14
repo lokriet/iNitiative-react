@@ -16,12 +16,13 @@
 }
 
 .Fish {
-  margin: 0 1rem;
+  margin: 0 1rem 1rem 1rem;
   color: #aaa;
 }
 
 :global .FeatureTypeContainer {
   width: 12rem;
+  flex-shrink: 0;
 }
 
 :global .FeatureTypeContainer .FeatureType__control {

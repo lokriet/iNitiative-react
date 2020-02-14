@@ -140,7 +140,6 @@ module.exports.updateFeature = async (req, res, next) => {
   }
 };
 
-
 module.exports.deleteFeature = async (req, res, next) => {
   const featureId = req.params.featureId;
   const userId = req.userId;
@@ -164,20 +163,48 @@ module.exports.deleteFeature = async (req, res, next) => {
     }
   }
 
-  await Feature.deleteOne({_id: featureId});
+  await Feature.deleteOne({ _id: featureId });
   res.status(200).json({
     statusCode: 200,
     responseCode: responseCodes.SUCCESS,
     message: 'Feature deleted'
   });
-}
+};
 
 module.exports.getSharedFeatures = async (req, res, next) => {
   try {
     const features = await Feature.find({ isHomebrew: false }).sort({
       name: 1
     });
+
     res.status(200).json(features);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getHomebrewFeatures = async (req, res, next) => {
+  try {
+    const features = await Feature.find({
+      isHomebrew: true,
+      creator: req.userId
+    }).sort({ name: 1 });
+
+    const featureTypes = await Feature.distinct('type', {
+      $or: [
+        {
+          isHomebrew: true,
+          creator: req.userId,
+          $and: [{ type: { $ne: null } }, { type: { $ne: "" } }]
+        },
+        {
+          isHomebrew: false,
+          $and: [{ type: { $ne: null } }, { type: { $ne: "" } }]
+        }
+        
+      ]
+    });
+    res.status(200).json({ features, featureTypes });
   } catch (error) {
     next(error);
   }

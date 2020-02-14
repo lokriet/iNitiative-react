@@ -31,6 +31,9 @@ const conditionsReducer = (state = initialState, action) => {
     case ActionTypes.condition.SET_SHARED_CONDITIONS:
       return setSharedConditions(state, action);
 
+    case ActionTypes.condition.SET_HOMEBREW_CONDITIONS:
+      return setHomebrewConditions(state, action);
+
     case ActionTypes.condition.FETCH_CONDITIONS_FAILED:
       return fetchConditionsFailed(state, action);
 
@@ -144,6 +147,15 @@ const setSharedConditions = (state, action) => {
   return {
     ...state,
     sharedConditions: action.conditions,
+    fetching: false,
+    error: null
+  };
+};
+
+const setHomebrewConditions = (state, action) => {
+  return {
+    ...state,
+    homebrewConditions: action.conditions,
     fetching: false,
     error: null
   };

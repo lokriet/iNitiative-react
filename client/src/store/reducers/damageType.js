@@ -30,6 +30,9 @@ const damageTypesReducer = (state = initialState, action) => {
     case ActionTypes.damageType.SET_SHARED_DAMAGE_TYPES:
       return setSharedDamageTypes(state, action);
 
+    case ActionTypes.damageType.SET_HOMEBREW_DAMAGE_TYPES:
+      return setHomebrewDamageTypes(state, action);
+
     case ActionTypes.damageType.FETCH_DAMAGE_TYPES_FAILED:
       return fetchDamageTypesFailed(state, action);
     default:
@@ -118,6 +121,15 @@ const setSharedDamageTypes = (state, action) => {
   return {
     ...state,
     sharedDamageTypes: action.damageTypes,
+    fetching: false,
+    error: null
+  };
+};
+
+const setHomebrewDamageTypes = (state, action) => {
+  return {
+    ...state,
+    homebrewDamageTypes: action.damageTypes,
     fetching: false,
     error: null
   };

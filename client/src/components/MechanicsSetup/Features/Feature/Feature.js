@@ -94,7 +94,6 @@ class Feature extends Component {
   };
 
   handleTypeChanged = (newValue, action) => {
-    console.log('type changed... :(', newValue, action);
     this.setState({ typeValue: newValue });
 
     if (
@@ -176,6 +175,7 @@ class Feature extends Component {
             placeholder="Name"
             value={this.state.nameValue}
             onChange={this.handleNameChanged}
+            className={classes.Name}
           />
           <InlineInput
             className={classes.Description}

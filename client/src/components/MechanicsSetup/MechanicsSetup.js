@@ -4,11 +4,11 @@ import {useRouteMatch, Switch, Route, Redirect} from 'react-router-dom';
 import useAuthCheck from '../../hooks/useAuthCheck';
 import TabbedNavigation from '../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
-import DamageTypes from '../Setup/DamageTypes/DamageTypes';
-import Conditions from '../Setup/Conditions/Conditions';
-import Features from '../Setup/Features/Features';
+import DamageTypes from './DamageTypes/DamageTypes';
+import Conditions from './Conditions/Conditions';
+import Features from './Features/Features';
 
-const Admin = props => {
+const MechanicsSetup = props => {
   useAuthCheck(props);
   let { path, url } = useRouteMatch();
 
@@ -25,13 +25,13 @@ const Admin = props => {
           <Redirect to={`${url}/damage-types`} />
         </Route>
         <Route path={`${path}/damage-types`}>
-          <DamageTypes isHomebrew={false} />
+          <DamageTypes isHomebrew={props.isHomebrew} />
         </Route>
         <Route path={`${path}/conditions`}>
-          <Conditions isHomebrew={false} />
+          <Conditions isHomebrew={props.isHomebrew} />
         </Route>
         <Route path={`${path}/features`}>
-          <Features isHomebrew={false} />
+          <Features isHomebrew={props.isHomebrew} />
         </Route>
       </Switch>
     </Fragment>
@@ -44,4 +44,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(Admin);
+export default connect(mapStateToProps)(MechanicsSetup);

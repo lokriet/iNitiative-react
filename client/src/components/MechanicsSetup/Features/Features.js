@@ -21,8 +21,10 @@ const Features = props => {
   const [filteredFeatures, setFilteredFeatures] = useState(allFeatures);
 
   useEffect(() => {
-    dispatch(actions.getSharedFeatures());
-  }, [dispatch]);
+    props.isHomebrew
+      ? dispatch(actions.getHomebrewFeatures(props.token))
+      : dispatch(actions.getSharedFeatures());
+  }, [dispatch, props.isHomebrew, props.token]);
 
   const validateName = useCallback(
     (_id, name) => {
@@ -37,12 +39,7 @@ const Features = props => {
   const handleAddFeature = useCallback(
     (feature, setSubmitted) => {
       dispatch(
-        actions.addFeature(
-          feature,
-          props.isHomebrew,
-          props.token,
-          setSubmitted
-        )
+        actions.addFeature(feature, props.isHomebrew, props.token, setSubmitted)
       );
     },
     [dispatch, props.isHomebrew, props.token]
@@ -80,12 +77,9 @@ const Features = props => {
     props.saveAllCallbacks.forEach(item => item.callback());
   }, [props.saveAllCallbacks]);
 
-  const handleItemsFiltered = useCallback(
-    (filteredItems) => {
-      setFilteredFeatures(filteredItems);
-    },
-    [],
-  )
+  const handleItemsFiltered = useCallback(filteredItems => {
+    setFilteredFeatures(filteredItems);
+  }, []);
 
   let view;
   if (props.fetching) {
@@ -104,7 +98,7 @@ const Features = props => {
 
         <FilterInput
           allItems={allFeatures}
-          searchField='name'
+          searchField="name"
           onItemsFiltered={handleItemsFiltered}
         />
 

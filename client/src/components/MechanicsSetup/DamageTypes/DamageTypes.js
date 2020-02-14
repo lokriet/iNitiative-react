@@ -15,8 +15,10 @@ const DamageTypes = props => {
     : props.sharedDamageTypes;
 
   useEffect(() => {
-    dispatch(actions.getSharedDamageTypes());
-  }, [dispatch]);
+    props.isHomebrew
+      ? dispatch(actions.getHomebrewDamageTypes(props.token))
+      : dispatch(actions.getSharedDamageTypes());
+  }, [dispatch, props.isHomebrew, props.token]);
 
   const validateName = useCallback(
     (_id, name) => {
@@ -62,15 +64,18 @@ const DamageTypes = props => {
     [dispatch, props.token]
   );
 
-  const handleCancelChangingDamageType = useCallback((damageTypeId) => {
-    dispatch(actions.removeDamageTypeError(damageTypeId));
-  }, [dispatch]);
+  const handleCancelChangingDamageType = useCallback(
+    damageTypeId => {
+      dispatch(actions.removeDamageTypeError(damageTypeId));
+    },
+    [dispatch]
+  );
 
   let view;
   if (props.fetching) {
-    view = <Spinner />
+    view = <Spinner />;
   } else if (props.fetchingError) {
-    view = <ServerError serverError={props.fetchingError} />
+    view = <ServerError serverError={props.fetchingError} />;
   } else {
     view = (
       <div>
@@ -80,7 +85,7 @@ const DamageTypes = props => {
           onCancel={handleCancelChangingDamageType}
           serverError={props.errors.ADD}
         />
-  
+
         {allDamageTypes.map(damageType => (
           <DamageType
             key={damageType._id}
@@ -95,7 +100,7 @@ const DamageTypes = props => {
       </div>
     );
   }
-  
+
   return view;
 };
 

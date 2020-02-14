@@ -166,4 +166,28 @@ router.delete('/damageType/:damageTypeId', isAuth, damageTypeController.deleteDa
  */
 router.get('/shared', damageTypeController.getSharedDamageTypes);
 
+
+
+/**
+ * Get user's homebrew damage type
+ * http://localhost:3001/damageTypes/homebrew GET
+ * 
+ * ==Response==
+ * Success:
+ * status: 200
+ * data: [
+ *  {
+ *    name
+ *    isHomebrew
+ *    creator
+ *    _id
+ *  }
+ * ]
+ * 
+ * Failure:
+ * status: 401
+ * message: Not authenticated
+ */
+router.get('/homebrew', isAuth, damageTypeController.getHomebrewDamageTypes);
+
 module.exports = router;

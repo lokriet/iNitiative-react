@@ -9,6 +9,7 @@ export const ConditionActionTypes = {
 
   START_FETCHING_CONDITIONS: 'START_FETCHING_CONDITIONS',
   SET_SHARED_CONDITIONS: 'SET_SHARED_CONDITIONS',
+  SET_HOMEBREW_CONDITIONS: 'SET_HOMEBREW_CONDITIONS',
   FETCH_CONDITIONS_FAILED: 'FETCH_CONDITIONS_FAILED',
 
   REGISTER_SAVE_CONDITION_CALLBACK: 'REGISTER_SAVE_CONDITION_CALLBACK',
@@ -221,6 +222,47 @@ export const getSharedConditions = () => {
   };
 };
 
+export const getHomebrewConditions = token => {
+  return async dispatch => {
+    try {
+      dispatch(startFetchingConditions());
+      const response = await fetch('http://localhost:3001/conditions/homebrew', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (
+        response.status === 500 ||
+        response.status === 401
+      ) {
+        const responseData = await response.json();
+        dispatch(
+          fetchConditionsFailed({
+            type: ErrorType[response.status],
+            message: responseData.message
+          })
+        );
+      } else if (response.status === 200) {
+        const conditions = await response.json();
+        dispatch(setHomebrewConditions(conditions));
+      } else {
+        dispatch(
+          fetchConditionsFailed({
+            type: ErrorType.INTERNAL_SERVER_ERROR,
+            message: 'Fetching homebrew conditions failed'
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(fetchConditionsFailed({
+        type: ErrorType.INTERNAL_CLIENT_ERROR,
+        message: 'Fetching homebrew conditions failed'
+      }))
+    }
+  }
+}
+
 export const addConditionSuccess = condition => {
   return {
     type: ConditionActionTypes.ADD_CONDITION_SUCCESS,
@@ -266,6 +308,13 @@ export const startFetchingConditions = () => {
 export const setSharedConditions = conditions => {
   return {
     type: ConditionActionTypes.SET_SHARED_CONDITIONS,
+    conditions
+  };
+};
+
+export const setHomebrewConditions = conditions => {
+  return {
+    type: ConditionActionTypes.SET_HOMEBREW_CONDITIONS,
     conditions
   };
 };

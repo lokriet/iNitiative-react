@@ -32,6 +32,9 @@ const featuresReducer = (state = initialState, action) => {
     case ActionTypes.feature.SET_SHARED_FEATURES:
       return setSharedFeatures(state, action);
 
+    case ActionTypes.feature.SET_HOMEBREW_FEATURES:
+      return setHomebrewFeatures(state, action);
+
     case ActionTypes.feature.FETCH_FEATURES_FAILED:
       return fetchFeaturesFailed(state, action);
 
@@ -51,7 +54,8 @@ const addFeatureSuccess = (state, action) => {
 
   let newFeatureTypes = state.featureTypes;
   if (
-    (action.feature.type != null && action.feature.type.length !== 0) &&
+    action.feature.type != null &&
+    action.feature.type.length !== 0 &&
     !state.featureTypes.includes(action.feature.type)
   ) {
     newFeatureTypes = state.featureTypes.concat(action.feature.type);
@@ -86,7 +90,8 @@ const updateFeatureSuccess = (state, action) => {
 
   let newFeatureTypes = state.featureTypes;
   if (
-    (action.feature.type != null && action.feature.type.length !== 0) &&
+    action.feature.type != null &&
+    action.feature.type.length !== 0 &&
     !state.featureTypes.includes(action.feature.type)
   ) {
     newFeatureTypes = state.featureTypes.concat(action.feature.type);
@@ -169,13 +174,28 @@ const setSharedFeatures = (state, action) => {
     ...state,
     sharedFeatures: action.features,
     featureTypes: getDistinctFeatureTypes(
-      state.homebrewFeatures,
-      action.features
+      action.features,
+      state.homebrewFeatures
     ),
     fetching: false,
     error: null
   };
 };
+
+const setHomebrewFeatures = (state, action) => {
+  return {
+    ...state,
+    homebrewFeatures: action.features,
+    // featureTypes: getDistinctFeatureTypes(
+    //   state.sharedFeatures,
+    //   action.features
+    // ),
+    featureTypes: action.featureTypes,
+    fetching: false,
+    error: null
+  };
+};
+
 
 const fetchFeaturesFailed = (state, action) => {
   return {
@@ -203,10 +223,12 @@ const removeErrorFromStateErrors = (errors, featureId) => {
 const getDistinctFeatureTypes = (sharedFeatures, homebrewFeatures) => {
   const featureTypesSet = new Set();
   sharedFeatures.forEach(feature => {
-    if (feature.type != null && feature.type.length > 0) featureTypesSet.add(feature.type);
+    if (feature.type != null && feature.type.length > 0)
+      featureTypesSet.add(feature.type);
   });
   homebrewFeatures.forEach(feature => {
-    if (feature.type != null && feature.type.length > 0) featureTypesSet.add(feature.type);
+    if (feature.type != null && feature.type.length > 0)
+      featureTypesSet.add(feature.type);
   });
   return [...featureTypesSet];
 };

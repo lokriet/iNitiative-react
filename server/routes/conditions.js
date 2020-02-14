@@ -175,4 +175,28 @@ router.delete('/condition/:conditionId', isAuth, conditionController.deleteCondi
  */
 router.get('/shared', conditionController.getSharedConditions);
 
+
+/**
+ * Get user's homebrew conditions
+ * http://localhost:3001/conditions/homebrew GET
+ * 
+ * ==Response==
+ * Success:
+ * status: 200
+ * data: [
+ *  {
+ *    name
+ *    description
+ *    isHomebrew
+ *    creator
+ *    _id
+ *  }
+ * ]
+ * 
+ * Failure:
+ * status: 401
+ * message: Not authenticated
+ */
+router.get('/homebrew', isAuth, conditionController.getHomebrewConditions);
+
 module.exports = router;

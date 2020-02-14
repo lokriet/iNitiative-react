@@ -21,8 +21,10 @@ const Conditions = props => {
   const [filteredConditions, setFilteredConditions] = useState(allConditions);
 
   useEffect(() => {
-    dispatch(actions.getSharedConditions());
-  }, [dispatch]);
+    props.isHomebrew
+      ? dispatch(actions.getHomebrewConditions(props.token))
+      : dispatch(actions.getSharedConditions());
+  }, [dispatch, props.token, props.isHomebrew]);
 
   const validateName = useCallback(
     (_id, name) => {
@@ -80,12 +82,9 @@ const Conditions = props => {
     props.saveAllCallbacks.forEach(item => item.callback());
   }, [props.saveAllCallbacks]);
 
-  const handleItemsFiltered = useCallback(
-    (filteredItems) => {
-      setFilteredConditions(filteredItems);
-    },
-    [],
-  )
+  const handleItemsFiltered = useCallback(filteredItems => {
+    setFilteredConditions(filteredItems);
+  }, []);
 
   let view;
   if (props.fetching) {
@@ -104,7 +103,7 @@ const Conditions = props => {
 
         <FilterInput
           allItems={allConditions}
-          searchField='name'
+          searchField="name"
           onItemsFiltered={handleItemsFiltered}
         />
 
@@ -123,6 +122,8 @@ const Conditions = props => {
         <IconButton icon={faCheck} onClick={handleSaveAll}>
           Save all
         </IconButton>
+        <br />
+        <br />
       </div>
     );
   }

@@ -138,7 +138,6 @@ module.exports.updateCondition = async (req, res, next) => {
   }
 };
 
-
 module.exports.deleteCondition = async (req, res, next) => {
   const conditionId = req.params.conditionId;
   const userId = req.userId;
@@ -149,7 +148,10 @@ module.exports.deleteCondition = async (req, res, next) => {
     return;
   }
 
-  if (condition.isHomebrew && condition.creator.toString() !== userId.toString()) {
+  if (
+    condition.isHomebrew &&
+    condition.creator.toString() !== userId.toString()
+  ) {
     next(httpErrors.notAuthorizedError());
     return;
   }
@@ -162,19 +164,31 @@ module.exports.deleteCondition = async (req, res, next) => {
     }
   }
 
-  await Condition.deleteOne({_id: conditionId});
+  await Condition.deleteOne({ _id: conditionId });
   res.status(200).json({
     statusCode: 200,
     responseCode: responseCodes.SUCCESS,
     message: 'Condition deleted'
   });
-}
+};
 
 module.exports.getSharedConditions = async (req, res, next) => {
   try {
     const conditions = await Condition.find({ isHomebrew: false }).sort({
       name: 1
     });
+    res.status(200).json(conditions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getHomebrewConditions = async (req, res, next) => {
+  try {
+    const conditions = await Condition.find({
+      isHomebrew: true,
+      creator: req.userId
+    }).sort({ name: 1 });
     res.status(200).json(conditions);
   } catch (error) {
     next(error);

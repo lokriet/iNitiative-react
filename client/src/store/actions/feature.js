@@ -9,6 +9,7 @@ export const FeatureActionTypes = {
 
   START_FETCHING_FEATURES: 'START_FETCHING_FEATURES',
   SET_SHARED_FEATURES: 'SET_SHARED_FEATURES',
+  SET_HOMEBREW_FEATURES: 'SET_HOMEBREW_FEATURES',
   FETCH_FEATURES_FAILED: 'FETCH_FEATURES_FAILED',
 
   REGISTER_SAVE_FEATURE_CALLBACK: 'REGISTER_SAVE_FEATURE_CALLBACK',
@@ -221,6 +222,47 @@ export const getSharedFeatures = () => {
   };
 };
 
+export const getHomebrewFeatures = token => {
+  return async dispatch => {
+    try {
+      dispatch(startFetchingFeatures());
+      const response = await fetch('http://localhost:3001/features/homebrew', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (
+        response.status === 500 ||
+        response.status === 401
+      ) {
+        const responseData = await response.json();
+        dispatch(
+          fetchFeaturesFailed({
+            type: ErrorType[response.status],
+            message: responseData.message
+          })
+        );
+      } else if (response.status === 200) {
+        const responseData = await response.json();
+        dispatch(setHomebrewFeatures(responseData.features, responseData.featureTypes));
+      } else {
+        dispatch(
+          fetchFeaturesFailed({
+            type: ErrorType.INTERNAL_SERVER_ERROR,
+            message: 'Fetching homebrew features failed'
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(fetchFeaturesFailed({
+        type: ErrorType.INTERNAL_CLIENT_ERROR,
+        message: 'Fetching homebrew features failed'
+      }))
+    }
+  }
+}
+
 export const addFeatureSuccess = feature => {
   return {
     type: FeatureActionTypes.ADD_FEATURE_SUCCESS,
@@ -267,6 +309,14 @@ export const setSharedFeatures = features => {
   return {
     type: FeatureActionTypes.SET_SHARED_FEATURES,
     features
+  };
+};
+
+export const setHomebrewFeatures = (features, featureTypes) => {
+  return {
+    type: FeatureActionTypes.SET_HOMEBREW_FEATURES,
+    features,
+    featureTypes
   };
 };
 

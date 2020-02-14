@@ -183,4 +183,28 @@ router.delete('/feature/:featureId', isAuth, featureController.deleteFeature);
  */
 router.get('/shared', featureController.getSharedFeatures);
 
+/**
+ * Get user's homebrew features
+ * http://localhost:3001/features/homebrew GET
+ * 
+ * ==Response==
+ * Success:
+ * status: 200
+ * data: [
+ *  {
+ *    name
+ *    description
+ *    type
+ *    isHomebrew
+ *    creator
+ *    _id
+ *  }
+ * ]
+ * 
+ * Failure:
+ * status: 401
+ * message: Not authenticated
+ */
+router.get('/homebrew', isAuth, featureController.getHomebrewFeatures);
+
 module.exports = router;

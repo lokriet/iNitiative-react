@@ -178,3 +178,15 @@ module.exports.getSharedDamageTypes = async (req, res, next) => {
     next(error);
   }
 };
+
+module.exports.getHomebrewDamageTypes = async (req, res, next) => {
+  try {
+    const damageTypes = await DamageType.find({
+      isHomebrew: true,
+      creator: req.userId
+    }).sort({ name: 1 });
+    res.status(200).json(damageTypes);
+  } catch (error) {
+    next(error);
+  }
+};
