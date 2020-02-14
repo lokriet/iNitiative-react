@@ -5,6 +5,8 @@ const initialState = {
   fetching: false,
   sharedFeatures: [],
   homebrewFeatures: [],
+  sharedFeaturesInitialised: null,
+  homebrewFeaturesInitialised: null,
   featureTypes: [],
   saveAllCallbacks: []
 };
@@ -173,6 +175,7 @@ const setSharedFeatures = (state, action) => {
   return {
     ...state,
     sharedFeatures: action.features,
+    sharedFeaturesInitialised: new Date().getTime(),
     featureTypes: getDistinctFeatureTypes(
       action.features,
       state.homebrewFeatures
@@ -186,6 +189,7 @@ const setHomebrewFeatures = (state, action) => {
   return {
     ...state,
     homebrewFeatures: action.features,
+    homebrewFeaturesInitialised: new Date().getTime(),
     // featureTypes: getDistinctFeatureTypes(
     //   state.sharedFeatures,
     //   action.features

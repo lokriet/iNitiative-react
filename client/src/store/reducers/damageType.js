@@ -4,7 +4,9 @@ const initialState = {
   error: null, // error for collective damage types operations
   fetching: false,
   sharedDamageTypes: [],
-  homebrewDamageTypes: []
+  homebrewDamageTypes: [],
+  sharedDamageTypesInitialised: null,
+  homebrewDamageTypesInitialised: null
 };
 
 const damageTypesReducer = (state = initialState, action) => {
@@ -121,6 +123,7 @@ const setSharedDamageTypes = (state, action) => {
   return {
     ...state,
     sharedDamageTypes: action.damageTypes,
+    sharedDamageTypesInitialised: new Date().getTime(),
     fetching: false,
     error: null
   };
@@ -130,6 +133,7 @@ const setHomebrewDamageTypes = (state, action) => {
   return {
     ...state,
     homebrewDamageTypes: action.damageTypes,
+    homebrewDamageTypesInitialised: new Date().getTime(),
     fetching: false,
     error: null
   };

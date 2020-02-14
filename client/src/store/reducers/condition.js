@@ -5,7 +5,9 @@ const initialState = {
   fetching: false,
   sharedConditions: [],
   homebrewConditions: [],
-  saveAllCallbacks: []
+  saveAllCallbacks: [],
+  sharedConditionsInitialised: null,
+  homebrewConditionsInitialised: null
 };
 
 const conditionsReducer = (state = initialState, action) => {
@@ -147,6 +149,7 @@ const setSharedConditions = (state, action) => {
   return {
     ...state,
     sharedConditions: action.conditions,
+    sharedConditionsInitialised: new Date().getTime(),
     fetching: false,
     error: null
   };
@@ -156,6 +159,7 @@ const setHomebrewConditions = (state, action) => {
   return {
     ...state,
     homebrewConditions: action.conditions,
+    homebrewConditionsInitialised: new Date().getTime(),
     fetching: false,
     error: null
   };

@@ -1,4 +1,5 @@
 import ErrorType from '../../util/error';
+import * as constants from '../../util/constants';
 
 export const ConditionActionTypes = {
   ADD_CONDITION_SUCCESS: 'ADD_CONDITION_SUCCESS',
@@ -80,12 +81,7 @@ export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const updateCondition = (
-  condition,
-  isHomebrew,
-  token,
-  setSubmitted
-) => {
+export const updateCondition = (condition, isHomebrew, token, setSubmitted) => {
   return async dispatch => {
     try {
       const response = await fetch(
@@ -143,7 +139,7 @@ export const updateCondition = (
         })
       );
       setSubmitted(false);
-    } 
+    }
   };
 };
 
@@ -196,7 +192,16 @@ export const deleteCondition = (conditionId, token) => {
 };
 
 export const getSharedConditions = () => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    if (
+      getState().condition.sharedConditionsInitialised &&
+      new Date().getTime() - getState().condition.sharedConditionsInitialised <
+        constants.refreshDataTimeout
+    ) {
+      console.log('skip going to db');
+      return;
+    }
+
     try {
       dispatch(startFetchingConditions());
       const response = await fetch('http://localhost:3001/conditions/shared');
@@ -223,19 +228,28 @@ export const getSharedConditions = () => {
 };
 
 export const getHomebrewConditions = token => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    if (
+      getState().condition.homebrewConditionsInitialised &&
+      new Date().getTime() - getState().condition.homebrewConditionsInitialised <
+      constants.refreshDataTimeout
+    ) {
+      console.log('skip going to db');
+      return;
+    }
+
     try {
       dispatch(startFetchingConditions());
-      const response = await fetch('http://localhost:3001/conditions/homebrew', {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await fetch(
+        'http://localhost:3001/conditions/homebrew',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
+      );
 
-      if (
-        response.status === 500 ||
-        response.status === 401
-      ) {
+      if (response.status === 500 || response.status === 401) {
         const responseData = await response.json();
         dispatch(
           fetchConditionsFailed({
@@ -255,13 +269,15 @@ export const getHomebrewConditions = token => {
         );
       }
     } catch (error) {
-      dispatch(fetchConditionsFailed({
-        type: ErrorType.INTERNAL_CLIENT_ERROR,
-        message: 'Fetching homebrew conditions failed'
-      }))
+      dispatch(
+        fetchConditionsFailed({
+          type: ErrorType.INTERNAL_CLIENT_ERROR,
+          message: 'Fetching homebrew conditions failed'
+        })
+      );
     }
-  }
-}
+  };
+};
 
 export const addConditionSuccess = condition => {
   return {
@@ -334,7 +350,7 @@ export const registerSaveConditionCallback = (conditionId, callback) => {
   };
 };
 
-export const unregisterSaveConditionCallback = (conditionId) => {
+export const unregisterSaveConditionCallback = conditionId => {
   return {
     type: ConditionActionTypes.UNREGISTER_SAVE_CONDITION_CALLBACK,
     conditionId

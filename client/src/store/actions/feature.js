@@ -1,4 +1,5 @@
 import ErrorType from '../../util/error';
+import * as constants from '../../util/constants';
 
 export const FeatureActionTypes = {
   ADD_FEATURE_SUCCESS: 'ADD_FEATURE_SUCCESS',
@@ -196,7 +197,16 @@ export const deleteFeature = (featureId, token) => {
 };
 
 export const getSharedFeatures = () => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    if (
+      getState().feature.sharedFeaturesInitialised &&
+      new Date().getTime() - getState().feature.sharedFeaturesInitialised <
+      constants.refreshDataTimeout
+    ) {
+      console.log('skip going to db');
+      return;
+    }
+
     try {
       dispatch(startFetchingFeatures());
       const response = await fetch('http://localhost:3001/features/shared');
@@ -223,7 +233,16 @@ export const getSharedFeatures = () => {
 };
 
 export const getHomebrewFeatures = token => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    if (
+      getState().feature.homebrewFeaturesInitialised &&
+      new Date().getTime() - getState().feature.homebrewFeaturesInitialised <
+      constants.refreshDataTimeout
+    ) {
+      console.log('skip going to db');
+      return;
+    }
+
     try {
       dispatch(startFetchingFeatures());
       const response = await fetch('http://localhost:3001/features/homebrew', {

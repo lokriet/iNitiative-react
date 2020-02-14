@@ -1,4 +1,5 @@
 import ErrorType from '../../util/error';
+import * as constants from '../../util/constants';
 
 export const DamageTypeActionTypes = {
   ADD_DAMAGE_TYPE_SUCCESS: 'ADD_DAMAGE_TYPE_SUCCESS',
@@ -193,7 +194,16 @@ export const deleteDamageType = (damageTypeId, token) => {
 };
 
 export const getSharedDamageTypes = () => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    if (
+      getState().damageType.sharedDamageTypesInitialised &&
+      new Date().getTime() - getState().damageType.sharedDamageTypesInitialised <
+      constants.refreshDataTimeout
+    ) {
+      console.log('skip going to db');
+      return;
+    }
+
     try {
       dispatch(startFetchingDamageTypes());
       const response = await fetch('http://localhost:3001/damageTypes/shared');
@@ -220,7 +230,16 @@ export const getSharedDamageTypes = () => {
 };
 
 export const getHomebrewDamageTypes = (token) => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    if (
+      getState().damageType.homebrewDamageTypesInitialised &&
+      new Date().getTime() - getState().damageType.homebrewDamageTypesInitialised <
+      constants.refreshDataTimeout
+    ) {
+      console.log('skip going to db');
+      return;
+    }
+
     try {
       dispatch(startFetchingDamageTypes());
       const response = await fetch('http://localhost:3001/damageTypes/homebrew', {
