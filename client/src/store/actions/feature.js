@@ -20,17 +20,14 @@ export const FeatureActionTypes = {
 export const addFeature = (feature, isHomebrew, token, setSubmitted) => {
   return async dispatch => {
     try {
-      const response = await fetch(
-        'http://localhost:3001/features/feature',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ feature, isHomebrew })
-        }
-      );
+      const response = await fetch('http://localhost:3001/features/feature', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ feature, isHomebrew })
+      });
 
       const responseData = await response.json();
       console.log('got response for feature creation', responseData);
@@ -81,12 +78,7 @@ export const addFeature = (feature, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const updateFeature = (
-  feature,
-  isHomebrew,
-  token,
-  setSubmitted
-) => {
+export const updateFeature = (feature, isHomebrew, token, setSubmitted) => {
   return async dispatch => {
     try {
       const response = await fetch(
@@ -144,7 +136,7 @@ export const updateFeature = (
         })
       );
       setSubmitted(false);
-    } 
+    }
   };
 };
 
@@ -201,9 +193,8 @@ export const getSharedFeatures = () => {
     if (
       getState().feature.sharedFeaturesInitialised &&
       new Date().getTime() - getState().feature.sharedFeaturesInitialised <
-      constants.refreshDataTimeout
+        constants.refreshDataTimeout
     ) {
-      console.log('skip going to db');
       return;
     }
 
@@ -237,9 +228,8 @@ export const getHomebrewFeatures = token => {
     if (
       getState().feature.homebrewFeaturesInitialised &&
       new Date().getTime() - getState().feature.homebrewFeaturesInitialised <
-      constants.refreshDataTimeout
+        constants.refreshDataTimeout
     ) {
-      console.log('skip going to db');
       return;
     }
 
@@ -251,10 +241,7 @@ export const getHomebrewFeatures = token => {
         }
       });
 
-      if (
-        response.status === 500 ||
-        response.status === 401
-      ) {
+      if (response.status === 500 || response.status === 401) {
         const responseData = await response.json();
         dispatch(
           fetchFeaturesFailed({
@@ -264,7 +251,9 @@ export const getHomebrewFeatures = token => {
         );
       } else if (response.status === 200) {
         const responseData = await response.json();
-        dispatch(setHomebrewFeatures(responseData.features, responseData.featureTypes));
+        dispatch(
+          setHomebrewFeatures(responseData.features, responseData.featureTypes)
+        );
       } else {
         dispatch(
           fetchFeaturesFailed({
@@ -274,13 +263,15 @@ export const getHomebrewFeatures = token => {
         );
       }
     } catch (error) {
-      dispatch(fetchFeaturesFailed({
-        type: ErrorType.INTERNAL_CLIENT_ERROR,
-        message: 'Fetching homebrew features failed'
-      }))
+      dispatch(
+        fetchFeaturesFailed({
+          type: ErrorType.INTERNAL_CLIENT_ERROR,
+          message: 'Fetching homebrew features failed'
+        })
+      );
     }
-  }
-}
+  };
+};
 
 export const addFeatureSuccess = feature => {
   return {
@@ -354,7 +345,7 @@ export const registerSaveFeatureCallback = (featureId, callback) => {
   };
 };
 
-export const unregisterSaveFeatureCallback = (featureId) => {
+export const unregisterSaveFeatureCallback = featureId => {
   return {
     type: FeatureActionTypes.UNREGISTER_SAVE_FEATURE_CALLBACK,
     featureId

@@ -1,8 +1,10 @@
 import * as ActionTypes from '../actions/actionTypes';
 const initialState = {
   errors: {}, // errors for individual condition operations. property keys are ids, for new one - ADD
-  error: null, // error for collective conditions operations
-  fetching: false,
+  errorShared: null, // error for collective conditions operations
+  errorHomebrew: null, // error for collective conditions operations
+  fetchingShared: false,
+  fetchingHomebrew: false,
   sharedConditions: [],
   homebrewConditions: [],
   saveAllCallbacks: [],
@@ -27,8 +29,11 @@ const conditionsReducer = (state = initialState, action) => {
     case ActionTypes.condition.REMOVE_CONDITION_ERROR:
       return removeConditionError(state, action);
 
-    case ActionTypes.condition.START_FETCHING_CONDITIONS:
-      return startFetchingConditions(state, action);
+    case ActionTypes.condition.START_FETCHING_SHARED_CONDITIONS:
+      return startFetchingSharedConditions(state, action);
+
+    case ActionTypes.condition.START_FETCHING_HOMEBREW_CONDITIONS:
+      return startFetchingHomebrewConditions(state, action);
 
     case ActionTypes.condition.SET_SHARED_CONDITIONS:
       return setSharedConditions(state, action);
@@ -36,8 +41,11 @@ const conditionsReducer = (state = initialState, action) => {
     case ActionTypes.condition.SET_HOMEBREW_CONDITIONS:
       return setHomebrewConditions(state, action);
 
-    case ActionTypes.condition.FETCH_CONDITIONS_FAILED:
-      return fetchConditionsFailed(state, action);
+    case ActionTypes.condition.FETCH_SHARED_CONDITIONS_FAILED:
+      return fetchSharedConditionsFailed(state, action);
+
+    case ActionTypes.condition.FETCH_HOMEBREW_CONDITIONS_FAILED:
+      return fetchHomebrewConditionsFailed(state, action);
 
     case ActionTypes.condition.REGISTER_SAVE_CONDITION_CALLBACK:
       return registerSaveConditionCallback(state, action);
@@ -138,10 +146,17 @@ const removeConditionError = (state, action) => {
   };
 };
 
-const startFetchingConditions = (state, action) => {
+const startFetchingSharedConditions = (state, action) => {
   return {
     ...state,
-    fetching: true
+    fetchingShared: true
+  };
+};
+
+const startFetchingHomebrewConditions = (state, action) => {
+  return {
+    ...state,
+    fetchingHomebrew: true
   };
 };
 
@@ -150,8 +165,8 @@ const setSharedConditions = (state, action) => {
     ...state,
     sharedConditions: action.conditions,
     sharedConditionsInitialised: new Date().getTime(),
-    fetching: false,
-    error: null
+    fetchingShared: false,
+    errorShared: null
   };
 };
 
@@ -160,16 +175,24 @@ const setHomebrewConditions = (state, action) => {
     ...state,
     homebrewConditions: action.conditions,
     homebrewConditionsInitialised: new Date().getTime(),
-    fetching: false,
-    error: null
+    fetchingHomebrew: false,
+    errorHomebrew: null
   };
 };
 
-const fetchConditionsFailed = (state, action) => {
+const fetchSharedConditionsFailed = (state, action) => {
   return {
     ...state,
-    fetching: false,
-    error: action.error
+    fetchingShared: false,
+    errorShared: action.error
+  };
+};
+
+const fetchHomebrewConditionsFailed = (state, action) => {
+  return {
+    ...state,
+    fetchingHomebrew: false,
+    errorHomebrew: action.error
   };
 };
 
@@ -199,7 +222,7 @@ const registerSaveConditionCallback = (state, action) => {
 };
 
 const unregisterSaveConditionCallback = (state, action) => {
-  return  {
+  return {
     ...state,
     saveAllCallbacks: state.saveAllCallbacks.filter(
       item => item.conditionId !== action.conditionId

@@ -86,11 +86,14 @@ const Conditions = props => {
     setFilteredConditions(filteredItems);
   }, []);
 
+
+  const fetchingError = props.isHomebrew ? props.fetchingHomebrewError : props.fetchingSharedError;
+  const fetching = props.isHomebrew ? props.fetchingHomebrew : props.fetchingShared;
   let view;
-  if (props.fetching) {
+  if (fetching) {
     view = <Spinner />;
-  } else if (props.fetchingError) {
-    view = <ServerError serverError={props.fetchingError} />;
+  } else if (fetchingError) {
+    view = <ServerError serverError={fetchingError} />;
   } else {
     view = (
       <div className={classes.Conditions}>
@@ -139,8 +142,10 @@ const mapStateToProps = state => {
     homebrewConditions: state.condition.homebrewConditions,
     sharedConditions: state.condition.sharedConditions,
     errors: state.condition.errors,
-    fetchingError: state.condition.error,
-    fetching: state.condition.fetching,
+    fetchingSharedError: state.condition.errorShared,
+    fetchingHomebrewError: state.condition.errorHomebrew,
+    fetchingShared: state.condition.fetchingShared,
+    fetchingHomebrew: state.condition.fetchingHomebrew,
     saveAllCallbacks: state.condition.saveAllCallbacks,
     token: state.auth.token
   };

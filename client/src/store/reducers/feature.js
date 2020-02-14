@@ -1,8 +1,10 @@
 import * as ActionTypes from '../actions/actionTypes';
 const initialState = {
   errors: {}, // errors for individual feature operations. property keys are ids, for new one - ADD
-  error: null, // error for collective features operations
-  fetching: false,
+  errorShared: null, // error for collective features operations
+  errorHomebrew: null, // error for collective features operations
+  fetchingShared: false,
+  fetchingHomebrew: false,
   sharedFeatures: [],
   homebrewFeatures: [],
   sharedFeaturesInitialised: null,
@@ -28,8 +30,11 @@ const featuresReducer = (state = initialState, action) => {
     case ActionTypes.feature.REMOVE_FEATURE_ERROR:
       return removeFeatureError(state, action);
 
-    case ActionTypes.feature.START_FETCHING_FEATURES:
-      return startFetchingFeatures(state, action);
+    case ActionTypes.feature.START_FETCHING_SHARED_FEATURES:
+      return startFetchingSharedFeatures(state, action);
+
+    case ActionTypes.feature.START_FETCHING_HOMEBREW_FEATURES:
+      return startFetchingHomebrewFeatures(state, action);
 
     case ActionTypes.feature.SET_SHARED_FEATURES:
       return setSharedFeatures(state, action);
@@ -37,8 +42,11 @@ const featuresReducer = (state = initialState, action) => {
     case ActionTypes.feature.SET_HOMEBREW_FEATURES:
       return setHomebrewFeatures(state, action);
 
-    case ActionTypes.feature.FETCH_FEATURES_FAILED:
-      return fetchFeaturesFailed(state, action);
+    case ActionTypes.feature.FETCH_SHARED_FEATURES_FAILED:
+      return fetchSharedFeaturesFailed(state, action);
+
+    case ActionTypes.feature.FETCH_HOMEBREW_FEATURES_FAILED:
+      return fetchHomebrewFeaturesFailed(state, action);
 
     case ActionTypes.feature.REGISTER_SAVE_FEATURE_CALLBACK:
       return registerSaveFeatureCallback(state, action);
@@ -164,10 +172,17 @@ const removeFeatureError = (state, action) => {
   };
 };
 
-const startFetchingFeatures = (state, action) => {
+const startFetchingSharedFeatures = (state, action) => {
   return {
     ...state,
-    fetching: true
+    fetchingShared: true
+  };
+};
+
+const startFetchingHomebrewFeatures = (state, action) => {
+  return {
+    ...state,
+    fetchingHomebrew: true
   };
 };
 
@@ -180,8 +195,8 @@ const setSharedFeatures = (state, action) => {
       action.features,
       state.homebrewFeatures
     ),
-    fetching: false,
-    error: null
+    fetchingShared: false,
+    errorShared: null
   };
 };
 
@@ -195,17 +210,24 @@ const setHomebrewFeatures = (state, action) => {
     //   action.features
     // ),
     featureTypes: action.featureTypes,
-    fetching: false,
-    error: null
+    fetchingHomebrew: false,
+    errorHomebrew: null
   };
 };
 
-
-const fetchFeaturesFailed = (state, action) => {
+const fetchSharedFeaturesFailed = (state, action) => {
   return {
     ...state,
-    fetching: false,
-    error: action.error
+    fetchingShared: false,
+    errorShared: action.error
+  };
+};
+
+const fetchHomebrewFeaturesFailed = (state, action) => {
+  return {
+    ...state,
+    fetchingHomebrew: false,
+    errorHomebrew: action.error
   };
 };
 

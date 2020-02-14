@@ -8,10 +8,12 @@ export const DamageTypeActionTypes = {
   DAMAGE_TYPE_OPERATION_FAILED: 'ADD_DAMAGE_TYPE_FAILED',
   REMOVE_DAMAGE_TYPE_ERROR: 'REMOVE_DAMAGE_TYPE_ERROR',
 
-  START_FETCHING_DAMAGE_TYPES: 'START_FETCHING_DAMAGE_TYPES',
+  START_FETCHING_SHARED_DAMAGE_TYPES: 'START_FETCHING_SHARED_DAMAGE_TYPES',
+  START_FETCHING_HOMEBREW_DAMAGE_TYPES: 'START_FETCHING_HOMEBREW_DAMAGE_TYPES',
   SET_SHARED_DAMAGE_TYPES: 'SET_SHARED_DAMAGE_TYPES',
   SET_HOMEBREW_DAMAGE_TYPES: 'SET_HOMEBREW_DAMAGE_TYPES',
-  FETCH_DAMAGE_TYPES_FAILED: 'FETCH_DAMAGE_TYPES_FAILED'
+  FETCH_SHARED_DAMAGE_TYPES_FAILED: 'FETCH_SHARED_DAMAGE_TYPES_FAILED',
+  FETCH_HOMEBREW_DAMAGE_TYPES_FAILED: 'FETCH_HOMEBREW_DAMAGE_TYPES_FAILED'
 };
 
 export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
@@ -200,19 +202,18 @@ export const getSharedDamageTypes = () => {
       new Date().getTime() - getState().damageType.sharedDamageTypesInitialised <
       constants.refreshDataTimeout
     ) {
-      console.log('skip going to db');
       return;
     }
 
     try {
-      dispatch(startFetchingDamageTypes());
+      dispatch(startFetchingSharedDamageTypes());
       const response = await fetch('http://localhost:3001/damageTypes/shared');
       if (response.status === 200) {
         const damageTypes = await response.json();
         dispatch(setSharedDamageTypes(damageTypes));
       } else {
         dispatch(
-          fetchDamageTypesFailed({
+          fetchSharedDamageTypesFailed({
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Fetching shared damage types failed'
           })
@@ -220,7 +221,7 @@ export const getSharedDamageTypes = () => {
       }
     } catch (error) {
       dispatch(
-        fetchDamageTypesFailed({
+        fetchSharedDamageTypesFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Fetching shared damage types failed'
         })
@@ -236,12 +237,11 @@ export const getHomebrewDamageTypes = (token) => {
       new Date().getTime() - getState().damageType.homebrewDamageTypesInitialised <
       constants.refreshDataTimeout
     ) {
-      console.log('skip going to db');
       return;
     }
 
     try {
-      dispatch(startFetchingDamageTypes());
+      dispatch(startFetchingHomebrewDamageTypes());
       const response = await fetch('http://localhost:3001/damageTypes/homebrew', {
         headers: {
           Authorization: `Bearer ${token}`
@@ -254,7 +254,7 @@ export const getHomebrewDamageTypes = (token) => {
       ) {
         const responseData = await response.json();
         dispatch(
-          fetchDamageTypesFailed({
+          fetchHomebrewDamageTypesFailed({
             type: ErrorType[response.status],
             message: responseData.message
           })
@@ -264,7 +264,7 @@ export const getHomebrewDamageTypes = (token) => {
         dispatch(setHomebrewDamageTypes(damageTypes));
       } else {
         dispatch(
-          fetchDamageTypesFailed({
+          fetchHomebrewDamageTypesFailed({
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Fetching homebrew damage types failed'
           })
@@ -272,7 +272,7 @@ export const getHomebrewDamageTypes = (token) => {
       }
     } catch (error) {
       dispatch(
-        fetchDamageTypesFailed({
+        fetchSharedDamageTypesFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Fetching homebrew damage types failed'
         })
@@ -317,9 +317,15 @@ export const removeDamageTypeError = damageTypeId => {
   };
 };
 
-export const startFetchingDamageTypes = () => {
+export const startFetchingSharedDamageTypes = () => {
   return {
-    type: DamageTypeActionTypes.START_FETCHING_DAMAGE_TYPES
+    type: DamageTypeActionTypes.START_FETCHING_SHARED_DAMAGE_TYPES
+  };
+};
+
+export const startFetchingHomebrewDamageTypes = () => {
+  return {
+    type: DamageTypeActionTypes.START_FETCHING_HOMEBREW_DAMAGE_TYPES
   };
 };
 
@@ -337,9 +343,16 @@ export const setHomebrewDamageTypes = damageTypes => {
   };
 };
 
-export const fetchDamageTypesFailed = error => {
+export const fetchSharedDamageTypesFailed = error => {
   return {
-    type: DamageTypeActionTypes.FETCH_DAMAGE_TYPES_FAILED,
+    type: DamageTypeActionTypes.FETCH_SHARED_DAMAGE_TYPES_FAILED,
+    error
+  };
+};
+
+export const fetchHomebrewDamageTypesFailed = error => {
+  return {
+    type: DamageTypeActionTypes.FETCH_HOMEBREW_DAMAGE_TYPES_FAILED,
     error
   };
 };

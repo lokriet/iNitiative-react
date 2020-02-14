@@ -1,8 +1,10 @@
 import * as ActionTypes from '../actions/actionTypes';
 const initialState = {
   errors: {}, // errors for individual damage types operations. property keys are ids, for new one - ADD
-  error: null, // error for collective damage types operations
-  fetching: false,
+  errorShared: null, // error for collective damage types operations
+  errorHomebrew: null, // error for collective damage types operations
+  fetchingShared: false,
+  fetchingHomebrew: false,
   sharedDamageTypes: [],
   homebrewDamageTypes: [],
   sharedDamageTypesInitialised: null,
@@ -26,8 +28,11 @@ const damageTypesReducer = (state = initialState, action) => {
     case ActionTypes.damageType.REMOVE_DAMAGE_TYPE_ERROR:
       return removeDamageTypeError(state, action);
 
-    case ActionTypes.damageType.START_FETCHING_DAMAGE_TYPES:
-      return startFetchingDamageTypes(state, action);
+    case ActionTypes.damageType.START_FETCHING_SHARED_DAMAGE_TYPES:
+      return startFetchingSharedDamageTypes(state, action);
+
+    case ActionTypes.damageType.START_FETCHING_HOMEBREW_DAMAGE_TYPES:
+      return startFetchingHomebrewDamageTypes(state, action);
 
     case ActionTypes.damageType.SET_SHARED_DAMAGE_TYPES:
       return setSharedDamageTypes(state, action);
@@ -35,8 +40,11 @@ const damageTypesReducer = (state = initialState, action) => {
     case ActionTypes.damageType.SET_HOMEBREW_DAMAGE_TYPES:
       return setHomebrewDamageTypes(state, action);
 
-    case ActionTypes.damageType.FETCH_DAMAGE_TYPES_FAILED:
-      return fetchDamageTypesFailed(state, action);
+    case ActionTypes.damageType.FETCH_SHARED_DAMAGE_TYPES_FAILED:
+      return fetchSharedDamageTypesFailed(state, action);
+
+    case ActionTypes.damageType.FETCH_HOMEBREW_DAMAGE_TYPES_FAILED:
+      return fetchHomebrewDamageTypesFailed(state, action);
     default:
       return state;
   }
@@ -112,10 +120,17 @@ const removeDamageTypeError = (state, action) => {
   };
 };
 
-const startFetchingDamageTypes = (state, action) => {
+const startFetchingSharedDamageTypes = (state, action) => {
   return {
     ...state,
-    fetching: true
+    fetchingShared: true
+  };
+};
+
+const startFetchingHomebrewDamageTypes = (state, action) => {
+  return {
+    ...state,
+    fetchingHomebrew: true
   };
 };
 
@@ -124,8 +139,8 @@ const setSharedDamageTypes = (state, action) => {
     ...state,
     sharedDamageTypes: action.damageTypes,
     sharedDamageTypesInitialised: new Date().getTime(),
-    fetching: false,
-    error: null
+    fetchingShared: false,
+    errorShared: null
   };
 };
 
@@ -134,16 +149,24 @@ const setHomebrewDamageTypes = (state, action) => {
     ...state,
     homebrewDamageTypes: action.damageTypes,
     homebrewDamageTypesInitialised: new Date().getTime(),
-    fetching: false,
-    error: null
+    fetchingHomebrew: false,
+    errorHomebrew: null
   };
 };
 
-const fetchDamageTypesFailed = (state, action) => {
+const fetchSharedDamageTypesFailed = (state, action) => {
   return {
     ...state,
-    fetching: false,
-    error: action.error
+    fetchingShared: false,
+    errorShared: action.error
+  };
+};
+
+const fetchHomebrewDamageTypesFailed = (state, action) => {
+  return {
+    ...state,
+    fetchingHomebrew: false,
+    errorHomebrew: action.error
   };
 };
 

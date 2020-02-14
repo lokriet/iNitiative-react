@@ -71,11 +71,13 @@ const DamageTypes = props => {
     [dispatch]
   );
 
+  const fetching = props.isHomebrew ? props.fetchingHomebrew : props.fetchingShared;
+  const fetchingError = props.isHomebrew ? props.errorHomebrew : props.errorShared;
   let view;
-  if (props.fetching) {
+  if (fetching) {
     view = <Spinner />;
-  } else if (props.fetchingError) {
-    view = <ServerError serverError={props.fetchingError} />;
+  } else if (fetchingError) {
+    view = <ServerError serverError={fetchingError} />;
   } else {
     view = (
       <div>
@@ -113,8 +115,10 @@ const mapStateToProps = state => {
     homebrewDamageTypes: state.damageType.homebrewDamageTypes,
     sharedDamageTypes: state.damageType.sharedDamageTypes,
     errors: state.damageType.errors,
-    fetchingError: state.damageType.error,
-    fetching: state.damageType.fetching,
+    errorShared: state.damageType.errorShared,
+    errorHomebrew: state.damageType.errorHomebrew,
+    fetchingShared: state.damageType.fetchingShared,
+    fetchingHomebrew: state.damageType.fetchingHomebrew,
     token: state.auth.token
   };
 };

@@ -8,10 +8,12 @@ export const ConditionActionTypes = {
   CONDITION_OPERATION_FAILED: 'ADD_CONDITION_FAILED',
   REMOVE_CONDITION_ERROR: 'REMOVE_CONDITION_ERROR',
 
-  START_FETCHING_CONDITIONS: 'START_FETCHING_CONDITIONS',
+  START_FETCHING_SHARED_CONDITIONS: 'START_FETCHING_SHARED_CONDITIONS',
+  START_FETCHING_HOMEBREW_CONDITIONS: 'START_FETCHING_HOMEBREW_CONDITIONS',
   SET_SHARED_CONDITIONS: 'SET_SHARED_CONDITIONS',
   SET_HOMEBREW_CONDITIONS: 'SET_HOMEBREW_CONDITIONS',
-  FETCH_CONDITIONS_FAILED: 'FETCH_CONDITIONS_FAILED',
+  FETCH_SHARED_CONDITIONS_FAILED: 'FETCH_SHARED_CONDITIONS_FAILED',
+  FETCH_HOMEBREW_CONDITIONS_FAILED: 'FETCH_HOMEBREW_CONDITIONS_FAILED',
 
   REGISTER_SAVE_CONDITION_CALLBACK: 'REGISTER_SAVE_CONDITION_CALLBACK',
   UNREGISTER_SAVE_CONDITION_CALLBACK: 'UNREGISTER_SAVE_CONDITION_CALLBACK'
@@ -198,19 +200,18 @@ export const getSharedConditions = () => {
       new Date().getTime() - getState().condition.sharedConditionsInitialised <
         constants.refreshDataTimeout
     ) {
-      console.log('skip going to db');
       return;
     }
 
     try {
-      dispatch(startFetchingConditions());
+      dispatch(startFetchingSharedConditions());
       const response = await fetch('http://localhost:3001/conditions/shared');
       if (response.status === 200) {
         const conditions = await response.json();
         dispatch(setSharedConditions(conditions));
       } else {
         dispatch(
-          fetchConditionsFailed({
+          fetchSharedConditionsFailed({
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Fetching shared conditions failed'
           })
@@ -218,7 +219,7 @@ export const getSharedConditions = () => {
       }
     } catch (error) {
       dispatch(
-        fetchConditionsFailed({
+        fetchSharedConditionsFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Fetching shared conditions failed'
         })
@@ -234,12 +235,11 @@ export const getHomebrewConditions = token => {
       new Date().getTime() - getState().condition.homebrewConditionsInitialised <
       constants.refreshDataTimeout
     ) {
-      console.log('skip going to db');
       return;
     }
 
     try {
-      dispatch(startFetchingConditions());
+      dispatch(startFetchingHomebrewConditions());
       const response = await fetch(
         'http://localhost:3001/conditions/homebrew',
         {
@@ -252,7 +252,7 @@ export const getHomebrewConditions = token => {
       if (response.status === 500 || response.status === 401) {
         const responseData = await response.json();
         dispatch(
-          fetchConditionsFailed({
+          fetchHomebrewConditionsFailed({
             type: ErrorType[response.status],
             message: responseData.message
           })
@@ -262,7 +262,7 @@ export const getHomebrewConditions = token => {
         dispatch(setHomebrewConditions(conditions));
       } else {
         dispatch(
-          fetchConditionsFailed({
+          fetchHomebrewConditionsFailed({
             type: ErrorType.INTERNAL_SERVER_ERROR,
             message: 'Fetching homebrew conditions failed'
           })
@@ -270,7 +270,7 @@ export const getHomebrewConditions = token => {
       }
     } catch (error) {
       dispatch(
-        fetchConditionsFailed({
+        fetchHomebrewConditionsFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Fetching homebrew conditions failed'
         })
@@ -315,9 +315,15 @@ export const removeConditionError = conditionId => {
   };
 };
 
-export const startFetchingConditions = () => {
+export const startFetchingSharedConditions = () => {
   return {
-    type: ConditionActionTypes.START_FETCHING_CONDITIONS
+    type: ConditionActionTypes.START_FETCHING_SHARED_CONDITIONS
+  };
+};
+
+export const startFetchingHomebrewConditions = () => {
+  return {
+    type: ConditionActionTypes.START_FETCHING_HOMEBREW_CONDITIONS
   };
 };
 
@@ -335,9 +341,16 @@ export const setHomebrewConditions = conditions => {
   };
 };
 
-export const fetchConditionsFailed = error => {
+export const fetchSharedConditionsFailed = error => {
   return {
-    type: ConditionActionTypes.FETCH_CONDITIONS_FAILED,
+    type: ConditionActionTypes.FETCH_SHARED_CONDITIONS_FAILED,
+    error
+  };
+};
+
+export const fetchHomebrewConditionsFailed = error => {
+  return {
+    type: ConditionActionTypes.FETCH_HOMEBREW_CONDITIONS_FAILED,
     error
   };
 };
