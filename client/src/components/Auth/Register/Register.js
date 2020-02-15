@@ -5,9 +5,11 @@ import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
 import * as actions from '../../../store/actions/index';
-import classes from './Register.module.css';
 import ErrorType from '../../../util/error';
-import FormikInput from '../../UI/Form/FormikInput/FormikInput';
+
+import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
+
+import classes from './Register.module.css';
 
 const Register = props => {
   const [redirectPath, setRedirectPath] = useState('/');
@@ -58,11 +60,18 @@ const Register = props => {
 
     form = (
       <Formik
+        // initialValues={{
+        //   username: '',
+        //   email: '1@1.com',
+        //   password: '1111111',
+        //   confirmPassword: '1111111',
+        //   rememberMe: true
+        // }}
         initialValues={{
           username: '',
-          email: '1@1.com',
-          password: '1111111',
-          confirmPassword: '1111111',
+          email: '',
+          password: '',
+          confirmPassword: '',
           rememberMe: true
         }}
         validationSchema={Yup.object({

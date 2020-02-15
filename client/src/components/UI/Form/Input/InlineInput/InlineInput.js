@@ -4,16 +4,17 @@ import classes from './InlineInput.module.css';
 import TextareaAutosize from 'react-textarea-autosize';
 
 const InlineInput = React.forwardRef((props, ref) => {
-  const { inputType, className, ...htmlProps } = props;
+  const { inputType, hidingBorder, className, ...htmlProps } = props;
 
   let element;
+  const defaultClass = hidingBorder ? classes.HidingInlineInput : classes.InlineInput
   switch (inputType) {
     case 'textarea':
       element = (
         <TextareaAutosize
           minRows={1}
           maxRows={12}
-          className={`${classes.InlineInput} ${className}`}
+          className={`${defaultClass} ${className}`}
           {...htmlProps}
           inputRef={ref || (() => {})}
         />
@@ -21,7 +22,7 @@ const InlineInput = React.forwardRef((props, ref) => {
       break;
     default:
       element = (
-        <input className={`${classes.InlineInput} ${className}`} {...htmlProps} ref={ref} />
+        <input className={`${defaultClass} ${className}`} {...htmlProps} ref={ref} />
       );
   }
 

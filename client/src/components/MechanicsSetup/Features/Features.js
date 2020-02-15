@@ -4,12 +4,14 @@ import { connect, useDispatch } from 'react-redux';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import * as actions from '../../../store/actions/index';
+
 import AddFeature from './AddFeature/AddFeature';
 import Feature from './Feature/Feature';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Spinner from '../../UI/Spinner/Spinner';
-import IconButton from '../../UI/Form/IconButton/IconButton';
+import IconButton from '../../UI/Form/Button/IconButton/IconButton';
 import FilterInput from '../../UI/FilterInput/FilterInput';
+
 import classes from './Features.module.css';
 
 const Features = props => {
@@ -98,11 +100,13 @@ const Features = props => {
           onCancel={handleCancelChangingFeature}
         />
 
-        <FilterInput
-          allItems={allFeatures}
-          searchField="name"
-          onItemsFiltered={handleItemsFiltered}
-        />
+        <div className={classes.SearchRow}>
+          <FilterInput
+            allItems={allFeatures}
+            searchField="name"
+            onItemsFiltered={handleItemsFiltered}
+          />
+        </div>
 
         {filteredFeatures.map(feature => (
           <Feature

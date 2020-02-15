@@ -15,3 +15,7 @@
 .Centered {
   justify-content: center;
 }
+
+.AlignCentered {
+  align-items: center;
+}

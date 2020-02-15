@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
-import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
-import { AddButton } from '../../../UI/Form/AddButton/AddButton';
+import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
+import { AddButton } from '../../../UI/Form/Button/AddButton/AddButton';
 
 import classes from './AddDamageType.module.css';
 
@@ -13,7 +13,7 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
   const [adding, setAdding] = useState(false);
   const [isNameValid, setIsNameValid] = useState(true);
 
-  const setSubmitted = useCallback((success) => {
+  const setSubmitted = useCallback(success => {
     if (success) {
       setAdding(false);
     }
@@ -52,6 +52,7 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
         <Fragment>
           <div>
             <InlineInput
+              hidingBorder
               type="text"
               onKeyDown={handleKeyDown}
               defaultValue=""

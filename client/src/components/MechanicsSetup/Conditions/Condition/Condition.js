@@ -1,19 +1,25 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { faTimes, faCheck, faUndoAlt, faFish } from '@fortawesome/free-solid-svg-icons';
+import {
+  faTimes,
+  faCheck,
+  faUndoAlt,
+  faFish
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { connect } from 'react-redux';
 
-import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
-import IconButton from '../../../UI/Form/IconButton/IconButton';
+import * as actions from '../../../../store/actions/index';
+
+import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
+import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
 import SavedBadge from '../../../UI/SavedBadge/SavedBadge';
+import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 
 import classes from './Condition.module.css';
-import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
-import * as actions from '../../../../store/actions/index';
-import { connect } from 'react-redux';
 
 class Condition extends Component {
   static propTypes = {
@@ -120,6 +126,7 @@ class Condition extends Component {
       <div className={classes.Condition}>
         <ItemsRow className={classes.InputFieldsRow}>
           <InlineInput
+            hidingBorder
             type="text"
             name="name"
             placeholder="Name"
@@ -127,6 +134,7 @@ class Condition extends Component {
             onChange={this.handleNameChanged}
           />
           <InlineInput
+            hidingBorder
             className={classes.Description}
             inputType="textarea"
             name="description"
@@ -158,9 +166,19 @@ class Condition extends Component {
         ) : null}
 
         <br />
-        <FontAwesomeIcon icon={faFish} className={classes.Fish}></FontAwesomeIcon>
-        <FontAwesomeIcon icon={faFish} className={classes.Fish}></FontAwesomeIcon>
-        <FontAwesomeIcon icon={faFish} flip={'horizontal'} className={classes.Fish}></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          flip={'horizontal'}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
       </div>
     );
   }
@@ -168,9 +186,11 @@ class Condition extends Component {
 
 const mapActionsToProps = dispatch => {
   return {
-    registerSaveCallback: (conditionId, callback) => dispatch(actions.registerSaveConditionCallback(conditionId, callback)),
-    unregisterSaveCallback: (conditionId) => dispatch(actions.unregisterSaveConditionCallback(conditionId))
-  }
-}
+    registerSaveCallback: (conditionId, callback) =>
+      dispatch(actions.registerSaveConditionCallback(conditionId, callback)),
+    unregisterSaveCallback: conditionId =>
+      dispatch(actions.unregisterSaveConditionCallback(conditionId))
+  };
+};
 
 export default connect(null, mapActionsToProps)(Condition);

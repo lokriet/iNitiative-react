@@ -1,0 +1,50 @@
+:global .InlineSelectContainer {
+  width: 12rem;
+  flex-shrink: 0;
+}
+
+:global .InlineSelectContainer .InlineSelect__control {
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-bottom: 1px solid #ccc;
+  box-shadow: none;
+  outline: none;
+}
+
+:global .InlineSelectContainer:hover .InlineSelect__control,
+:global .InlineSelectContainer:focus .InlineSelect__control,
+:global .InlineSelectContainer:active .InlineSelect__control {
+  outline: none;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+:global .InlineSelectContainer .InlineSelect__indicators {
+  visibility: hidden;
+}
+
+:global .InlineSelectContainer:hover .InlineSelect__indicators,
+:global .InlineSelectContainer:focus .InlineSelect__indicators,
+:global .InlineSelectContainer:active .InlineSelect__indicators {
+  visibility: visible;
+}
+
+:global .InlineSelect__option.InlineSelect__option--is-selected {
+  background-color: #999;
+  color: white;
+}
+
+:global .InlineSelect__option.InlineSelect__option--is-focused {
+  background-color: #eee;
+  color: black;
+}
+
+:global .InlineSelect__indicator.InlineSelect__clear-indicator,
+:global .InlineSelect__indicator.InlineSelect__dropdown-indicator {
+  color: #ccc;
+}
+
+:global .InlineSelect__indicator.InlineSelect__clear-indicator:hover,
+:global .InlineSelect__indicator.InlineSelect__dropdown-indicator:hover {
+  color: #aaa;
+}

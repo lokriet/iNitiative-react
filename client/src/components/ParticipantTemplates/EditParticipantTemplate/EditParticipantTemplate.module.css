@@ -1,0 +1,17 @@
+.EditParticipantTemplateForm {
+  justify-content: center;
+  align-items: center;
+  justify-items: left;
+  gap: 1rem 2rem;
+  display: grid;
+  grid-template-columns: max-content 20rem;
+}
+
+.RadioButtonsGroup {
+  display: flex;
+  align-items: center;
+}
+
+.RadioButtonsGroup label {
+  margin-right: 1rem;
+}

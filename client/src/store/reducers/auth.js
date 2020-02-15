@@ -4,7 +4,7 @@ const initialState = {
   error: null,
   loading: false,
   token: null,
-  userId: null,
+  user: null,
   redirectPath: '/',
   initialAuthCheckDone: false
 };

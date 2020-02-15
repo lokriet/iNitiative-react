@@ -6,9 +6,9 @@ import { faTimes, faUndoAlt } from '@fortawesome/free-solid-svg-icons';
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
-import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
+import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
-import IconButton from '../../../UI/Form/IconButton/IconButton';
+import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import SavedBadge from '../../../UI/SavedBadge/SavedBadge';
 
 import classes from './DamageType.module.css';
@@ -35,7 +35,7 @@ const DamageType = ({
 
   const handleHideSavedBadge = useCallback(() => {
     setShowSavedBadge(false);
-  }, [])
+  }, []);
 
   const handleBlur = useCallback(
     event => {
@@ -58,16 +58,19 @@ const DamageType = ({
     onCancel(damageType._id);
   }, [damageType, onCancel]);
 
-  const handleKeyDown = useCallback(event => {
-    if (event.keyCode === 13) {
-      // enter
-      event.target.blur();
-    } else if (event.keyCode === 27) {
-      // escape
-      handleCancel();
-      event.target.blur();
-    }
-  }, [handleCancel]);
+  const handleKeyDown = useCallback(
+    event => {
+      if (event.keyCode === 13) {
+        // enter
+        event.target.blur();
+      } else if (event.keyCode === 27) {
+        // escape
+        handleCancel();
+        event.target.blur();
+      }
+    },
+    [handleCancel]
+  );
 
   useEffect(() => {
     if (serverError || !isNameValid) {
@@ -81,10 +84,11 @@ const DamageType = ({
     <div className={classes.DamageType}>
       <ItemsRow>
         <InlineInput
+          hidingBorder
           type="text"
           name="name"
           placeholder="Name"
-          defaultValue={damageType ? damageType.name : ""}
+          defaultValue={damageType ? damageType.name : ''}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           ref={nameRef}

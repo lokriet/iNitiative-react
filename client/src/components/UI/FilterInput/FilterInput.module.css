@@ -3,11 +3,16 @@
   border: 1px solid #aaa;
   border-radius: 4px;
   width: 16rem;
-  margin: 0 auto 2rem auto;
+  margin: 0 auto;
 }
 
 .Icon {
   margin-right: 0.5rem;
+  color: #ccc;
+}
+
+.FilterInput:hover .Icon,
+.FilterInput:focus-within .Icon {
   color: #aaa;
 }
 

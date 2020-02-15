@@ -1,0 +1,9 @@
+.List {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ListItem {
+  margin: 0 0.5rem;
+}

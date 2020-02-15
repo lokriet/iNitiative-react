@@ -2,17 +2,17 @@ import React, { useState, useCallback, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import CreatableSelect from 'react-select/creatable';
+import { connect } from 'react-redux';
 
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
-import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
-import { AddButton } from '../../../UI/Form/AddButton/AddButton';
+import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
+import { AddButton } from '../../../UI/Form/Button/AddButton/AddButton';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
-import IconButton from '../../../UI/Form/IconButton/IconButton';
+import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 
 import classes from './AddFeature.module.css';
-import { connect } from 'react-redux';
 
 const AddFeature = ({
   serverError,
@@ -48,8 +48,18 @@ const AddFeature = ({
     }
 
     setNameError(null);
-    onSave({ name: nameValue, type: typeValue, description: descriptionValue }, setSubmitted);
-  }, [descriptionValue, nameValue, typeValue, onSave, onValidateName, setSubmitted]);
+    onSave(
+      { name: nameValue, type: typeValue, description: descriptionValue },
+      setSubmitted
+    );
+  }, [
+    descriptionValue,
+    nameValue,
+    typeValue,
+    onSave,
+    onValidateName,
+    setSubmitted
+  ]);
 
   const handleKeyDown = useCallback(
     event => {
@@ -71,11 +81,14 @@ const AddFeature = ({
     setDescriptionValue(event.target.value);
   }, []);
 
-  const handleTypeChanged = useCallback((newValue) => {
+  const handleTypeChanged = useCallback(newValue => {
     setTypeValue(newValue ? newValue.value : null);
   }, []);
 
-  const featureTypeOptions = featureTypes.map(item => ({label: item, value: item}));
+  const featureTypeOptions = featureTypes.map(item => ({
+    label: item,
+    value: item
+  }));
   return (
     <div className={classes.AddFeature}>
       {adding ? (
@@ -85,12 +98,13 @@ const AddFeature = ({
               options={featureTypeOptions}
               onChange={handleTypeChanged}
               isClearable={true}
-              placeholder='Type'
-              className='AddFeatureTypeContainer'
-              classNamePrefix='AddFeatureType'
+              placeholder="Type"
+              className="AddFeatureTypeContainer"
+              classNamePrefix="AddFeatureType"
             />
 
             <InlineInput
+              hidingBorder
               className={classes.Name}
               type="text"
               onKeyDown={handleKeyDown}
@@ -100,6 +114,7 @@ const AddFeature = ({
               autoFocus
             />
             <InlineInput
+              hidingBorder
               className={classes.Description}
               inputType="textarea"
               onKeyDown={handleKeyDown}

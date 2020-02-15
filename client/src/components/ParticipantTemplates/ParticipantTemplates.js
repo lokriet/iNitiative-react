@@ -1,16 +1,54 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom';
+
+import withAuthCheck from '../../hoc/withAuthCheck';
+import TabbedNavigation from '../Navigation/TabbedNavigation/TabbedNavigation';
+import TabbedNavigationItem from '../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
+import ParticipantTemplatesList from './ParticipantTemplatesList/ParticipantTemplatesList';
+
+export const ParticipantType = {
+  Player: 'player',
+  Monster: 'monster'
+};
 
 const ParticipantTemplates = props => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  let { path, url } = useRouteMatch();
 
-ParticipantTemplates.propTypes = {
+  return props.isAuthenticated ? (
+    <Fragment>
+      <TabbedNavigation>
+        <TabbedNavigationItem link={`${url}/players`}>
+          Players
+        </TabbedNavigationItem>
+        <TabbedNavigationItem link={`${url}/monsters`}>
+          Monsters
+        </TabbedNavigationItem>
+      </TabbedNavigation>
 
-}
+      <Switch>
+        <Route exact path={path}>
+          <Redirect to={`${url}/players`} />
+        </Route>
+        <Route path={`${path}/players`}>
+          <ParticipantTemplatesList type={ParticipantType.Player} />
+        </Route>
+        <Route path={`${path}/monsters`}>
+          <ParticipantTemplatesList type={ParticipantType.Monster} />
+        </Route>
+      </Switch>
+    </Fragment>
+  ) : null;
+};
 
-export default ParticipantTemplates
+ParticipantTemplates.propTypes = {};
+
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.auth.token != null,
+    initialAuthCheckDone: state.auth.initialAuthCheckDone
+  };
+};
+
+export default connect(mapStateToProps)(withAuthCheck(ParticipantTemplates));

@@ -5,16 +5,17 @@ import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
 import * as actions from '../../../store/actions/index';
-import classes from './Login.module.css';
 import ErrorType from '../../../util/error';
-import FormikInput from '../../UI/Form/FormikInput/FormikInput';
+
+import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
+
+import classes from './Login.module.css';
 
 const Login = props => {
-  const [redirectPath, setRedirectPath] = useState('/');
+  const [redirectPath] = useState(props.redirectPath);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setRedirectPath(props.redirectPath);
     dispatch(actions.setAuthRedirectPath('/'));
   }, [props.redirectPath, dispatch]);
 
@@ -95,7 +96,7 @@ const Login = props => {
 
           <div>
             Don't have an account?
-            <Link to={'/register'}>{'Register'}</Link>
+            <Link to={'/register'}>Register</Link>
           </div>
         </Form>
       </Formik>

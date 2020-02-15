@@ -4,12 +4,14 @@ import { connect, useDispatch } from 'react-redux';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import * as actions from '../../../store/actions/index';
+
 import AddCondition from './AddCondition/AddCondition';
 import Condition from './Condition/Condition';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Spinner from '../../UI/Spinner/Spinner';
-import IconButton from '../../UI/Form/IconButton/IconButton';
+import IconButton from '../../UI/Form/Button/IconButton/IconButton';
 import FilterInput from '../../UI/FilterInput/FilterInput';
+
 import classes from './Conditions.module.css';
 
 const Conditions = props => {
@@ -104,11 +106,13 @@ const Conditions = props => {
           onCancel={handleCancelChangingCondition}
         />
 
-        <FilterInput
-          allItems={allConditions}
-          searchField="name"
-          onItemsFiltered={handleItemsFiltered}
-        />
+        <div className={classes.SearchRow}>
+          <FilterInput
+            allItems={allConditions}
+            searchField="name"
+            onItemsFiltered={handleItemsFiltered}
+          />
+        </div>
 
         {filteredConditions.map(condition => (
           <Condition

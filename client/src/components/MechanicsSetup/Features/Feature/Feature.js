@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CreatableSelect from 'react-select/creatable';
 import { connect } from 'react-redux';
 
-import InlineInput from '../../../UI/Form/InlineInput/InlineInput';
-import IconButton from '../../../UI/Form/IconButton/IconButton';
+import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
+import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
@@ -170,6 +170,7 @@ class Feature extends Component {
           />
 
           <InlineInput
+            hidingBorder
             type="text"
             name="name"
             placeholder="Name"
@@ -178,6 +179,7 @@ class Feature extends Component {
             className={classes.Name}
           />
           <InlineInput
+            hidingBorder
             className={classes.Description}
             inputType="textarea"
             name="description"

@@ -1,12 +1,21 @@
-.InlineInput {
+.HidingInlineInput {
   padding: 0.5rem 1rem;
   border: 1px solid transparent;
   border-bottom-color: #ccc;
   height: 38px;
 }
 
+.InlineInput {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 38px;
+}
+
 .InlineInput:hover,
-.InlineInput:focus {
+.InlineInput:focus,
+.HidingInlineInput:hover,
+.HidingInlineInput:focus {
   border-color: #ccc;
   border-radius: 4px;
 }
