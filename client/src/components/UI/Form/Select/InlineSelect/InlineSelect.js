@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import CreatableSelect from 'react-select/creatable';
-import Select from 'react-select/src/Select';
-import classes from './InlineSelect.module.css';
+import Select from 'react-select';
+import './InlineSelect.module.css';
+import GroupedMenu from './GroupedMenu/GroupedMenu';
 
 const InlineSelect = props => {
-  const {isCreatable, isClearable, options, className, ...htmlProps } = props;
+  const {isCreatable, isClearable, isMulti, isGrouped, options, className, ...htmlProps } = props;
 
   const SelectComponent = isCreatable ? CreatableSelect : Select;
 
@@ -13,13 +14,21 @@ const InlineSelect = props => {
     <SelectComponent
       options={options}
       isClearable={isClearable}
-      className={`${classes.InlineSelectContainer} ${className}`}
+      isMulti={isMulti}
+      closeMenuOnSelect={!isMulti}
+      className={`InlineSelectContainer ${className}`}
       classNamePrefix="InlineSelect"
+      components={isGrouped ? {MenuList: GroupedMenu} : {}}
       {...htmlProps}
     />
   );
 };
 
-InlineSelect.propTypes = {};
+InlineSelect.propTypes = {
+  isCreatable: PropTypes.bool,
+  isClearable: PropTypes.bool,
+  options: PropTypes.array,
+  className: PropTypes.string
+};
 
 export default InlineSelect;

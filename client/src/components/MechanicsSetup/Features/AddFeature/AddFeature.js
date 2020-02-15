@@ -1,7 +1,6 @@
 import React, { useState, useCallback, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import CreatableSelect from 'react-select/creatable';
 import { connect } from 'react-redux';
 
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
@@ -13,6 +12,7 @@ import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 
 import classes from './AddFeature.module.css';
+import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
 
 const AddFeature = ({
   serverError,
@@ -94,13 +94,13 @@ const AddFeature = ({
       {adding ? (
         <Fragment>
           <ItemsRow centered>
-            <CreatableSelect
+            <InlineSelect
+              isCreatable
+              isClearable
               options={featureTypeOptions}
               onChange={handleTypeChanged}
-              isClearable={true}
               placeholder="Type"
-              className="AddFeatureTypeContainer"
-              classNamePrefix="AddFeatureType"
+              className={classes.Type}
             />
 
             <InlineInput

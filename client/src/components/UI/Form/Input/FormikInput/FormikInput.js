@@ -9,11 +9,11 @@ const Input =  ({
   form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
   ...props
 })  => {
-  const {serverError, className, ...htmlProps} = {...props}
+  const {serverError, className, ...htmlProps} = props;
 
   return (
     <div className={classes.InputContainer}>
-      <InlineInput className={classes.className} {...htmlProps}  {...field}  />
+      <InlineInput className={className} {...htmlProps} {...field}  />
       <ErrorMessage name={field.name} />
       {serverError ? <ServerValidationError for={field.name} serverError={serverError} /> : null }
     </div>

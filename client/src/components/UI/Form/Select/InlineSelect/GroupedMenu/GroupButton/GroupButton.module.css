@@ -1,0 +1,8 @@
+.GroupButton {
+  display: inline-block
+}
+
+.LabelButton {
+  border: none;
+  background-color: transparent;
+}

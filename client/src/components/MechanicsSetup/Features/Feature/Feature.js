@@ -7,7 +7,6 @@ import {
   faFish
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import CreatableSelect from 'react-select/creatable';
 import { connect } from 'react-redux';
 
 import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
@@ -20,6 +19,7 @@ import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import * as actions from '../../../../store/actions/index';
 
 import classes from './Feature.module.css';
+import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
 
 class Feature extends Component {
   static propTypes = {
@@ -159,13 +159,13 @@ class Feature extends Component {
     return (
       <div className={classes.Feature}>
         <ItemsRow className={classes.InputFieldsRow}>
-          <CreatableSelect
+          <InlineSelect
             options={featureTypeOptions}
             onChange={this.handleTypeChanged}
-            isClearable={true}
+            isClearable
+            isCreatable
             placeholder="Type"
-            className="FeatureTypeContainer"
-            classNamePrefix="FeatureType"
+            className={classes.Type}
             value={this.state.typeValue}
           />
 

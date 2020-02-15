@@ -1,6 +1,5 @@
 :global .InlineSelectContainer {
-  width: 12rem;
-  flex-shrink: 0;
+  text-align: left;
 }
 
 :global .InlineSelectContainer .InlineSelect__control {
