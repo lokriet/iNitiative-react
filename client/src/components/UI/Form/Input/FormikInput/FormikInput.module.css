@@ -10,3 +10,7 @@
   border: 1px solid #aaa;
   border-radius: 4px;
 } */
+
+.ValidationError {
+  color: #791010;
+}

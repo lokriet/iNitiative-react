@@ -14,7 +14,7 @@ const Input =  ({
   return (
     <div className={classes.InputContainer}>
       <InlineInput className={className} {...htmlProps} {...field}  />
-      <ErrorMessage name={field.name} />
+      <div className={classes.ValidationError}><ErrorMessage name={field.name} /></div>
       {serverError ? <ServerValidationError for={field.name} serverError={serverError} /> : null }
     </div>
   );

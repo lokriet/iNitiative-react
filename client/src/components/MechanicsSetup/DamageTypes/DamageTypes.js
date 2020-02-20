@@ -16,9 +16,9 @@ const DamageTypes = props => {
 
   useEffect(() => {
     props.isHomebrew
-      ? dispatch(actions.getHomebrewDamageTypes(props.token))
+      ? dispatch(actions.getHomebrewDamageTypes())
       : dispatch(actions.getSharedDamageTypes());
-  }, [dispatch, props.isHomebrew, props.token]);
+  }, [dispatch, props.isHomebrew]);
 
   const validateName = useCallback(
     (_id, name) => {
@@ -35,12 +35,11 @@ const DamageTypes = props => {
         actions.addDamageType(
           { name },
           props.isHomebrew,
-          props.token,
           setSubmitted
         )
       );
     },
-    [dispatch, props.isHomebrew, props.token]
+    [dispatch, props.isHomebrew]
   );
 
   const handleUpdateDamageType = useCallback(
@@ -49,19 +48,18 @@ const DamageTypes = props => {
         actions.updateDamageType(
           { _id, name },
           props.isHomebrew,
-          props.token,
           setSubmitted
         )
       );
     },
-    [dispatch, props.isHomebrew, props.token]
+    [dispatch, props.isHomebrew]
   );
 
   const handleDeleteDamageType = useCallback(
     damageTypeId => {
-      dispatch(actions.deleteDamageType(damageTypeId, props.token));
+      dispatch(actions.deleteDamageType(damageTypeId));
     },
-    [dispatch, props.token]
+    [dispatch]
   );
 
   const handleCancelChangingDamageType = useCallback(
@@ -118,8 +116,7 @@ const mapStateToProps = state => {
     errorShared: state.damageType.errorShared,
     errorHomebrew: state.damageType.errorHomebrew,
     fetchingShared: state.damageType.fetchingShared,
-    fetchingHomebrew: state.damageType.fetchingHomebrew,
-    token: state.auth.token
+    fetchingHomebrew: state.damageType.fetchingHomebrew
   };
 };
 

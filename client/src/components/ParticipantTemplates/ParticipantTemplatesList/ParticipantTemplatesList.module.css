@@ -1,3 +1,21 @@
 .SearchRow {
   margin-bottom: 2rem;
 }
+
+.Table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  position: relative;
+}
+
+.TableHeader {
+}
+
+.TableHeader th {
+  padding: 0.5rem;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  border-bottom: 2px solid #aaa;
+  box-shadow: 0 2px 2px -2px #aaa;
+}

@@ -1,6 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import ErrorType from '../../../../util/error';
+import Error from '../Error/Error';
 
 const ServerValidationError = props => {
   let errors = null;
@@ -12,15 +13,18 @@ const ServerValidationError = props => {
     props.serverError.data.length > 0
   ) {
     const myErrors = props.for ? props.serverError.data.filter(
-      error => error.param === props.for
+      error => {
+        const name = error.param.split('.').pop();
+        return name === props.for
+      }
       ) : props.serverError.data;
     if (myErrors.length > 0) {
       errors = (
-        <Fragment>
+        <>
           {myErrors.map((error, index) => (
-            <div className={props.className} key={index}>{error.msg}</div>
+            <Error key={index}>{error.msg}</Error>
           ))}
-        </Fragment>
+        </>
       );
     }
   }
@@ -29,8 +33,7 @@ const ServerValidationError = props => {
 
 ServerValidationError.propTypes = {
   for: PropTypes.string,
-  serverError: PropTypes.object,
-  className: PropTypes.string
+  serverError: PropTypes.object
 };
 
 export default ServerValidationError;

@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import * as actions from '../../../store/actions/index';
 import ErrorType from '../../../util/error';
 
+import Button from '../../UI/Form/Button/Button';
 import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 
 import classes from './Login.module.css';
@@ -90,9 +91,9 @@ const Login = props => {
 
           {operationErrorMessage}
 
-          <button type="submit" disabled={props.loading}>
+          <Button type="submit" disabled={props.loading}>
             Login
-          </button>
+          </Button>
 
           <div>
             Don't have an account?

@@ -1,5 +1,5 @@
 import ErrorType from '../../util/error';
-import * as constants from '../../util/constants';
+import constants from '../../util/constants';
 
 export const DamageTypeActionTypes = {
   ADD_DAMAGE_TYPE_SUCCESS: 'ADD_DAMAGE_TYPE_SUCCESS',
@@ -16,16 +16,17 @@ export const DamageTypeActionTypes = {
   FETCH_HOMEBREW_DAMAGE_TYPES_FAILED: 'FETCH_HOMEBREW_DAMAGE_TYPES_FAILED'
 };
 
-export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
-  return async dispatch => {
+export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         'http://localhost:3001/damageTypes/damageType',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           },
           body: JSON.stringify({ damageType, isHomebrew })
         }
@@ -83,18 +84,18 @@ export const addDamageType = (damageType, isHomebrew, token, setSubmitted) => {
 export const updateDamageType = (
   damageType,
   isHomebrew,
-  token,
   setSubmitted
 ) => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/damageTypes/damageType/${damageType._id}`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           },
           body: JSON.stringify({ damageType, isHomebrew })
         }
@@ -147,15 +148,16 @@ export const updateDamageType = (
   };
 };
 
-export const deleteDamageType = (damageTypeId, token) => {
-  return async dispatch => {
+export const deleteDamageType = (damageTypeId) => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/damageTypes/damageType/${damageTypeId}`,
         {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           }
         }
       );
@@ -230,7 +232,7 @@ export const getSharedDamageTypes = () => {
   };
 };
 
-export const getHomebrewDamageTypes = (token) => {
+export const getHomebrewDamageTypes = () => {
   return async (dispatch, getState) => {
     if (
       getState().damageType.homebrewDamageTypesInitialised &&
@@ -242,9 +244,10 @@ export const getHomebrewDamageTypes = (token) => {
 
     try {
       dispatch(startFetchingHomebrewDamageTypes());
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch('http://localhost:3001/damageTypes/homebrew', {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${idToken}`
         }
       });
 

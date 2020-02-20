@@ -13,6 +13,7 @@ import thunk from 'redux-thunk';
 import damageTypeReducer from './store/reducers/damageType';
 import conditionReducer from './store/reducers/condition';
 import featureReducer from './store/reducers/feature';
+import participantTemplateReducer from './store/reducers/participantTemplate';
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
@@ -23,7 +24,8 @@ const rootReducer = combineReducers({
   auth: authReducer,
   damageType: damageTypeReducer,
   condition: conditionReducer,
-  feature: featureReducer
+  feature: featureReducer,
+  participantTemplate: participantTemplateReducer
 });
 
 const sagaMiddleware = createSagaMiddleware();
@@ -35,7 +37,12 @@ const store = createStore(
 
 sagaMiddleware.run(watchAll);
 
-ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

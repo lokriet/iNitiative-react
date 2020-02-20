@@ -1,5 +1,5 @@
 // import { push } from 'react-router-redux';
-import { put } from 'redux-saga/effects';
+import { put, select } from 'redux-saga/effects';
 import ErrorType from '../../util/error';
 
 import * as actions from '../actions/index';
@@ -7,17 +7,21 @@ import * as actions from '../actions/index';
 // import createHistory from 'history/createBrowserHistory';
 // const history = createHistory();
 
+export const getFirebase = (state) => state.auth.firebase;
+
 export function* authSaga(action) {
   console.log("I'm in saga!");
   yield put(actions.authStart());
 
   try {
-    const url = action.isRegister ? 'http://localhost:3001/auth/signup' : 'http://localhost:3001/auth/signin';
+    const url = action.isRegister
+      ? 'http://localhost:3001/auth/signup'
+      : 'http://localhost:3001/auth/signin';
 
     const body = {
       email: action.payload.email,
       password: action.payload.password
-    }
+    };
     if (action.isRegister) {
       body.username = action.payload.username;
     }
@@ -55,6 +59,9 @@ export function* authSaga(action) {
       } else {
         yield localStorage.removeItem('token');
       }
+      const firebase = yield select(getFirebase);
+      const firebaseLoginResult = yield firebase.doSignInWithCustomToken(responseData.data.token);
+      console.log('firebase login result: ', firebaseLoginResult);
       yield put(actions.authSuccess(responseData.data));
     }
   } catch (error) {
@@ -71,6 +78,8 @@ export function* authSaga(action) {
 
 export function* logoutSaga(action) {
   yield localStorage.removeItem('token');
+  const firebase = yield select(getFirebase);
+  yield firebase.doSignOut();
   yield put(actions.logoutSuccess());
 }
 
@@ -83,9 +92,13 @@ export function* checkAuthStateSaga(action) {
   }
 
   try {
+    const firebase = yield select(getFirebase);
+    const firebaseLoginResult = yield firebase.doSignInWithCustomToken(token);
+    console.log('firebase login result: ', firebaseLoginResult);
+    const idToken = yield firebase.doGetIdToken();
     const response = yield fetch('http://localhost:3001/users/userinfo', {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${idToken}`
       }
     });
 
@@ -96,8 +109,11 @@ export function* checkAuthStateSaga(action) {
         user: responseData
       })
     );
-    yield put(actions.authCheckInitialStateDone());
+    
   } catch (error) {
+    // yield put(actions.authFailed(error));
     console.log(error);
+  } finally {
+    yield put(actions.authCheckInitialStateDone());
   }
 }

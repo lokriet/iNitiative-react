@@ -13,7 +13,6 @@ const useDropdownValues = () => {
   const [conditions, setConditions] = useState([]);
   const [damageTypes, setDamageTypes] = useState([]);
 
-  const token = useSelector(state => state.auth.token);
   const sharedDamageTypes = useSelector(
     state => state.damageType.sharedDamageTypes
   );
@@ -32,12 +31,12 @@ const useDropdownValues = () => {
 
   useEffect(() => {
     dispatch(actions.getSharedDamageTypes());
-    dispatch(actions.getHomebrewDamageTypes(token));
+    dispatch(actions.getHomebrewDamageTypes());
     dispatch(actions.getSharedConditions());
-    dispatch(actions.getHomebrewConditions(token));
+    dispatch(actions.getHomebrewConditions());
     dispatch(actions.getSharedFeatures());
-    dispatch(actions.getHomebrewFeatures(token));
-  }, [dispatch, token]);
+    dispatch(actions.getHomebrewFeatures());
+  }, [dispatch]);
 
   const makeSortedOptionsList = useCallback(items => {
     return items

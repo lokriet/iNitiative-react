@@ -23,3 +23,8 @@
 .Comment {
   width: 13rem;
 }
+
+.Avatar {
+  align-self: flex-start;
+  text-align: left;
+}

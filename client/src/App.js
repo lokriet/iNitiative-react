@@ -19,39 +19,60 @@ const App = props => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (props.firebase == null) {
+      dispatch(actions.initFirebase());
+    }
+  }, [dispatch, props.firebase]);
+
+  useEffect(() => {
+    let unsubscribe = null;
+    if (props.firebase) {
+      unsubscribe = props.firebase.auth.onAuthStateChanged(authUser => {
+        //TODO;
+      })
+    };
+
+    return () => {
+      if (unsubscribe != null) {
+        unsubscribe();
+      }
+    }
+  }, [props.firebase]);
+
+  useEffect(() => {
     if (!props.isAuthenticated && !props.initialAuthCheckDone) {
       dispatch(actions.authCheckInitialState());
     }
   }, [props.isAuthenticated, props.initialAuthCheckDone, dispatch]);
 
   return props.initialAuthCheckDone ? (
-    <BrowserRouter>
-      <Layout>
-        <Toolbar />
-        <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/register" component={Register} />
-          <Route path="/login" component={Login} />
-          <Route path="/admin">
-            <MechanicsSetup isHomebrew={false} />
-          </Route>
+      <BrowserRouter>
+        <Layout>
+          {/* <Toolbar /> */}
+          <Switch>
+            <Route path="/" exact component={Home} />
+            <Route path="/register" component={Register} />
+            <Route path="/login" component={Login} />
+            <Route path="/admin">
+              <MechanicsSetup isHomebrew={false} />
+            </Route>
 
-          <Route path="/homebrew">
-            <MechanicsSetup isHomebrew={true} />
-          </Route>
+            <Route path="/homebrew">
+              <MechanicsSetup isHomebrew={true} />
+            </Route>
 
-          <Route path="/templates/new">
-            <EditParticipantTemplate isNew />{' '}
-          </Route>
-          <Route path="/templates/edit/:templateId">
-            <EditParticipantTemplate />{' '}
-          </Route>
-          <Route path="/templates" component={ParticipantTemplates} />
-          <Route path="/logout" component={Logout} />
-          <Route path="/" component={PageNotFound} />
-        </Switch>
-      </Layout>
-    </BrowserRouter>
+            <Route path="/templates/new">
+              <EditParticipantTemplate isNew />
+            </Route>
+            <Route path="/templates/edit/:templateId">
+              <EditParticipantTemplate />
+            </Route>
+            <Route path="/templates" component={ParticipantTemplates} />
+            <Route path="/logout" component={Logout} />
+            <Route path="/" component={PageNotFound} />
+          </Switch>
+        </Layout>
+      </BrowserRouter>
   ) : (
     <Spinner />
   );
@@ -60,6 +81,7 @@ const App = props => {
 const mapStateToProps = state => {
   return {
     isAuthenticated: state.auth.token != null,
+    firebase: state.auth.firebase,
     initialAuthCheckDone: state.auth.initialAuthCheckDone,
     isAdmin: state.auth.user != null && state.auth.user.isAdmin
   };

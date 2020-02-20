@@ -1,0 +1,33 @@
+.ParticipantTemplateRow {
+  border-bottom: 1px solid #ccc;
+}
+
+.ParticipantTemplateRow:hover {
+  background-color: #eee;
+}
+
+.ParticipantTemplateRow td {
+  padding: 1rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.ParticipantTemplateRow .AvatarCell {
+  padding: 0.3rem 0.5rem 0 0.5rem;
+}
+
+.Avatar {
+  max-height: 3rem;
+  max-width: 3rem;
+}
+
+.Separator {
+  margin-left: 0.5rem;
+}
+
+.Comment {
+  max-width: 15rem;
+  max-height: 4rem;
+  overflow: auto;
+  white-space: pre-wrap;
+}

@@ -1,5 +1,5 @@
 import ErrorType from '../../util/error';
-import * as constants from '../../util/constants';
+import constants from '../../util/constants';
 
 export const ConditionActionTypes = {
   ADD_CONDITION_SUCCESS: 'ADD_CONDITION_SUCCESS',
@@ -19,16 +19,18 @@ export const ConditionActionTypes = {
   UNREGISTER_SAVE_CONDITION_CALLBACK: 'UNREGISTER_SAVE_CONDITION_CALLBACK'
 };
 
-export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
-  return async dispatch => {
+export const addCondition = (condition, isHomebrew, setSubmitted) => {
+  return async (dispatch, getState) => {
     try {
+      
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         'http://localhost:3001/conditions/condition',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           },
           body: JSON.stringify({ condition, isHomebrew })
         }
@@ -83,16 +85,17 @@ export const addCondition = (condition, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const updateCondition = (condition, isHomebrew, token, setSubmitted) => {
-  return async dispatch => {
+export const updateCondition = (condition, isHomebrew, setSubmitted) => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/conditions/condition/${condition._id}`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           },
           body: JSON.stringify({ condition, isHomebrew })
         }
@@ -145,15 +148,16 @@ export const updateCondition = (condition, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const deleteCondition = (conditionId, token) => {
-  return async dispatch => {
+export const deleteCondition = (conditionId) => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/conditions/condition/${conditionId}`,
         {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           }
         }
       );
@@ -228,7 +232,7 @@ export const getSharedConditions = () => {
   };
 };
 
-export const getHomebrewConditions = token => {
+export const getHomebrewConditions = () => {
   return async (dispatch, getState) => {
     if (
       getState().condition.homebrewConditionsInitialised &&
@@ -240,11 +244,12 @@ export const getHomebrewConditions = token => {
 
     try {
       dispatch(startFetchingHomebrewConditions());
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         'http://localhost:3001/conditions/homebrew',
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           }
         }
       );

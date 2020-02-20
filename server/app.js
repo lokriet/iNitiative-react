@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const http = require('http');
 
-const database = require('./database');
+const database = require('./util/database');
 const connectionUtils = require('./util/connectionUtils');
 const httpErrors = require('./util/httpErrors');
 
@@ -15,6 +15,7 @@ const usersRouter = require('./routes/users');
 const damageTypesRouter = require('./routes/damageTypes');
 const conditionsRouter = require('./routes/conditions');
 const featuresRouter = require('./routes/features');
+const templatesRouter = require('./routes/participantTemplates');
 
 const responseCodes = require('./util/responseCodes');
 
@@ -32,6 +33,7 @@ if (isDev) {
   console.log('Running dev server');
   app.use(logger('dev'));
 }
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -52,6 +54,7 @@ app.use('/users', usersRouter);
 app.use('/damageTypes', damageTypesRouter);
 app.use('/conditions', conditionsRouter);
 app.use('/features', featuresRouter);
+app.use('/participantTemplates', templatesRouter);
 
 
 app.use(function(req, res, next) {

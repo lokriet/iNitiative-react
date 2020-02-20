@@ -2,9 +2,11 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const User = require('../model/user');
 
-const jwtUtils = require('../util/jwtUtils');
 const responseCodes = require('../util/responseCodes');
 const httpErrors = require('../util/httpErrors');
+
+const getAdmin = require('../util/firebaseAuthAdmin');
+
 
 module.exports.createUser = async (req, res, next) => {
   try {
@@ -28,12 +30,14 @@ module.exports.createUser = async (req, res, next) => {
     });
 
     const savedUser = await user.save();
-    const claims = {
-      userId: savedUser._id,
+    
+    const userId = savedUser._id;
+    const additionalClaims = {
       isAdmin: savedUser.isAdmin
     };
 
-    const token = jwtUtils.generateJWT(claims);
+    const token = await getAdmin().auth().createCustomToken(userId, additionalClaims);
+    // const token = jwtUtils.generateJWT(claims);
 
     return res.status(201).json({
       message: 'User created',
@@ -79,12 +83,19 @@ module.exports.login = async (req, res, next) => {
       return;
     }
 
-    const claims = {
-      userId: user._id,
+    // const claims = {
+    //   userId: user._id,
+    //   isAdmin: user.isAdmin
+    // };
+
+    // const token = jwtUtils.generateJWT(claims);
+    const userId = user._id;
+    console.log('userId: ', userId);
+    const additionalClaims = {
       isAdmin: user.isAdmin
     };
+    const token = await getAdmin().auth().createCustomToken(userId.toString(), additionalClaims);
 
-    const token = jwtUtils.generateJWT(claims);
     return res.status(200).json({
       message: 'Login successful',
       statusCode: 200,

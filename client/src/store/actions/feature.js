@@ -1,5 +1,5 @@
 import ErrorType from '../../util/error';
-import * as constants from '../../util/constants';
+import constants from '../../util/constants';
 
 export const FeatureActionTypes = {
   ADD_FEATURE_SUCCESS: 'ADD_FEATURE_SUCCESS',
@@ -17,14 +17,15 @@ export const FeatureActionTypes = {
   UNREGISTER_SAVE_FEATURE_CALLBACK: 'UNREGISTER_SAVE_FEATURE_CALLBACK'
 };
 
-export const addFeature = (feature, isHomebrew, token, setSubmitted) => {
-  return async dispatch => {
+export const addFeature = (feature, isHomebrew, setSubmitted) => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch('http://localhost:3001/features/feature', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${idToken}`
         },
         body: JSON.stringify({ feature, isHomebrew })
       });
@@ -78,16 +79,17 @@ export const addFeature = (feature, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const updateFeature = (feature, isHomebrew, token, setSubmitted) => {
-  return async dispatch => {
+export const updateFeature = (feature, isHomebrew, setSubmitted) => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/features/feature/${feature._id}`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           },
           body: JSON.stringify({ feature, isHomebrew })
         }
@@ -140,15 +142,16 @@ export const updateFeature = (feature, isHomebrew, token, setSubmitted) => {
   };
 };
 
-export const deleteFeature = (featureId, token) => {
-  return async dispatch => {
+export const deleteFeature = (featureId) => {
+  return async (dispatch, getState) => {
     try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/features/feature/${featureId}`,
         {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${idToken}`
           }
         }
       );
@@ -223,7 +226,7 @@ export const getSharedFeatures = () => {
   };
 };
 
-export const getHomebrewFeatures = token => {
+export const getHomebrewFeatures = () => {
   return async (dispatch, getState) => {
     if (
       getState().feature.homebrewFeaturesInitialised &&
@@ -235,9 +238,10 @@ export const getHomebrewFeatures = token => {
 
     try {
       dispatch(startFetchingFeatures());
+      const idToken =  await getState().auth.firebase.doGetIdToken();
       const response = await fetch('http://localhost:3001/features/homebrew', {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${idToken}`
         }
       });
 

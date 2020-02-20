@@ -1,4 +1,8 @@
+import Firebase from "../../components/Firebase/firebase";
+
 export const AuthActionTypes = {
+  SET_FIREBASE: 'SET_FIREBASE',
+
   AUTHENTICATE: 'AUTHENTICATE',
   AUTH_START: 'AUTH_START',
   AUTH_SUCCESS: 'AUTH_SUCCESS',
@@ -11,6 +15,20 @@ export const AuthActionTypes = {
   AUTH_CHECK_INITIAL_STATE_DONE: 'AUTH_CHECK_INITIAL_STATE_DONE',
   SET_AUTH_REDIRECT_PATH: 'SET_AUTH_REDIRECT_PATH'
 };
+
+export const initFirebase = () => {
+  return dispatch => {
+    const firebase = new Firebase();
+    dispatch(setFirebase(firebase));
+  }
+}
+
+export const setFirebase = (firebase) => {
+  return {
+    type: AuthActionTypes.SET_FIREBASE,
+    firebase
+  }
+}
 
 export const authenticate = (isRegister, payload) => {
   return {

@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import * as Yup from 'yup';
-import PropTypes from 'prop-types';
 import useQueryParams from '../../../hooks/useQueryParams';
 import withAuthCheck from '../../../hoc/withAuthCheck';
 import { ParticipantType } from '../ParticipantTemplates';
 import { Formik, Field, Form } from 'formik';
 import Input from '../../UI/Form/Input/FormikInput/FormikInput';
 import Select from '../../UI/Form/Select/FormikSelect/FormikSelect';
+import ImmunitiesSelect from '../../UI/Form/Select/ImmunitiesSelect/ImmunitiesSelect';
 import classes from './EditParticipantTemplate.module.css';
 import useDropdownValues from '../../../hooks/useDropdownValues';
+import Avatar from '../../ImageUpload/Avatar/Avatar';
+import { useDispatch, connect } from 'react-redux';
+import * as actions from '../../../store/actions';
+import { Redirect } from 'react-router-dom';
+import ServerError from '../../UI/Errors/ServerError/ServerError';
+import Button from '../../UI/Form/Button/Button';
 
 const EditParticipantTemplate = props => {
   const queryParams = useQueryParams();
@@ -18,20 +24,35 @@ const EditParticipantTemplate = props => {
 
   const [damageTypes, combined, features] = useDropdownValues();
 
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(actions.startParticipantTemplateOperation());
+  }, [dispatch])
+
+  const submitHandler = useCallback(
+    (values, setSubmitting) => {
+      console.log('submit!', values);
+      // setSubmittingForm(true);
+      dispatch(actions.addParticipantTemplate(values, setSubmitting));
+    },
+    [dispatch]
+  );
+
   const form = (
     <Formik
       initialValues={{
         type: participantType,
+        avatarUrl: null,
         name: '',
         initiativeModifier: 0,
         maxHp: '',
         armorClass: '',
         speed: '',
         mapSize: 1,
-        immunities: '',
-        vulnerabilities: '',
-        resistances: '',
-        features: '',
+        immunities: { damageTypes: [], conditions: [] },
+        vulnerabilities: [],
+        resistances: [],
+        features: [],
         comment: ''
       }}
       validationSchema={Yup.object({
@@ -51,162 +72,186 @@ const EditParticipantTemplate = props => {
           .required('Map size is required')
           .min(1, 'Map size should be more than 0'),
         comment: Yup.string().trim(),
-        immunities: Yup.array().of(Yup.string()),
+        immunities: Yup.object(),
         vulnerabilities: Yup.array().of(Yup.string()),
         resistances: Yup.array().of(Yup.string()),
         features: Yup.array().of(Yup.string())
       })}
       onSubmit={(values, { setSubmitting }) =>
-        // handleSubmit(values, setSubmitting)
-        console.log('submit!', values)
+        submitHandler(values, setSubmitting)
       }
     >
-      <Form className={classes.EditParticipantTemplateForm}>
-        <label>Type</label>
-        <div className={classes.RadioButtonsGroup}>
-          <Field
-            type="radio"
-            name="type"
-            id="player"
-            value={ParticipantType.Player}
-            component={Input}
-          />
-          <label htmlFor="player">Player</label>
-          <Field
-            type="radio"
-            name="type"
-            id="monster"
-            value={ParticipantType.Monster}
-            component={Input}
-          />
-          <label htmlFor="monster">Monster</label>
-        </div>
+      {formProps => {
+        // console.log(formProps);
+        return formProps.submitCount > 0 &&
+                !formProps.isSubmitting &&
+                formProps.isValid &&
+                props.operationSuccess ? (
+          <Redirect to={`/templates/${formProps.values.type}s`} />
+        ) : (
+          <Form className={classes.EditParticipantTemplateForm}>
+            <label>Type</label>
+            <div className={classes.RadioButtonsGroup}>
+              <Field
+                type="radio"
+                name="type"
+                id="player"
+                value={ParticipantType.Player}
+                component={Input}
+                serverError={props.serverError}
+              />
+              <label htmlFor="player">Player</label>
+              <Field
+                type="radio"
+                name="type"
+                id="monster"
+                value={ParticipantType.Monster}
+                component={Input}
+                serverError={props.serverError}
+              />
+              <label htmlFor="monster">Monster</label>
+            </div>
 
-        <label htmlFor="name">Name</label>
-        <Field
-          type="text"
-          id="name"
-          name="name"
-          hidingBorder
-          component={Input}
-        />
+            <label className={classes.Avatar}>Avatar</label>
 
-        <label htmlFor="initiativeModifier">Initiative Modifier</label>
-        <Field
-          type="number"
-          name="initiativeModifier"
-          id="initiativeModifier"
-          hidingBorder
-          component={Input}
-        />
+            <div className={classes.Avatar}>
+              <Field id="avatarUrl" name="avatarUrl" component={Avatar} />
+            </div>
 
-        <label htmlFor="maxHp">Max HP</label>
-        <Field
-          type="number"
-          name="maxHp"
-          id="maxHp"
-          min={1}
-          hidingBorder
-          component={Input}
-        />
+            <label htmlFor="name">Name</label>
+            <Field
+              type="text"
+              id="name"
+              name="name"
+              hidingBorder
+              component={Input}
+              serverError={props.serverError}
+            />
 
-        <label htmlFor="armorClass">Armor class</label>
-        <Field
-          type="number"
-          name="armorClass"
-          id="armorClass"
-          min={0}
-          hidingBorder
-          component={Input}
-        />
+            <label htmlFor="initiativeModifier">Initiative Modifier</label>
+            <Field
+              type="number"
+              name="initiativeModifier"
+              id="initiativeModifier"
+              hidingBorder
+              component={Input}
+              serverError={props.serverError}
+            />
 
-        <label htmlFor="speed">Speed</label>
-        <Field
-          type="number"
-          name="speed"
-          id="speed"
-          min={0}
-          hidingBorder
-          component={Input}
-        />
+            <label htmlFor="maxHp">Max HP</label>
+            <Field
+              type="number"
+              name="maxHp"
+              id="maxHp"
+              min={1}
+              hidingBorder
+              component={Input}
+              serverError={props.serverError}
+            />
 
-        <label htmlFor="mapSize">Map size</label>
-        <Field
-          type="number"
-          name="mapSize"
-          id="mapSize"
-          min={1}
-          hidingBorder
-          component={Input}
-        />
+            <label htmlFor="armorClass">Armor class</label>
+            <Field
+              type="number"
+              name="armorClass"
+              id="armorClass"
+              min={0}
+              hidingBorder
+              component={Input}
+              serverError={props.serverError}
+            />
 
-        <label htmlFor="immunities">Immunities</label>
-        <Field
-          className={classes.Select}
-          name="immunities"
-          id="immunities"
-          isMulti
-          isGrouped
-          component={Select}
-          options={combined}
-        />
+            <label htmlFor="speed">Speed</label>
+            <Field
+              type="number"
+              name="speed"
+              id="speed"
+              min={0}
+              hidingBorder
+              component={Input}
+              serverError={props.serverError}
+            />
 
-        <label htmlFor="resistances">Resistances</label>
-        <Field
-          isMulti
-          className={classes.Select}
-          name="resistances"
-          id="resistances"
-          component={Select}
-          options={damageTypes}
-        />
+            <label htmlFor="mapSize">Map size</label>
+            <Field
+              type="number"
+              name="mapSize"
+              id="mapSize"
+              min={1}
+              hidingBorder
+              component={Input}
+              serverError={props.serverError}
+            />
 
-        <label htmlFor="vulnerabilities">Vulnerabilities</label>
-        <Field
-          isMulti
-          className={classes.Select}
-          name="vulnerabilities"
-          id="vulnerabilities"
-          component={Select}
-          options={damageTypes}
-        />
+            <label htmlFor="immunities">Immunities</label>
+            <Field
+              className={classes.Select}
+              name="immunities"
+              id="immunities"
+              isMulti
+              isGrouped
+              component={ImmunitiesSelect}
+              options={combined}
+            />
 
-        <label htmlFor="features">Features</label>
-        <Field
-          isMulti
-          isGrouped
-          className={classes.Select}
-          name="features"
-          id="features"
-          component={Select}
-          options={features}
-        />
+            <label htmlFor="resistances">Resistances</label>
+            <Field
+              isMulti
+              className={classes.Select}
+              name="resistances"
+              id="resistances"
+              component={Select}
+              options={damageTypes}
+            />
 
-        <label htmlFor="comment">Comment</label>
-        <Field
-          className={classes.Comment}
-          inputType="textarea"
-          name="comment"
-          id="comment"
-          hidingBorder
-          component={Input}
-        />
-        <button type="submit">Save</button>
-      </Form>
+            <label htmlFor="vulnerabilities">Vulnerabilities</label>
+            <Field
+              isMulti
+              className={classes.Select}
+              name="vulnerabilities"
+              id="vulnerabilities"
+              component={Select}
+              options={damageTypes}
+            />
+
+            <label htmlFor="features">Features</label>
+            <Field
+              isMulti
+              isGrouped
+              className={classes.Select}
+              name="features"
+              id="features"
+              component={Select}
+              options={features}
+            />
+
+            <label htmlFor="comment">Comment</label>
+            <Field
+              className={classes.Comment}
+              inputType="textarea"
+              name="comment"
+              id="comment"
+              hidingBorder
+              component={Input}
+              serverError={props.serverError}
+            />
+            {props.serverError ? <ServerError /> : null}
+            <Button type="submit" disabled={formProps.isSubmitting}>
+              Save
+            </Button>
+          </Form>
+        );
+      }}
     </Formik>
   );
 
-  // return (
-  //   // <div>
-  //     {form}
-  //     {/* <InlineInput type="text" name="name" placeholder="Name" />
-  //     <InlineInput type="number" name="initiativeModifier" placeholder="Name" /> */}
-  //     {/* New {participantType} */}
-  //   // </div>
-  // );
   return <div>{form}</div>;
 };
 
-EditParticipantTemplate.propTypes = {};
+const mapStateToProps = state => {
+  return {
+    operationSuccess: state.participantTemplate.operationSuccess,
+    serverError: state.participantTemplate.error
+  };
+};
 
-export default withAuthCheck(EditParticipantTemplate);
+export default connect(mapStateToProps)(withAuthCheck(EditParticipantTemplate));

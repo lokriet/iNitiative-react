@@ -13,6 +13,7 @@
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-validator": "^6.4.0",
+    "firebase-admin": "^8.9.2",
     "helmet": "^3.21.2",
     "jsrsasign": "^8.0.12",
     "mongoose": "^5.8.11",

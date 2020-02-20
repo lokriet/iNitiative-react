@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const constants = require('./constants');
+const constants = require('../constants');
 
 //Removes the warning with promises
 mongoose.Promise = global.Promise;

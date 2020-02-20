@@ -1,4 +1,5 @@
 import * as ActionTypes from '../actions/actionTypes';
+import { AuthActionTypes } from '../actions';
 
 const initialState = {
   error: null,
@@ -6,11 +7,14 @@ const initialState = {
   token: null,
   user: null,
   redirectPath: '/',
-  initialAuthCheckDone: false
+  initialAuthCheckDone: false,
+  firebase: null
 };
 
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
+    case AuthActionTypes.SET_FIREBASE:
+      return { ...state, firebase: action.firebase };
     case ActionTypes.auth.AUTH_START:
       return { ...state, error: null, loading: true };
     case ActionTypes.auth.AUTH_SUCCESS:
@@ -29,14 +33,14 @@ const authReducer = (state = initialState, action) => {
         error: action.error,
         loading: false
       };
-    case ActionTypes.auth.LOGOUT_SUCCESS: 
+    case ActionTypes.auth.LOGOUT_SUCCESS:
       return {
         ...state,
         token: null,
         user: null,
         error: null,
         loading: false
-      }
+      };
     case ActionTypes.auth.SET_AUTH_REDIRECT_PATH:
       return {
         ...state,
@@ -46,7 +50,7 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         initialAuthCheckDone: true
-      }
+      };
     default:
       return state;
   }

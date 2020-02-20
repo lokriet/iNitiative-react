@@ -24,9 +24,9 @@ const Features = props => {
 
   useEffect(() => {
     props.isHomebrew
-      ? dispatch(actions.getHomebrewFeatures(props.token))
+      ? dispatch(actions.getHomebrewFeatures())
       : dispatch(actions.getSharedFeatures());
-  }, [dispatch, props.isHomebrew, props.token]);
+  }, [dispatch, props.isHomebrew]);
 
   const validateName = useCallback(
     (_id, name) => {
@@ -41,10 +41,10 @@ const Features = props => {
   const handleAddFeature = useCallback(
     (feature, setSubmitted) => {
       dispatch(
-        actions.addFeature(feature, props.isHomebrew, props.token, setSubmitted)
+        actions.addFeature(feature, props.isHomebrew, setSubmitted)
       );
     },
-    [dispatch, props.isHomebrew, props.token]
+    [dispatch, props.isHomebrew]
   );
 
   const handleUpdateFeature = useCallback(
@@ -53,19 +53,18 @@ const Features = props => {
         actions.updateFeature(
           feature,
           props.isHomebrew,
-          props.token,
           setSubmitted
         )
       );
     },
-    [dispatch, props.isHomebrew, props.token]
+    [dispatch, props.isHomebrew]
   );
 
   const handleDeleteFeature = useCallback(
     featureId => {
-      dispatch(actions.deleteFeature(featureId, props.token));
+      dispatch(actions.deleteFeature(featureId));
     },
-    [dispatch, props.token]
+    [dispatch]
   );
 
   const handleCancelChangingFeature = useCallback(
@@ -144,8 +143,7 @@ const mapStateToProps = state => {
     errorHomebrew: state.feature.errorHomebrew,
     fetchingShared: state.feature.fetchingShared,
     fetchingHomebrew: state.feature.fetchingHomebrew,
-    saveAllCallbacks: state.feature.saveAllCallbacks,
-    token: state.auth.token
+    saveAllCallbacks: state.feature.saveAllCallbacks
   };
 };
 

@@ -10,6 +10,7 @@ module.exports.createCondition = async (req, res, next) => {
     if (!errors.isEmpty()) {
       console.log(errors);
       next(httpErrors.validationError(errors.array()));
+      return;
     }
 
     const isHomebrew = req.body.isHomebrew;
@@ -19,6 +20,7 @@ module.exports.createCondition = async (req, res, next) => {
       const user = await User.findById(req.userId);
       if (!user.isAdmin) {
         next(httpErrors.notAuthorizedError());
+        return;
       }
     }
 

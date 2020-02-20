@@ -24,9 +24,9 @@ const Conditions = props => {
 
   useEffect(() => {
     props.isHomebrew
-      ? dispatch(actions.getHomebrewConditions(props.token))
+      ? dispatch(actions.getHomebrewConditions())
       : dispatch(actions.getSharedConditions());
-  }, [dispatch, props.token, props.isHomebrew]);
+  }, [dispatch, props.isHomebrew]);
 
   const validateName = useCallback(
     (_id, name) => {
@@ -44,12 +44,11 @@ const Conditions = props => {
         actions.addCondition(
           condition,
           props.isHomebrew,
-          props.token,
           setSubmitted
         )
       );
     },
-    [dispatch, props.isHomebrew, props.token]
+    [dispatch, props.isHomebrew]
   );
 
   const handleUpdateCondition = useCallback(
@@ -58,19 +57,18 @@ const Conditions = props => {
         actions.updateCondition(
           condition,
           props.isHomebrew,
-          props.token,
           setSubmitted
         )
       );
     },
-    [dispatch, props.isHomebrew, props.token]
+    [dispatch, props.isHomebrew]
   );
 
   const handleDeleteCondition = useCallback(
     conditionId => {
-      dispatch(actions.deleteCondition(conditionId, props.token));
+      dispatch(actions.deleteCondition(conditionId));
     },
-    [dispatch, props.token]
+    [dispatch]
   );
 
   const handleCancelChangingCondition = useCallback(
@@ -150,8 +148,7 @@ const mapStateToProps = state => {
     fetchingHomebrewError: state.condition.errorHomebrew,
     fetchingShared: state.condition.fetchingShared,
     fetchingHomebrew: state.condition.fetchingHomebrew,
-    saveAllCallbacks: state.condition.saveAllCallbacks,
-    token: state.auth.token
+    saveAllCallbacks: state.condition.saveAllCallbacks
   };
 };
 
