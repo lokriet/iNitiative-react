@@ -154,7 +154,7 @@ module.exports.deleteDamageType = async (req, res, next) => {
     return;
   }
 
-  if (damageType.isHomebrew) {
+  if (!damageType.isHomebrew) {
     const user = await User.findById(userId);
     if (!user.isAdmin) {
       next(httpErrors.notAuthorizedError());

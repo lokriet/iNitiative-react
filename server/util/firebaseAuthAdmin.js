@@ -1,17 +1,20 @@
 const admin = require('firebase-admin');
 const constants = require('../constants');
+const serviceAccount = require(constants.GOOGLE_APPLICATION_CREDENTIALS);
 
-let initialized = false;
+let adminAuth = null;
 
-const getAdmin = () => {
-  if (!initialized) {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(), 
-      storageBucket: constants.GOOGLE_STORAGE_BUCKET
+const getAdminAuth = () => {
+  if (!adminAuth) {
+    const credential = process.env.NODE_ENV === 'production' ? admin.credential.applicationDefault() : admin.credential.cert(serviceAccount);
+
+    const app = admin.initializeApp({
+      credential: credential,
+      storageBucket: constants.GOOGLE_STORAGE_BUCKET, 
     });
-    initialized = true;
+    adminAuth = app.auth();
   }
-  return admin;
+  return adminAuth;
 }
 
-module.exports = getAdmin;
+module.exports = getAdminAuth;

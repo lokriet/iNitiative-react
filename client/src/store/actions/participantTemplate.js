@@ -11,27 +11,47 @@ export const ParticipantTemplateActionTypes = {
 
   START_FETCHING_PARTICIPANT_TEMPLATES: 'START_FETCHING_PARTICIPANT_TEMPLATES',
   SET_PARTICIPANT_TEMPLATES: 'SET_PARTICIPANT_TEMPLATES',
+  SET_EDITED_PARTICIPANT_TEMPLATE: 'SET_EDITED_PARTICIPANT_TEMPLATE',
   FETCH_PARTICIPANT_TEMPLATES_FAILED: 'FETCH_PARTICIPANT_TEMPLATES_FAILED'
 };
 
-export const addParticipantTemplate = (template, setSubmitting) => {
+const INTERNAL_ERROR_MESSAGE = 'Internal error occured. Please try again.';
+
+export const editParticipantTemplate = (templateId, template, setSubmitting) => {
   return async (dispatch, getState) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
-      const response = await fetch(
-        'http://localhost:3001/participantTemplates/template',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`
-          },
-          body: JSON.stringify({ template })
-        }
-      );
+      let response;
+      if (templateId == null) {
+        // create
+        response = await fetch(
+          'http://localhost:3001/participantTemplates/template',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`
+            },
+            body: JSON.stringify({ template })
+          }
+        );
+      } else {
+        // update
+        response = await fetch(
+          `http://localhost:3001/participantTemplates/template/${templateId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`
+            },
+            body: JSON.stringify({ template })
+          }
+        );
+      }
 
       const responseData = await response.json();
-      console.log('got response for participant template creation', responseData);
+      console.log('got response for participant template edit', responseData);
 
       if (
         response.status === 500 ||
@@ -41,7 +61,7 @@ export const addParticipantTemplate = (template, setSubmitting) => {
         dispatch(
           participantTemplateOperationFailed(null, {
             type: ErrorType[response.status],
-            message: responseData.message
+            message: response.status === 500 ? INTERNAL_ERROR_MESSAGE : responseData.message
           })
         );
       } else if (response.status === 422) {
@@ -51,15 +71,19 @@ export const addParticipantTemplate = (template, setSubmitting) => {
             data: responseData.data
           })
         );
-      } else if (response.status === 201) {
+      } else if (response.status === 201 || response.status === 200) {
         console.log(responseData.data);
-        dispatch(addParticipantTemplateSuccess(responseData.data));
+        if (templateId == null) {
+          dispatch(addParticipantTemplateSuccess(responseData.data));
+        } else {
+          dispatch(updateParticipantTemplateSuccess(responseData.data));
+        }
       } else {
         console.log('Unexpected response status');
         dispatch(
           participantTemplateOperationFailed(null, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
-            message: 'Internal error occured. Please try again.'
+            message: INTERNAL_ERROR_MESSAGE
           })
         );
       }
@@ -67,11 +91,60 @@ export const addParticipantTemplate = (template, setSubmitting) => {
       dispatch(
         participantTemplateOperationFailed(null, {
           type: ErrorType.INTERNAL_CLIENT_ERROR,
-          message: 'Internal error occured. Please try again.'
+          message: INTERNAL_ERROR_MESSAGE
         })
       );
     } finally {
       setSubmitting(false);
+    }
+  };
+};
+
+export const deleteParticipantTemplate = (templateId) => {
+  return async (dispatch, getState) => {
+    try {
+      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const response = await fetch(
+        `http://localhost:3001/participantTemplates/template/${templateId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (
+        response.status === 500 ||
+        response.status === 401 ||
+        response.status === 403
+      ) {
+        dispatch(
+          participantTemplateOperationFailed({
+            type: ErrorType[response.status],
+            message: response.status === 500 ? INTERNAL_ERROR_MESSAGE : responseData.message
+          })
+        );
+      } else if (response.status === 200) {
+        dispatch(deleteParticipantTemplateSuccess(templateId));
+      } else {
+        console.log('Unexpected response status');
+        dispatch(
+          participantTemplateOperationFailed({
+            type: ErrorType.INTERNAL_CLIENT_ERROR,
+            message: INTERNAL_ERROR_MESSAGE
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        participantTemplateOperationFailed({
+          type: ErrorType.INTERNAL_SERVER_ERROR,
+          message: INTERNAL_ERROR_MESSAGE
+        })
+      );
     }
   };
 };
@@ -103,7 +176,7 @@ export const getParticipantTemplates = () => {
         dispatch(
           fetchParticipantTemplatesFailed({
             type: ErrorType[response.status],
-            message: responseData.message
+            message: response.status === 500 ? 'Fetching particpiant templates failed' : responseData.message
           })
         );
       } else if (response.status === 200) {
@@ -113,15 +186,61 @@ export const getParticipantTemplates = () => {
         dispatch(
           fetchParticipantTemplatesFailed({
             type: ErrorType.INTERNAL_SERVER_ERROR,
-            message: 'Fetching homebrew damage types failed'
+            message: 'Fetching particpiant templates failed'
           })
         );
       }
     } catch (error) {
+      console.log(error);
       dispatch(
         fetchParticipantTemplatesFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
-          message: 'Fetching homebrew damage types failed'
+          message: 'Fetching particpiant templates failed'
+        })
+      );
+    }
+  };
+};
+
+export const getParticipantTemplateById = (templateId) => {
+  return async (dispatch, getState) => {
+    try {
+      dispatch(startFetchingParticipantTemplates());
+      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const response = await fetch(`http://localhost:3001/participantTemplates/${templateId}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`
+        }
+      });
+
+      if (
+        response.status === 500 ||
+        response.status === 401
+      ) {
+        const responseData = await response.json();
+        dispatch(
+          fetchParticipantTemplatesFailed({
+            type: ErrorType[response.status],
+            message: response.status === 500 ? 'Fetching particpiant template failed' : responseData.message
+          })
+        );
+      } else if (response.status === 200) {
+        const participantTemplate = await response.json();
+        dispatch(setEditedParticipantTemplate(participantTemplate));
+      } else {
+        dispatch(
+          fetchParticipantTemplatesFailed({
+            type: ErrorType.INTERNAL_SERVER_ERROR,
+            message: 'Fetching particpiant template failed'
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        fetchParticipantTemplatesFailed({
+          type: ErrorType.INTERNAL_CLIENT_ERROR,
+          message: 'Fetching particpiant template failed'
         })
       );
     }
@@ -182,6 +301,20 @@ export const setParticipantTemplates = participantTemplates => {
     participantTemplates
   };
 };
+
+export const setEditedParticipantTemplate = participantTemplate => {
+  return {
+    type: ParticipantTemplateActionTypes.SET_EDITED_PARTICIPANT_TEMPLATE,
+    participantTemplate
+  };
+};
+
+export const resetEditedParticipantTemplate = () => {
+  return {
+    type: ParticipantTemplateActionTypes.SET_EDITED_PARTICIPANT_TEMPLATE,
+    participantTemplate: null
+  };
+}
 
 export const fetchParticipantTemplatesFailed = error => {
   return {

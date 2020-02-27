@@ -4,7 +4,6 @@ import { useDispatch, connect } from 'react-redux';
 
 import * as actions from './store/actions';
 import Layout from './components/UI/Layout/Layout';
-import { Toolbar } from './components/Navigation/Toolbar/Toolbar';
 import Home from './components/Home/Home';
 import PageNotFound from './components/PageNotFound/PageNotFound';
 import Logout from './components/Auth/Logout/Logout';

@@ -5,6 +5,7 @@ const initialState = {
   operationSuccess: false,
   fetching: false,
   participantTemplates: [],
+  editedParticipantTemplate: null,
   participantTemplatesInitialised: null // date
 };
 
@@ -30,6 +31,9 @@ const participantTemplatesReducer = (state = initialState, action) => {
 
     case ActionTypes.participantTemplate.SET_PARTICIPANT_TEMPLATES:
       return setParticipantTemplates(state, action);
+    
+    case ActionTypes.participantTemplate.SET_EDITED_PARTICIPANT_TEMPLATE: 
+      return setEditedParticipantTemplate(state, action);
 
     case ActionTypes.participantTemplate.FETCH_PARTICIPANT_TEMPLATES_FAILED:
       return fetchParticipantTemplatesFailed(state, action);
@@ -61,17 +65,11 @@ const addParticipantTemplateSuccess = (state, action) => {
 const updateParticipantTemplateSuccess = (state, action) => {
   const newParticipantTemplates = state.participantTemplates
     .map(item =>
-      item._id === action.participantTemplate._id
+      item._id.toString() === action.participantTemplate._id.toString()
         ? action.participantTemplate
         : item
     )
     .sort((a, b) => a.name.localeCompare(b.name));
-
-  console.log(
-    'new participant Templates',
-    newParticipantTemplates,
-    action.participantTemplate
-  );
 
   return {
     ...state,
@@ -85,7 +83,7 @@ const deleteParticipantTemplateSuccess = (state, action) => {
   return {
     ...state,
     participantTemplates: state.participantTemplates.filter(
-      item => item._id !== action.participantTemplateId
+      item => item._id.toString() !== action.participantTemplateId
       ),
     operationSuccess: true,
     error: null
@@ -113,6 +111,15 @@ const setParticipantTemplates = (state, action) => {
     ...state,
     participantTemplates: action.participantTemplates,
     participantTemplatesInitialised: new Date().getTime(),
+    fetching: false,
+    error: null
+  };
+};
+
+const setEditedParticipantTemplate = (state, action) => {
+  return {
+    ...state,
+    editedParticipantTemplate: action.participantTemplate,
     fetching: false,
     error: null
   };

@@ -5,7 +5,7 @@ const User = require('../model/user');
 const responseCodes = require('../util/responseCodes');
 const httpErrors = require('../util/httpErrors');
 
-const getAdmin = require('../util/firebaseAuthAdmin');
+const getAdminAuth = require('../util/firebaseAuthAdmin');
 
 
 module.exports.createUser = async (req, res, next) => {
@@ -15,6 +15,7 @@ module.exports.createUser = async (req, res, next) => {
     if (!errors.isEmpty()) {
       console.log(errors);
       next(httpErrors.validationError(errors.array()));
+      return;
     }
 
     const email = req.body.email;
@@ -31,12 +32,20 @@ module.exports.createUser = async (req, res, next) => {
 
     const savedUser = await user.save();
     
-    const userId = savedUser._id;
+    const userId = savedUser._id.toString();
     const additionalClaims = {
       isAdmin: savedUser.isAdmin
     };
 
-    const token = await getAdmin().auth().createCustomToken(userId, additionalClaims);
+    // console.log('created user', userId);
+    let token;
+    try {
+      token = await getAdminAuth().createCustomToken(userId, additionalClaims);
+    } catch (error) {
+      await User.deleteOne({_id: userId});
+      next(error);
+      return;
+    }
     // const token = jwtUtils.generateJWT(claims);
 
     return res.status(201).json({
@@ -94,7 +103,7 @@ module.exports.login = async (req, res, next) => {
     const additionalClaims = {
       isAdmin: user.isAdmin
     };
-    const token = await getAdmin().auth().createCustomToken(userId.toString(), additionalClaims);
+    const token = await getAdminAuth().createCustomToken(userId.toString(), additionalClaims);
 
     return res.status(200).json({
       message: 'Login successful',

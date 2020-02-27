@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, connect } from 'react-redux';
 
 import * as actions from '../../../store/actions';
@@ -16,6 +16,7 @@ const ParticipantTemplatesList = props => {
   const [allTemplates, setAllTemplates] = useState([]);
   const [filteredTemplates, setFilteredTemplates] = useState(allTemplates);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(actions.getParticipantTemplates());
@@ -30,6 +31,16 @@ const ParticipantTemplatesList = props => {
   const handleItemsFiltered = useCallback(filteredItems => {
     setFilteredTemplates(filteredItems);
   }, []);
+
+  const handleEditTemplate = useCallback(templateId => {
+    console.log('going to edit template', templateId);
+    history.push(`/templates/edit/${templateId}`)
+  }, [history]);
+
+  const handleDeleteTemplate = useCallback(templateId => {
+    console.log('going to delete template', templateId);
+    dispatch(actions.deleteParticipantTemplate(templateId));
+  }, [dispatch]);
   
   return (
     <div>
@@ -63,11 +74,12 @@ const ParticipantTemplatesList = props => {
             <th>Features</th>
             <th>Size</th>
             <th>Comment</th>
+            <th>{/* action buttons */}</th>
           </tr>
         </thead>
         <tbody>
           {filteredTemplates.map(item => (
-            <ParticipantTemplateRow key={item._id} template={item} />
+            <ParticipantTemplateRow key={item._id} template={item} onDelete={handleDeleteTemplate} onEdit={handleEditTemplate} />
           ))}
         </tbody>
       </table>
@@ -83,7 +95,6 @@ const mapStateToProps = state => {
   return {
     participantTemplates: state.participantTemplate.participantTemplates,
     error: state.participantTemplate.error,
-    errors: state.participantTemplate.errors,
     fetching: state.participantTemplate.fetching
   };
 };

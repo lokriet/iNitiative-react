@@ -28,3 +28,11 @@
   align-self: flex-start;
   text-align: left;
 }
+
+.FullRow {
+  grid-column: 1 / span 2;
+}
+
+.FullRow button {
+  margin-right: 1rem;
+}

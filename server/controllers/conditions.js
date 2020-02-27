@@ -158,7 +158,7 @@ module.exports.deleteCondition = async (req, res, next) => {
     return;
   }
 
-  if (condition.isHomebrew) {
+  if (!condition.isHomebrew) {
     const user = await User.findById(userId);
     if (!user.isAdmin) {
       next(httpErrors.notAuthorizedError());

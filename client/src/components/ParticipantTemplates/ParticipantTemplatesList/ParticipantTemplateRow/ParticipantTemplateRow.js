@@ -1,11 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons';
+
 import List from '../../../UI/Table/List/List';
 import Color from '../../../UI/Color/Color';
+import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
+import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 
 import classes from './ParticipantTemplateRow.module.css';
 
-const ParticipantTemplateRow = ({ template }) => {
+const ParticipantTemplateRow = ({ template, onEdit, onDelete }) => {
+
+
   return (
     <tr className={classes.ParticipantTemplateRow}>
       <td>
@@ -44,12 +50,20 @@ const ParticipantTemplateRow = ({ template }) => {
       </td>
       <td>{template.mapSize}</td>
       <td className={classes.Comment}>{template.comment}</td>
+      <td>
+        <ItemsRow>
+        <IconButton icon={faCog} onClick={() => onEdit(template._id)} />
+        <IconButton icon={faTimes} onClick={() => onDelete(template._id)} />
+        </ItemsRow>
+      </td>
     </tr>
   );
 };
 
 ParticipantTemplateRow.propTypes = {
-  template: PropTypes.object
+  template: PropTypes.object.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired
 };
 
 export default ParticipantTemplateRow;

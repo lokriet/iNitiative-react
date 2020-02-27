@@ -157,7 +157,7 @@ module.exports.deleteFeature = async (req, res, next) => {
     return;
   }
 
-  if (feature.isHomebrew) {
+  if (!feature.isHomebrew) {
     const user = await User.findById(userId);
     if (!user.isAdmin) {
       next(httpErrors.notAuthorizedError());

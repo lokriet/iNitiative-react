@@ -32,7 +32,7 @@ const GroupedMenu = props => {
 
   const childrenCount= React.Children.count(props.children);
   const children = React.Children.map(props.children, child => {
-    return selectedGroups.includes(child.props.data.label) ? child : null
+    return child.props.data && selectedGroups.includes(child.props.data.label) ? child : null
   });
   const groupsFilter = (<details className={classes.GroupedMenu}>
     <summary>Filter groups</summary>

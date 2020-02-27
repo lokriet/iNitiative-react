@@ -4,10 +4,12 @@ import ErrorType from '../../util/error';
 
 import * as actions from '../actions/index';
 
+const INTERNAL_ERROR_MESSAGE =
+  'Internal server error occured while authenticating. Please try again.';
 // import createHistory from 'history/createBrowserHistory';
 // const history = createHistory();
 
-export const getFirebase = (state) => state.auth.firebase;
+export const getFirebase = state => state.auth.firebase;
 
 export function* authSaga(action) {
   console.log("I'm in saga!");
@@ -43,7 +45,7 @@ export function* authSaga(action) {
       yield put(
         actions.authFailed({
           type: ErrorType[response.status],
-          message: responseData.message
+          message: response.status === 401 ? responseData.message : INTERNAL_ERROR_MESSAGE
         })
       );
     } else if (response.status === 422) {
@@ -60,7 +62,9 @@ export function* authSaga(action) {
         yield localStorage.removeItem('token');
       }
       const firebase = yield select(getFirebase);
-      const firebaseLoginResult = yield firebase.doSignInWithCustomToken(responseData.data.token);
+      const firebaseLoginResult = yield firebase.doSignInWithCustomToken(
+        responseData.data.token
+      );
       console.log('firebase login result: ', firebaseLoginResult);
       yield put(actions.authSuccess(responseData.data));
     }
@@ -69,8 +73,7 @@ export function* authSaga(action) {
     yield put(
       actions.authFailed({
         type: ErrorType.INTERNAL_CLIENT_ERROR,
-        message:
-          'Internal server error occured while authenticating. Please try again.'
+        message: INTERNAL_ERROR_MESSAGE
       })
     );
   }
@@ -109,7 +112,6 @@ export function* checkAuthStateSaga(action) {
         user: responseData
       })
     );
-    
   } catch (error) {
     // yield put(actions.authFailed(error));
     console.log(error);

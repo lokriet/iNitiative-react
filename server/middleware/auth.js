@@ -1,7 +1,7 @@
 // const jwtUtils = require('../util/jwtUtils');
 const httpErrors = require('../util/httpErrors');
 
-const getAdmin = require('../util/firebaseAuthAdmin');
+const getAdminAuth = require('../util/firebaseAuthAdmin');
 
 module.exports = async (req, res, next) => {
   const header = req.get('Authorization');
@@ -10,7 +10,6 @@ module.exports = async (req, res, next) => {
   }
 
   const token = header.split(' ')[1]; // value after 'Bearer '
-  let decodedToken;
   try {
     // const isValid = jwtUtils.validateJWT(token);
     // if (!isValid) {
@@ -19,7 +18,7 @@ module.exports = async (req, res, next) => {
 
     // decodedToken = jwtUtils.decodeJWT(token);
     // req.userId = decodedToken.userId;
-    const decodedToken = await getAdmin().auth().verifyIdToken(token);
+    const decodedToken = await getAdminAuth().verifyIdToken(token);
     req.userId = decodedToken.uid;
   } catch (err) {
     console.log('ERROR WHILE AUTHENTICATING:', err);
