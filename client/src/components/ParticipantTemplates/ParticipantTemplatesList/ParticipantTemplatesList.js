@@ -49,7 +49,6 @@ const ParticipantTemplatesList = props => {
           <div>
             <FilterInput
               allItems={allTemplates}
-              searchField="name"
               onItemsFiltered={handleItemsFiltered}
             />
           </div>

@@ -4,7 +4,7 @@
   justify-items: left;
   gap: 1rem 2rem;
   display: grid;
-  grid-template-columns: max-content 20rem;
+  grid-template-columns: max-content 13rem;
 }
 
 .RadioButtonsGroup {
@@ -16,17 +16,22 @@
   margin-right: 1rem;
 }
 
-.Select {
-  min-width: 13rem;
-}
-
-.Comment {
+.InputField {
   width: 13rem;
 }
 
 .Avatar {
   align-self: flex-start;
   text-align: left;
+}
+
+.ExtraSpeeds {
+  padding-left: 4rem;
+}
+
+.ExtraSpeedInput {
+  width: 2.5rem;
+  padding: 0.5rem 0.2rem;
 }
 
 .FullRow {

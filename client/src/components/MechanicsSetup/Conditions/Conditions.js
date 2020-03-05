@@ -107,7 +107,6 @@ const Conditions = props => {
         <div className={classes.SearchRow}>
           <FilterInput
             allItems={allConditions}
-            searchField="name"
             onItemsFiltered={handleItemsFiltered}
           />
         </div>

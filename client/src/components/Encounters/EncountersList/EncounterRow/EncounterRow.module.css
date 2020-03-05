@@ -1,3 +1,21 @@
+.EncounterRow:hover {
+  background-color: #eee;
+}
+
+.EncounterRow td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5rem 1rem;
+}
+
+.Name {
+  max-width: 20rem;
+}
+
+.Date {
+  min-width: 6rem;
+}
+
 .ModalQuestion {
   margin: 1rem;
 }

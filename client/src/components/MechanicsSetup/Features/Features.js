@@ -102,7 +102,6 @@ const Features = props => {
         <div className={classes.SearchRow}>
           <FilterInput
             allItems={allFeatures}
-            searchField="name"
             onItemsFiltered={handleItemsFiltered}
           />
         </div>

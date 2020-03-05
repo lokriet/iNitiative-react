@@ -20,7 +20,7 @@ const List = props => {
 };
 
 List.propTypes = {
-  items: PropTypes.array,
+  items: PropTypes.array.isRequired,
   listedProperty: PropTypes.string
 };
 

@@ -2,6 +2,7 @@ import * as ActionTypes from '../actions/actionTypes';
 
 const initialState = {
   encounters: [],
+  editedEncounter: null,
   operationError: null,
   operationSuccess: false,
   fetching: false,
@@ -17,6 +18,9 @@ const encounterReducer = (state = initialState, action) => {
     case ActionTypes.encounter.ADD_ENCOUNTER_SUCCESS:
       return addEncounterSuccess(state, action);
 
+    case ActionTypes.encounter.UPDATE_ENCOUNTER_SUCCESS:
+      return updateEncounterSuccess(state, action);
+
     case ActionTypes.encounter.DELETE_ENCOUNTER_SUCCESS:
       return deleteEncounterSuccess(state, action);
 
@@ -28,6 +32,9 @@ const encounterReducer = (state = initialState, action) => {
 
     case ActionTypes.encounter.SET_ENCOUNTERS:
       return setEncounters(state, action);
+
+    case ActionTypes.encounter.SET_EDITED_ENCOUNTER:
+      return setEditedEncounter(state, action);
 
     case ActionTypes.encounter.FETCH_ENCOUNTERS_FAILED:
       return fetchEncountersFailed(state, action);
@@ -61,6 +68,23 @@ const addEncounterSuccess = (state, action) => {
     operationSuccess: true
   };
 };
+
+const updateEncounterSuccess = (state, action) => {
+  return {
+    ...state,
+    encounters: [
+      {
+        _id: action.encounter._id,
+        name: action.encounter.name,
+        createdAt: new Date(action.encounter.createdAt),
+        updatedAt: new Date(action.encounter.updatedAt)
+      },
+      ...state.encounters.filter(item => item._id.toString() !== action.encounter._id.toString())
+    ],
+    operationError: null,
+    operationSuccess: true
+  }
+}
 
 const deleteEncounterSuccess = (state, action) => {
   return {
@@ -107,6 +131,15 @@ const fetchEncountersFailed = (state, action) => {
     ...state,
     fetching: false,
     fetchingError: action.error
+  };
+};
+
+const setEditedEncounter = (state, action) => {
+  return {
+    ...state,
+    editedEncounter: action.encounter,
+    fetching: false,
+    fetchingError: null
   };
 };
 

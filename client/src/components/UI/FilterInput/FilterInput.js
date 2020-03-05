@@ -14,7 +14,7 @@ const FilterInput = ({ allItems, onItemsFiltered, searchField }) => {
   const filterItems = useCallback(
     debouncedSearchTerm => {
       const results = allItems.filter(item =>
-        item[searchField]
+        item[(searchField || 'name')]
           .toLowerCase()
           .includes(debouncedSearchTerm.toLowerCase())
       );
@@ -50,9 +50,9 @@ const FilterInput = ({ allItems, onItemsFiltered, searchField }) => {
 };
 
 FilterInput.propTypes = {
-  allItems: PropTypes.array,
+  allItems: PropTypes.array.isRequired,
   searchField: PropTypes.string,
-  onItemsFiltered: PropTypes.func
+  onItemsFiltered: PropTypes.func.isRequired
 };
 
 export default FilterInput;

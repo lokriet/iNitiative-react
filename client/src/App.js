@@ -71,6 +71,9 @@ const App = props => {
             <Route path="/templates" component={ParticipantTemplates} />
             
             <Route path="/encounters/new">
+              <EditEncounter isNew />
+            </Route>
+            <Route path="/encounters/edit/:encounterId">
               <EditEncounter />
             </Route>
             <Route path="/encounters" exact component={EncountersList} />

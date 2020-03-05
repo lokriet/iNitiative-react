@@ -40,13 +40,13 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
 
   return (
     <tr className={classes.EncounterRow}>
-      <td>{encounter.name}</td>
-      <td>{formatDate(encounter.createdAt)}</td>
-      <td>{formatDate(encounter.updatedAt)}</td>
-      <td>
+      <td className={classes.Name}>{encounter.name}</td>
+      <td className={classes.Date}>{formatDate(encounter.createdAt)}</td>
+      <td className={classes.Date}>{formatDate(encounter.updatedAt)}</td>
+      <td className={classes.Buttons}>
         <ItemsRow>
-          <IconButton icon={faPlay} onClick={onPlay} />
-          <IconButton icon={faCog} onClick={onEdit} />
+          <IconButton icon={faPlay} onClick={() => onPlay(encounter._id)} />
+          <IconButton icon={faCog} onClick={() => onEdit(encounter._id)} />
 
           <Popup
             trigger={open => <IconButton icon={faTimes} />}

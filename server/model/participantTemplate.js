@@ -34,6 +34,10 @@ const participantTemplateSchema = new Schema({
     required: true
   },
 
+  swimSpeed: Number,
+  climbSpeed: Number,
+  flySpeed: Number,
+
   mapSize: {
     type: Number,
     required: true

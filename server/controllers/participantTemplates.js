@@ -104,6 +104,9 @@ module.exports.updateParticipantTemplate = async (req, res, next) => {
     participantTemplate.maxHp = templateData.maxHp;
     participantTemplate.armorClass = templateData.armorClass;
     participantTemplate.speed = templateData.speed;
+    participantTemplate.swimSpeed = templateData.swimSpeed;
+    participantTemplate.climbSpeed = templateData.climbSpeed;
+    participantTemplate.flySpeed = templateData.flySpeed;
     participantTemplate.mapSize = templateData.mapSize;
     participantTemplate.immunities = templateData.immunities;
     participantTemplate.resistances = templateData.resistances;

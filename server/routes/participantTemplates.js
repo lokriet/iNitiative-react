@@ -88,6 +88,18 @@ router.post(
     body('template.speed')
       .isInt({ min: 1 })
       .withMessage('Speed should be more than 0'),
+    body('template.swimSpeed')
+      .optional({checkFalsy: true, nullable: true})
+      .isInt({ min: 1 })
+      .withMessage('Speed should be more than 0'),
+    body('template.climbSpeed')
+      .optional({checkFalsy: true, nullable: true})
+      .isInt({ min: 1 })
+      .withMessage('Speed should be more than 0'),
+    body('template.flySpeed')
+      .optional({checkFalsy: true, nullable: true})
+      .isInt({ min: 1 })
+      .withMessage('Speed should be more than 0'),  
     body('template.mapSize')
       .isInt({ min: 1 })
       .withMessage('Map size should be more than 0'),
@@ -175,6 +187,18 @@ router.put(
     body('template.speed')
       .isInt({ min: 1 })
       .withMessage('Speed should be more than 0'),
+    body('template.swimSpeed')
+      .optional({checkFalsy: true, nullable: true})
+      .isInt({ min: 1 })
+      .withMessage('Speed should be more than 0'),
+    body('template.climbSpeed')
+      .optional({checkFalsy: true, nullable: true})
+      .isInt({ min: 1 })
+      .withMessage('Speed should be more than 0'),
+    body('template.flySpeed')
+      .optional({checkFalsy: true, nullable: true})
+      .isInt({ min: 1 })
+      .withMessage('Speed should be more than 0'),    
     body('template.mapSize')
       .isInt({ min: 1 })
       .withMessage('Map size should be more than 0'),

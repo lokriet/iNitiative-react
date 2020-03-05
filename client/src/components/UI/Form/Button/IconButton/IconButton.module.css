@@ -3,6 +3,8 @@
   padding: 0.25rem 0;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .PaddedIcon {

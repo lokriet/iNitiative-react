@@ -6,7 +6,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import withAuthCheck from '../../../hoc/withAuthCheck';
 import * as actions from '../../../store/actions';
 
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import EncounterRow from './EncounterRow/EncounterRow';
 import IconButton from '../../UI/Form/Button/IconButton/IconButton';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
@@ -16,13 +16,19 @@ import Spinner from '../../UI/Spinner/Spinner';
 
 const EncountersList = props => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(actions.getEncounters());
   }, [dispatch])
 
-  const handleEditEncounter = useCallback(() => {}, []);
-  const handlePlayEncounter = useCallback(() => {}, []);
+  const handleEditEncounter = useCallback((encounterId) => {
+    history.push(`/encounters/edit/${encounterId}`);
+  }, [history]);
+
+  const handlePlayEncounter = useCallback((encounterId) => {
+    console.log('wanna play', encounterId);
+  }, []);
   
   const handleDeleteEncounter = useCallback((encounterId) => {
     console.log('deleting');

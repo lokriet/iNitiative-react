@@ -10,64 +10,87 @@ import ServerValidationError from '../../UI/Errors/ServerValidationError/ServerV
 
 import classes from './EditEncounter.module.css';
 import { useDispatch, connect } from 'react-redux';
-import { Redirect, useHistory } from 'react-router-dom';
+import { Redirect, useHistory, useParams } from 'react-router-dom';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
+import Spinner from '../../UI/Spinner/Spinner';
+import TemplatesPicker from '../TemplatesPicker/TemplatesPicker';
 
 const EditEncounter = props => {
-  const [encounterName, setEncounterName] = useState(null);
+  const [encounterName, setEncounterName] = useState('');
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
+  const { encounterId } = useParams();
+  const editMode = !props.isNew;
 
   useEffect(() => {
     dispatch(actions.resetEncounterOperation());
-    // if (editMode) {
-    //   dispatch(actions.getParticipantTemplateById(templateId));
-    // }
+    dispatch(actions.getParticipantTemplates());
 
-    // return () => {
-    //   if (editMode) {
-    //     dispatch(actions.resetEditedParticipantTemplate());
-    //   }
-    // };
-  }, [dispatch]);
+    if (editMode) {
+      dispatch(actions.getEncounterById(encounterId));
+    }
+
+    return () => {
+      if (editMode) {
+        dispatch(actions.resetEditedEncounter());
+      }
+    };
+  }, [dispatch, editMode, encounterId]);
+
+  useEffect(() => {
+    if (props.editedEncounter) {
+      setEncounterName(props.editedEncounter.name);
+    }
+  }, [props.editedEncounter]);
 
   const handleSaveEncounter = useCallback(() => {
     setSubmitAttempted(true);
-    dispatch(actions.editEncounter(null, { name: encounterName }));
-  }, [dispatch, encounterName]);
+    if (editMode) {
+      dispatch(
+        actions.editEncounter(encounterId, {
+          _id: encounterId,
+          name: encounterName
+        })
+      );
+    } else {
+      dispatch(actions.editEncounter(null, { name: encounterName }));
+    }
+  }, [dispatch, encounterName, editMode, encounterId]);
 
   let view;
-  if (submitAttempted && props.success) {
+  if (submitAttempted && props.saveSuccess) {
     view = <Redirect to="/encounters" />;
+  } else if (editMode && props.fetchingEncounterError) {
+    view = <ServerError serverError={props.fetchingEncounterError} />;
+  } else if (editMode && !props.editedEncounter) {
+    view = <Spinner />;
   } else {
     view = (
       <div>
         <div>Create encounter</div>
         <input
           className={classes.EncounterName}
+          value={encounterName}
           onChange={event => setEncounterName(event.target.value)}
         />
-        {props.error ? (
+        
+        <div className={classes.TemplatesPicker}>
+          <TemplatesPicker />
+        </div>
+
+        {props.saveError ? (
           <div>
-            <ServerValidationError serverError={props.error} for="name" />
+            <ServerValidationError serverError={props.saveError} for="name" />
+            <ServerError serverError={props.saveError} />
           </div>
-        ) : (
-          ''
-        )}
+        ) : null}
         <ItemsRow centered>
           <Button type="button" onClick={history.goBack}>
             Cancel
           </Button>
           <Button onClick={handleSaveEncounter}>Save</Button>
         </ItemsRow>
-        {props.error ? (
-          <div>
-            <ServerError serverError={props.error} />
-          </div>
-        ) : (
-          ''
-        )}
       </div>
     );
   }
@@ -78,8 +101,10 @@ EditEncounter.propTypes = {};
 
 const mapStateToProps = state => {
   return {
-    error: state.encounter.error,
-    success: state.encounter.operationSuccess
+    saveError: state.encounter.operationError,
+    saveSuccess: state.encounter.operationSuccess,
+    editedEncounter: state.encounter.editedEncounter,
+    fetchingEncounterError: state.encounter.fetchingError
   };
 };
 

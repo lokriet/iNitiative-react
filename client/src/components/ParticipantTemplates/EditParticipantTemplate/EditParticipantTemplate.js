@@ -16,6 +16,7 @@ import { Redirect, useHistory, useParams } from 'react-router-dom';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Button from '../../UI/Form/Button/Button';
 import Spinner from '../../UI/Spinner/Spinner';
+import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 
 const EditParticipantTemplate = props => {
   const queryParams = useQueryParams();
@@ -23,7 +24,7 @@ const EditParticipantTemplate = props => {
     queryParams.get('type') || ParticipantType.Player
   );
   const { templateId } = useParams();
-  const editMode = templateId != null;
+  const editMode = !props.isNew;
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -70,7 +71,7 @@ const EditParticipantTemplate = props => {
         editedVulnerabilities,
         editedResistances,
         editedFeatures
-      })
+      });
     }
   }, [editMode, props.editedTemplate]);
 
@@ -91,7 +92,10 @@ const EditParticipantTemplate = props => {
 
   let form;
 
-  if (!editMode || (props.editedTemplate != null && dropdownValues.initialized)) {
+  if (
+    !editMode ||
+    (props.editedTemplate != null && dropdownValues.initialized)
+  ) {
     form = (
       <Formik
         initialValues={{
@@ -104,6 +108,9 @@ const EditParticipantTemplate = props => {
           maxHp: editMode ? props.editedTemplate.maxHp : '',
           armorClass: editMode ? props.editedTemplate.armorClass : '',
           speed: editMode ? props.editedTemplate.speed : '',
+          swimSpeed: editMode ? props.editedTemplate.swimSpeed : '',
+          climbSpeed: editMode ? props.editedTemplate.climbSpeed : '',
+          flySpeed: editMode ? props.editedTemplate.flySpeed : '',
           mapSize: editMode ? props.editedTemplate.mapSize : 1,
           immunities: editMode
             ? dropdownValues.editedImmunities
@@ -126,6 +133,9 @@ const EditParticipantTemplate = props => {
           speed: Yup.number()
             .required('Speed is required')
             .min(0, 'Speed should be positive'),
+          swimSpeed: Yup.number().min(0, 'Speed should be positive').nullable(true),
+          climbSpeed: Yup.number().min(0, 'Speed should be positive').nullable(true),
+          flySpeed: Yup.number().min(0, 'Speed should be positive').nullable(true),
           mapSize: Yup.number()
             .required('Map size is required')
             .min(1, 'Map size should be more than 0'),
@@ -178,6 +188,7 @@ const EditParticipantTemplate = props => {
 
               <label htmlFor="name">Name</label>
               <Field
+                className={classes.InputField}
                 type="text"
                 id="name"
                 name="name"
@@ -188,6 +199,7 @@ const EditParticipantTemplate = props => {
 
               <label htmlFor="initiativeModifier">Initiative Modifier</label>
               <Field
+                className={classes.InputField}
                 type="number"
                 name="initiativeModifier"
                 id="initiativeModifier"
@@ -198,6 +210,7 @@ const EditParticipantTemplate = props => {
 
               <label htmlFor="maxHp">Max HP</label>
               <Field
+                className={classes.InputField}
                 type="number"
                 name="maxHp"
                 id="maxHp"
@@ -209,6 +222,7 @@ const EditParticipantTemplate = props => {
 
               <label htmlFor="armorClass">Armor class</label>
               <Field
+                className={classes.InputField}
                 type="number"
                 name="armorClass"
                 id="armorClass"
@@ -220,6 +234,7 @@ const EditParticipantTemplate = props => {
 
               <label htmlFor="speed">Speed</label>
               <Field
+                className={classes.InputField}
                 type="number"
                 name="speed"
                 id="speed"
@@ -229,8 +244,48 @@ const EditParticipantTemplate = props => {
                 serverError={props.serverError}
               />
 
+              <div className={classes.FullRow}>
+                <ItemsRow alignCentered className={classes.ExtraSpeeds}>
+                  <label htmlFor="swimSpeed">Swim</label>
+                  <Field
+                    className={classes.ExtraSpeedInput}
+                    type="number"
+                    name="swimSpeed"
+                    id="swimSpeed"
+                    min={0}
+                    hidingBorder
+                    component={Input}
+                    serverError={props.serverError}
+                  />
+
+                  <label htmlFor="climbSpeed">Climb</label>
+                  <Field
+                    className={classes.ExtraSpeedInput}
+                    type="number"
+                    name="climbSpeed"
+                    id="climbSpeed"
+                    min={0}
+                    hidingBorder
+                    component={Input}
+                    serverError={props.serverError}
+                  />
+                  <label htmlFor="flySpeed">Fly</label>
+                  <Field
+                    className={classes.ExtraSpeedInput}
+                    type="number"
+                    name="flySpeed"
+                    id="flySpeed"
+                    min={0}
+                    hidingBorder
+                    component={Input}
+                    serverError={props.serverError}
+                  />
+                </ItemsRow>
+              </div>
+
               <label htmlFor="mapSize">Map size</label>
               <Field
+                className={classes.InputField}
                 type="number"
                 name="mapSize"
                 id="mapSize"
@@ -242,7 +297,7 @@ const EditParticipantTemplate = props => {
 
               <label htmlFor="immunities">Immunities</label>
               <Field
-                className={classes.Select}
+                className={classes.InputField}
                 name="immunities"
                 id="immunities"
                 isMulti
@@ -254,7 +309,7 @@ const EditParticipantTemplate = props => {
               <label htmlFor="resistances">Resistances</label>
               <Field
                 isMulti
-                className={classes.Select}
+                className={classes.InputField}
                 name="resistances"
                 id="resistances"
                 component={Select}
@@ -264,7 +319,7 @@ const EditParticipantTemplate = props => {
               <label htmlFor="vulnerabilities">Vulnerabilities</label>
               <Field
                 isMulti
-                className={classes.Select}
+                className={classes.InputField}
                 name="vulnerabilities"
                 id="vulnerabilities"
                 component={Select}
@@ -275,7 +330,7 @@ const EditParticipantTemplate = props => {
               <Field
                 isMulti
                 isGrouped
-                className={classes.Select}
+                className={classes.InputField}
                 name="features"
                 id="features"
                 component={Select}
@@ -284,7 +339,7 @@ const EditParticipantTemplate = props => {
 
               <label htmlFor="comment">Comment</label>
               <Field
-                className={classes.Comment}
+                className={classes.InputField}
                 inputType="textarea"
                 name="comment"
                 id="comment"

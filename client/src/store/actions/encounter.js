@@ -10,6 +10,7 @@ export const EncounterActionTypes = {
 
   START_FETCHING_ENCOUNTERS: 'START_FETCHING_ENCOUNTERS',
   SET_ENCOUNTERS: 'SET_ENCOUNTERS',
+  SET_EDITED_ENCOUNTER: 'SET_EDITED_ENCOUNTER',
   FETCH_ENCOUNTERS_FAILED: 'FETCH_ENCOUNTERS_FAILED'
 };
 
@@ -144,6 +145,50 @@ export const deleteEncounter = (encounterId) => {
   };
 };
 
+export const getEncounterById = (encounterId) => {
+  return async (dispatch, getState) => {
+    try {
+      dispatch(startFetchingEncounters());
+      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const response = await fetch(`http://localhost:3001/encounters/${encounterId}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`
+        }
+      });
+
+      if (
+        response.status === 500 ||
+        response.status === 401
+      ) {
+        const responseData = await response.json();
+        dispatch(
+          fetchEncountersFailed({
+            type: ErrorType[response.status],
+            message: response.status === 500 ? 'Fetching encounter failed' : responseData.message
+          })
+        );
+      } else if (response.status === 200) {
+        const encounter = await response.json();
+        dispatch(setEditedEncounter(encounter));
+      } else {
+        dispatch(
+          fetchEncountersFailed({
+            type: ErrorType.INTERNAL_SERVER_ERROR,
+            message: 'Fetching encounter failed'
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        fetchEncountersFailed({
+          type: ErrorType.INTERNAL_CLIENT_ERROR,
+          message: 'Fetching encounter failed'
+        })
+      );
+    }
+  };
+};
 
 export const getEncounters = () => {
   return async (dispatch, getState) => {
@@ -249,5 +294,19 @@ export const fetchEncountersFailed = error => {
   return {
     type: EncounterActionTypes.FETCH_ENCOUNTERS_FAILED,
     error
+  };
+};
+
+export const setEditedEncounter = encounter => {
+  return {
+    type: EncounterActionTypes.SET_EDITED_ENCOUNTER,
+    encounter
+  };
+};
+
+export const resetEditedEncounter = () => {
+  return {
+    type: EncounterActionTypes.SET_EDITED_ENCOUNTER,
+    encounter: null
   };
 };

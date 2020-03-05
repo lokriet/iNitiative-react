@@ -35,22 +35,6 @@ const Register = props => {
     [dispatch]
   );
 
-  function equalTo(ref, msg) {
-    return Yup.mixed().test({
-      name: 'equalTo',
-      exclusive: false,
-      // eslint-disable-next-line no-template-curly-in-string
-      message: msg || '${path} must be the same as ${reference}',
-      params: {
-        reference: ref.path
-      },
-      test: function(value) {
-        return value === this.resolve(ref);
-      }
-    });
-  }
-  Yup.addMethod(Yup.string, 'equalTo', equalTo);
-
   let form = null;
 
   if (!props.isAuthenticated) {
@@ -61,13 +45,6 @@ const Register = props => {
 
     form = (
       <Formik
-        // initialValues={{
-        //   username: '',
-        //   email: '1@1.com',
-        //   password: '1111111',
-        //   confirmPassword: '1111111',
-        //   rememberMe: true
-        // }}
         initialValues={{
           username: '',
           email: '',
@@ -84,8 +61,8 @@ const Register = props => {
             .required('Required')
             .min(6, 'Must be at least 6 characters long'),
           confirmPassword: Yup.string()
-            .equalTo(Yup.ref('password'), 'Passwords must match')
             .required('Required')
+            .oneOf([Yup.ref('password')], "Passwords don't match")
         })}
         onSubmit={(values, { setSubmitting }) =>
           handleSubmit(values, setSubmitting)

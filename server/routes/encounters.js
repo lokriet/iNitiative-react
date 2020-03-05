@@ -36,7 +36,7 @@ const router = express.Router();
  * Failure:
  * status: 401
  * message: Not Authenticated
- * 
+ *
  * status: 422
  * message: 'Validation failed'
  *  data: [ (array of them!) {
@@ -62,32 +62,65 @@ router.post(
   encounterController.createEncounter
 );
 
+router.put(
+  '/encounter/:encounterId',
+  isAuth,
+  [
+    body('encounter.name')
+      .exists()
+      .withMessage('Encounter name is required')
+      .trim()
+  ],
+  encounterController.updateEncounter
+);
 
 /**
  * Delete encounter
  * http://localhost:3001/encounters/encounter/:encounterId DELETE
- * 
+ *
  * ==Response==
  * Success:
  * status: 200
  * message: 'Encounter deleted'
- * 
+ *
  * Failure:
  * status: 404
  * message: 'Page not found'
- * 
+ *
  * status: 403
  * message: 'Not authorized'
- * 
+ *
  * status: 401
  * message: 'Not authenticated'
  */
-router.delete('/encounter/:encounterId', isAuth, encounterController.deleteEncounter);
+router.delete(
+  '/encounter/:encounterId',
+  isAuth,
+  encounterController.deleteEncounter
+);
 
 /**
- * Get all users participant templates
+ * Get encounter by id
+ * http://localhost:3001/encounters/:encounterId GET
+ *
+ * ==Response==
+ * Success:
+ * status: 200
+ * data:
+ *  {
+ *    name
+ *    creator
+ *    _id
+ *    createdAt:  "2020-03-04T22:00:15.057Z"
+ *    updatedAt:  "2020-05-06T23:00:15.057Z"
+ *  }
+ */
+router.get('/:encounterId', isAuth, encounterController.getEncounter);
+
+/**
+ * Get all users encounters
  * http://localhost:3001/encounters GET
- * 
+ *
  * ==Response==
  * Success:
  * status: 200

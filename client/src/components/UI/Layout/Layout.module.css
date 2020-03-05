@@ -16,4 +16,5 @@
   text-align: center;
   flex-grow: 1;
   overflow: auto;
+  padding-bottom: 2rem;
 }
