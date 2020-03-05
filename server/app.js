@@ -16,6 +16,7 @@ const damageTypesRouter = require('./routes/damageTypes');
 const conditionsRouter = require('./routes/conditions');
 const featuresRouter = require('./routes/features');
 const templatesRouter = require('./routes/participantTemplates');
+const encountersRouter = require('./routes/encounters');
 
 const responseCodes = require('./util/responseCodes');
 
@@ -55,6 +56,7 @@ app.use('/damageTypes', damageTypesRouter);
 app.use('/conditions', conditionsRouter);
 app.use('/features', featuresRouter);
 app.use('/participantTemplates', templatesRouter);
+app.use('/encounters', encountersRouter);
 
 
 app.use(function(req, res, next) {

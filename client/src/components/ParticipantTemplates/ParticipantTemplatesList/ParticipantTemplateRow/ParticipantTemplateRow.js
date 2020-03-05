@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import List from '../../../UI/Table/List/List';
-import Color from '../../../UI/Color/Color';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 
@@ -14,9 +13,6 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete }) => {
 
   return (
     <tr className={classes.ParticipantTemplateRow}>
-      <td>
-        <Color color={template.color} />
-      </td>
       <td className={classes.AvatarCell}>
         {template.avatarUrl ? (
           <img

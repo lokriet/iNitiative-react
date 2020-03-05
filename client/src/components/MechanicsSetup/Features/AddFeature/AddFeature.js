@@ -7,7 +7,7 @@ import ServerValidationError from '../../../UI/Errors/ServerValidationError/Serv
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
 import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
-import { AddButton } from '../../../UI/Form/Button/AddButton/AddButton';
+import AddButton from '../../../UI/Form/Button/AddButton/AddButton';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 

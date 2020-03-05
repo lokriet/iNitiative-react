@@ -13,6 +13,8 @@ import Register from './components/Auth/Register/Register';
 import MechanicsSetup from './components/MechanicsSetup/MechanicsSetup';
 import ParticipantTemplates from './components/ParticipantTemplates/ParticipantTemplates';
 import EditParticipantTemplate from './components/ParticipantTemplates/EditParticipantTemplate/EditParticipantTemplate';
+import EncountersList from './components/Encounters/EncountersList/EncountersList';
+import EditEncounter from './components/Encounters/EditEncounter/EditEncounter';
 
 const App = props => {
   const dispatch = useDispatch();
@@ -67,7 +69,13 @@ const App = props => {
               <EditParticipantTemplate />
             </Route>
             <Route path="/templates" component={ParticipantTemplates} />
+            
+            <Route path="/encounters/new">
+              <EditEncounter />
+            </Route>
+            <Route path="/encounters" exact component={EncountersList} />
             <Route path="/logout" component={Logout} />
+            <Route path="/404" component={PageNotFound} />
             <Route path="/" component={PageNotFound} />
           </Switch>
         </Layout>

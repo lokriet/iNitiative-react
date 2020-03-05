@@ -8,7 +8,7 @@ import * as actions from '../../../store/actions';
 import ParticipantTemplateRow from './ParticipantTemplateRow/ParticipantTemplateRow';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import FilterInput from '../../UI/FilterInput/FilterInput';
-import { AddButton } from '../../UI/Form/Button/AddButton/AddButton';
+import AddButton from '../../UI/Form/Button/AddButton/AddButton';
 
 import classes from './ParticipantTemplatesList.module.css';
 
@@ -23,7 +23,7 @@ const ParticipantTemplatesList = props => {
   }, [dispatch]);
 
   useEffect(() => {
-    const allTemplates = props.participantTemplates.filter(item => item.type === props.type);
+    const allTemplates = props.participantTemplates ? props.participantTemplates.filter(item => item.type === props.type) : [];
     setAllTemplates(allTemplates);
     setFilteredTemplates(allTemplates)
   }, [props.type, props.participantTemplates]);
@@ -61,7 +61,6 @@ const ParticipantTemplatesList = props => {
       <table className={classes.Table}>
         <thead>
           <tr className={classes.TableHeader}>
-            <th>{/* color */}</th>
             <th>{/* avatar */}</th>
             <th>Name</th>
             <th>Ini</th>

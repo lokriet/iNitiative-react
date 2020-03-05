@@ -131,28 +131,32 @@ module.exports.updateParticipantTemplate = async (req, res, next) => {
 };
 
 module.exports.deleteParticipantTemplate = async (req, res, next) => {
-  const templateId = req.params.templateId;
-  const userId = req.userId;
-
-  const template = await ParticipantTemplate.findById(templateId);
-  if (!template) {
-    next(httpErrors.pageNotFoundError());
-    return;
+  try {
+    const templateId = req.params.templateId;
+    const userId = req.userId;
+  
+    const template = await ParticipantTemplate.findById(templateId);
+    if (!template) {
+      next(httpErrors.pageNotFoundError());
+      return;
+    }
+  
+    if (
+      template.creator.toString() !== userId.toString()
+    ) {
+      next(httpErrors.notAuthorizedError());
+      return;
+    }
+  
+    await ParticipantTemplate.deleteOne({ _id: templateId });
+    res.status(200).json({
+      statusCode: 200,
+      responseCode: responseCodes.SUCCESS,
+      message: 'Participanat template deleted'
+    });
+  } catch (error) {
+    next(error);
   }
-
-  if (
-    template.creator.toString() !== userId.toString()
-  ) {
-    next(httpErrors.notAuthorizedError());
-    return;
-  }
-
-  await ParticipantTemplate.deleteOne({ _id: templateId });
-  res.status(200).json({
-    statusCode: 200,
-    responseCode: responseCodes.SUCCESS,
-    message: 'Participanat template deleted'
-  });
 };
 
 module.exports.getParticipantTemplates = async (req, res, next) => {

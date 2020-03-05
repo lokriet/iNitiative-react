@@ -14,6 +14,7 @@ import damageTypeReducer from './store/reducers/damageType';
 import conditionReducer from './store/reducers/condition';
 import featureReducer from './store/reducers/feature';
 import participantTemplateReducer from './store/reducers/participantTemplate';
+import encounterReducer from './store/reducers/encounter';
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
@@ -25,7 +26,8 @@ const rootReducer = combineReducers({
   damageType: damageTypeReducer,
   condition: conditionReducer,
   feature: featureReducer,
-  participantTemplate: participantTemplateReducer
+  participantTemplate: participantTemplateReducer,
+  encounter: encounterReducer
 });
 
 const sagaMiddleware = createSagaMiddleware();

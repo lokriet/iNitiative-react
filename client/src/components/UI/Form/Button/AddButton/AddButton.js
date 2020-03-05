@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import classes from './AddButton.module.css';
 
-export const AddButton = props => {
+const AddButton = props => {
   return (
     <button
       type="button"
@@ -16,3 +16,5 @@ export const AddButton = props => {
     </button>
   );
 };
+
+export default AddButton;

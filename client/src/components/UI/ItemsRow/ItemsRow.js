@@ -3,12 +3,16 @@ import PropTypes from 'prop-types';
 import classes from './ItemsRow.module.css';
 
 const ItemsRow = props => {
+
   const classList = [classes.ItemsRow];
   if (props.centered) {
     classList.push(classes.Centered);
   }
   if (props.alignCentered) {
     classList.push(classes.AlignCentered)
+  }
+  if (props.className) {
+    classList.push(props.className);
   }
 
   return <div className={classList.join(' ')}>{props.children}</div>;

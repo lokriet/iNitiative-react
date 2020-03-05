@@ -44,6 +44,9 @@ const MechanicsSetup = props => {
                 <Route path={`${path}/features`}>
                   <Features isHomebrew={props.isHomebrew} />
                 </Route>
+                <Route path="*">
+                  <Redirect to="/404" />
+                </Route>
               </Switch>
             </Fragment>
           );

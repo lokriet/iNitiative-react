@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom';
 
 import withAuthCheck from '../../hoc/withAuthCheck';
+
 import TabbedNavigation from '../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
 import ParticipantTemplatesList from './ParticipantTemplatesList/ParticipantTemplatesList';
@@ -37,12 +37,13 @@ const ParticipantTemplates = props => {
         <Route path={`${path}/monsters`}>
           <ParticipantTemplatesList type={ParticipantType.Monster} />
         </Route>
+        <Route path="*">
+          <Redirect to='/404' />
+        </Route>
       </Switch>
     </Fragment>
   ) : null;
 };
-
-ParticipantTemplates.propTypes = {};
 
 const mapStateToProps = state => {
   return {

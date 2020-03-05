@@ -31,12 +31,12 @@ const participantTemplatesReducer = (state = initialState, action) => {
 
     case ActionTypes.participantTemplate.SET_PARTICIPANT_TEMPLATES:
       return setParticipantTemplates(state, action);
+      
+    case ActionTypes.participantTemplate.FETCH_PARTICIPANT_TEMPLATES_FAILED:
+      return fetchParticipantTemplatesFailed(state, action);
     
     case ActionTypes.participantTemplate.SET_EDITED_PARTICIPANT_TEMPLATE: 
       return setEditedParticipantTemplate(state, action);
-
-    case ActionTypes.participantTemplate.FETCH_PARTICIPANT_TEMPLATES_FAILED:
-      return fetchParticipantTemplatesFailed(state, action);
 
     default:
       return state;

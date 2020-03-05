@@ -8,9 +8,6 @@
   position: relative;
 }
 
-.TableHeader {
-}
-
 .TableHeader th {
   padding: 0.5rem;
   position: sticky;

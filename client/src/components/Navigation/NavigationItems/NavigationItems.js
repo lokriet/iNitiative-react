@@ -22,6 +22,7 @@ const NavigationItems = props => {
         ) : null}
         {props.isAuthenticated ? <NavigationItem link="/homebrew">Homebrew</NavigationItem> : null}
         {props.isAuthenticated ? <NavigationItem link="/templates">Templates</NavigationItem> : null}
+        {props.isAuthenticated ? <NavigationItem link="/encounters">Encounters</NavigationItem> : null}
       </ul>
       <ul className={classes.NavigationItems}>
         {auth}
