@@ -18,6 +18,7 @@ const Login = props => {
 
   useEffect(() => {
     dispatch(actions.setAuthRedirectPath('/'));
+    dispatch(actions.authInit());
   }, [props.redirectPath, dispatch]);
 
   const handleSubmit = useCallback(

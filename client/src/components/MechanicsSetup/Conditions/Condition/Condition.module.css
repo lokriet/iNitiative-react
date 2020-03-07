@@ -1,5 +1,23 @@
 .Condition {
+  margin: 1rem auto;
+
+  /* 15 + 20-60 + 1 + 2 + 2
+  40-80 */
+
+  width: 80%;
+  min-width: 40rem;
+  max-width: 60rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ConditionForm {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
 }
 
 .InputFieldsRow {
@@ -7,12 +25,16 @@
 }
 
 .Description {
-  min-width: 20rem;
   flex-grow: 1;
+  min-width: 20rem;
 }
 
 .Name {
   width: 12rem;
+}
+
+.SaveButtons {
+  width: 2rem;
 }
 
 .Fish {

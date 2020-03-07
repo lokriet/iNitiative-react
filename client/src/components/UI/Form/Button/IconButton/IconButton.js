@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classes from './IconButton.module.css';
 
 const IconButton = React.forwardRef((props, ref) => {
-  const { icon, ...htmlProps } = props;
+  const { icon, className, ...htmlProps } = props;
 
   const childrenNo = React.Children.count(props.children);
   const iconClasses = [classes.Icon];
@@ -11,8 +11,13 @@ const IconButton = React.forwardRef((props, ref) => {
     iconClasses.push(classes.PaddedIcon)
   }
 
+  const classList = [classes.IconButton];
+  if (className) {
+    classList.push(className);
+  }
+
   return (
-    <button ref={ref} type="button" className={classes.IconButton} {...htmlProps}>
+    <button ref={ref} type="button" className={classList.join(' ')} {...htmlProps}>
       <FontAwesomeIcon icon={icon} className={iconClasses.join(' ')}></FontAwesomeIcon>
       {props.children}
     </button>

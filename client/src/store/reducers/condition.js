@@ -7,7 +7,6 @@ const initialState = {
   fetchingHomebrew: false,
   sharedConditions: [],
   homebrewConditions: [],
-  saveAllCallbacks: [],
   sharedConditionsInitialised: null,
   homebrewConditionsInitialised: null
 };
@@ -46,12 +45,6 @@ const conditionsReducer = (state = initialState, action) => {
 
     case ActionTypes.condition.FETCH_HOMEBREW_CONDITIONS_FAILED:
       return fetchHomebrewConditionsFailed(state, action);
-
-    case ActionTypes.condition.REGISTER_SAVE_CONDITION_CALLBACK:
-      return registerSaveConditionCallback(state, action);
-
-    case ActionTypes.condition.UNREGISTER_SAVE_CONDITION_CALLBACK:
-      return unregisterSaveConditionCallback(state, action);
 
     default:
       return state;
@@ -209,25 +202,6 @@ const removeErrorFromStateErrors = (errors, conditionId) => {
     newErrors = errors;
   }
   return newErrors;
-};
-
-const registerSaveConditionCallback = (state, action) => {
-  return {
-    ...state,
-    saveAllCallbacks: state.saveAllCallbacks.concat({
-      conditionId: action.conditionId,
-      callback: action.callback
-    })
-  };
-};
-
-const unregisterSaveConditionCallback = (state, action) => {
-  return {
-    ...state,
-    saveAllCallbacks: state.saveAllCallbacks.filter(
-      item => item.conditionId !== action.conditionId
-    )
-  };
 };
 
 export default conditionsReducer;

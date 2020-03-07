@@ -9,8 +9,7 @@ const initialState = {
   homebrewFeatures: [],
   sharedFeaturesInitialised: null,
   homebrewFeaturesInitialised: null,
-  featureTypes: [],
-  saveAllCallbacks: []
+  featureTypes: []
 };
 
 const featuresReducer = (state = initialState, action) => {
@@ -47,12 +46,6 @@ const featuresReducer = (state = initialState, action) => {
 
     case ActionTypes.feature.FETCH_HOMEBREW_FEATURES_FAILED:
       return fetchHomebrewFeaturesFailed(state, action);
-
-    case ActionTypes.feature.REGISTER_SAVE_FEATURE_CALLBACK:
-      return registerSaveFeatureCallback(state, action);
-
-    case ActionTypes.feature.UNREGISTER_SAVE_FEATURE_CALLBACK:
-      return unregisterSaveFeatureCallback(state, action);
 
     default:
       return state;
@@ -257,25 +250,6 @@ const getDistinctFeatureTypes = (sharedFeatures, homebrewFeatures) => {
       featureTypesSet.add(feature.type);
   });
   return [...featureTypesSet];
-};
-
-const registerSaveFeatureCallback = (state, action) => {
-  return {
-    ...state,
-    saveAllCallbacks: state.saveAllCallbacks.concat({
-      featureId: action.featureId,
-      callback: action.callback
-    })
-  };
-};
-
-const unregisterSaveFeatureCallback = (state, action) => {
-  return {
-    ...state,
-    saveAllCallbacks: state.saveAllCallbacks.filter(
-      item => item.featureId !== action.featureId
-    )
-  };
 };
 
 export default featuresReducer;

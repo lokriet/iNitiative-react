@@ -1,4 +1,4 @@
-import React, { useState, useCallback, Fragment } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
@@ -34,7 +34,7 @@ const AddCondition = ({ serverError, onValidateName, onSave, onCancel }) => {
       return;
     }
     if (!onValidateName(null, nameValue)) {
-      setNameError('Condition already exists');
+      setNameError('Condition with this name already exists');
       return;
     }
 
@@ -65,8 +65,8 @@ const AddCondition = ({ serverError, onValidateName, onSave, onCancel }) => {
   return (
     <div className={classes.AddCondition}>
       {adding ? (
-        <Fragment>
-          <ItemsRow centered>
+        <div className={classes.AddConditionForm}>
+          <ItemsRow centered alignCentered>
             <InlineInput
               hidingBorder
               className={classes.Name}
@@ -93,7 +93,7 @@ const AddCondition = ({ serverError, onValidateName, onSave, onCancel }) => {
             <ServerValidationError serverError={serverError} />
           ) : null}
           {serverError ? <ServerError serverError={serverError} /> : null}
-        </Fragment>
+        </div>
       ) : (
         <AddButton onClick={handleStartAdding} />
       )}

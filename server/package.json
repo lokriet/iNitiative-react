@@ -6,6 +6,7 @@
     "start": "cross-env NODE_ENV=development nodemon app.js"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.0",
     "bcrypt": "^3.0.8",
     "compression": "^1.7.4",
     "cookie-parser": "~1.4.4",

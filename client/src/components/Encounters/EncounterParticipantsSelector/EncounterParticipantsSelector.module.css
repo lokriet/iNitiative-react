@@ -1,0 +1,26 @@
+.Container {
+  display: flex;
+}
+
+.TemplatesPicker {
+  width: 20rem;
+  padding: 0.5rem;
+  background-color: #eee;
+}
+
+.SelectedTemplatesContainer {
+  margin: 1rem 3rem;
+  
+}
+
+.Header {
+  margin: 1rem 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.EmptyList {
+  color: #aaa;
+  margin-left: 1rem;
+}

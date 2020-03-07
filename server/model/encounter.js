@@ -1,16 +1,95 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const encounterSchema = new Schema({
+var encounterParticipantSchema = new Schema({
+  type: {
+    type: String,
+    required: true
+  },
+
+  avatarUrl: String,
+
   name: {
     type: String,
     required: true
   },
-  creator: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
+
+  color: String,
+
+  initiativeModifier: {
+    type: Number,
     required: true
-  }
-}, {timestamps: true});
+  },
+
+  rolledInitiative: Number,
+
+  maxHp: {
+    type: Number,
+    required: true
+  },
+
+  currentHp: {
+    type: Number,
+    required: true
+  },
+
+  temporaryHp: Number,
+
+  armorClass: {
+    type: Number,
+    required: true
+  },
+
+  temporaryArmorClass: Number,
+
+  speed: {
+    type: Number,
+    required: true
+  },
+
+  swimSpeed: Number,
+  climbSpeed: Number,
+  flySpeed: Number,
+
+  temporarySpeed: Number,
+  temporarySwimSpeed: Number,
+  temporaryClimbSpeed: Number,
+  temporaryFlySpeed: Number,
+
+  mapSize: {
+    type: Number,
+    required: true
+  },
+
+  immunities: {
+    damageTypes: [{ type: Schema.Types.ObjectId, ref: 'DamageType' }],
+    conditions: [{ type: Schema.Types.ObjectId, ref: 'Condition' }]
+  },
+  vulnerabilities: [{ type: Schema.Types.ObjectId, ref: 'DamageType' }],
+  resistances: [{ type: Schema.Types.ObjectId, ref: 'DamageType' }],
+  features: [{ type: Schema.Types.ObjectId, ref: 'Feature' }],
+  conditions: [{type: Schema.Types.ObjectId, ref: 'Condition'}],
+
+  advantages: String,
+  comment: String
+});
+
+const encounterSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true
+    },
+
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+
+    participants: [encounterParticipantSchema]
+  },
+  { timestamps: true }
+);
 
 module.exports = mongoose.model('Encounter', encounterSchema);

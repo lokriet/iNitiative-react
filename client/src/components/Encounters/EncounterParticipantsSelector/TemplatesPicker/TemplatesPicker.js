@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import * as actions from '../../../store/actions';
+import * as actions from '../../../../store/actions';
 
-import { ParticipantType } from '../../ParticipantTemplates/ParticipantTemplates';
-import ItemsRow from '../../UI/ItemsRow/ItemsRow';
+import { ParticipantType } from '../../../ParticipantTemplates/ParticipantTemplates';
+import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import TemplatesPickList from './TemplatesPickList/TemplatesPickList';
-import Spinner from '../../UI/Spinner/Spinner';
-import ServerError from '../../UI/Errors/ServerError/ServerError';
+import Spinner from '../../../UI/Spinner/Spinner';
+import ServerError from '../../../UI/Errors/ServerError/ServerError';
 
 import classes from './TemplatesPicker.module.css';
 
@@ -43,11 +43,6 @@ const TemplatesPicker = props => {
     }
   }, [props.allTemplates, props.fetchingError, props.fetching]);
 
-  const handleAddParticipant = useCallback(participantId => {
-    console.log('adding participant...', participantId);
-    //TODO!
-  }, []);
-
   let templatesList;
   if (props.fetchingError) {
     templatesList = <ServerError serverError={props.fetchingError} />;
@@ -61,7 +56,7 @@ const TemplatesPicker = props => {
             ? templates.players
             : templates.monsters
         }
-        onAdd={handleAddParticipant}
+        onAdd={props.onAdd}
       />
     );
   }
@@ -87,7 +82,9 @@ const TemplatesPicker = props => {
   );
 };
 
-TemplatesPicker.propTypes = {};
+TemplatesPicker.propTypes = {
+  onAdd: PropTypes.func.isRequired
+};
 
 const mapStateToProps = state => {
   return {

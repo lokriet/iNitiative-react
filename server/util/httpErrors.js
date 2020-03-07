@@ -29,3 +29,11 @@ module.exports.validationError = errorData => {
   error.data = errorData
   return error;
 }
+
+module.exports.joiValidationError = errorData => {
+  const error = new Error('Validation failed');
+  error.statusCode = 500;
+  error.responseCode = responseCodes.VALIDATION_ERROR;
+  error.data = errorData
+  return error;
+}

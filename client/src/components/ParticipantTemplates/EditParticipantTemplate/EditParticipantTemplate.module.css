@@ -22,7 +22,7 @@
 
 .Avatar {
   align-self: flex-start;
-  text-align: left;
+  /* text-align: left; */
 }
 
 .ExtraSpeeds {

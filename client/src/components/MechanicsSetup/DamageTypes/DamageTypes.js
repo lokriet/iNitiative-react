@@ -78,7 +78,7 @@ const DamageTypes = props => {
     view = <ServerError serverError={fetchingError} />;
   } else {
     view = (
-      <div>
+      <>
         <AddDamageType
           onValidateName={validateName}
           onSave={handleAddDamageType}
@@ -97,7 +97,7 @@ const DamageTypes = props => {
             serverError={props.errors[damageType._id]}
           />
         ))}
-      </div>
+        </>
     );
   }
 

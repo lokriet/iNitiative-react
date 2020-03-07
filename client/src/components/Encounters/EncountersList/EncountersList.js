@@ -6,7 +6,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import withAuthCheck from '../../../hoc/withAuthCheck';
 import * as actions from '../../../store/actions';
 
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import EncounterRow from './EncounterRow/EncounterRow';
 import IconButton from '../../UI/Form/Button/IconButton/IconButton';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
@@ -21,6 +21,10 @@ const EncountersList = props => {
   useEffect(() => {
     dispatch(actions.getEncounters());
   }, [dispatch])
+
+  const handleNewEncounter = useCallback((encounterId) => {
+    history.push(`/encounters/new`);
+  }, [history]);
 
   const handleEditEncounter = useCallback((encounterId) => {
     history.push(`/encounters/edit/${encounterId}`);
@@ -48,9 +52,7 @@ const EncountersList = props => {
     view = (
       <>
         <div className={classes.NewButton}>
-          <Link to="/encounters/new">
-            <IconButton icon={faPlus}>Start a new one!</IconButton>
-          </Link>
+          <IconButton icon={faPlus} onClick={handleNewEncounter}>Start a new one!</IconButton>
         </div>
         <table className={classes.Table}>
           <thead>

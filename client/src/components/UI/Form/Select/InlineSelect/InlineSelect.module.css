@@ -1,5 +1,5 @@
 :global .InlineSelectContainer {
-  text-align: left;
+  /* text-align: left; */
 }
 
 :global .InlineSelectContainer .InlineSelect__control {
@@ -46,4 +46,17 @@
 :global .InlineSelect__indicator.InlineSelect__clear-indicator:hover,
 :global .InlineSelect__indicator.InlineSelect__dropdown-indicator:hover {
   color: #aaa;
+}
+
+:global .InlineSelect__value-container .InlineSelect__single-value,
+:global .InlineSelect__value-container .InlineSelect__placeholder {
+  white-space: normal;
+  position: unset;
+  transform: unset;
+}
+
+:global .InlineSelect__single-value+div .InlineSelect__input {
+  position: absolute;
+  top: 2px;
+  left: 8px;
 }

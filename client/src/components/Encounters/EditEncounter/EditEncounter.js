@@ -13,10 +13,11 @@ import { useDispatch, connect } from 'react-redux';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import Spinner from '../../UI/Spinner/Spinner';
-import TemplatesPicker from '../TemplatesPicker/TemplatesPicker';
+import EncounterParticipantsSelector from '../EncounterParticipantsSelector/EncounterParticipantsSelector';
 
 const EditEncounter = props => {
   const [encounterName, setEncounterName] = useState('');
+  const [addedParticipants, setAddedParticipants] = useState([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -46,17 +47,24 @@ const EditEncounter = props => {
 
   const handleSaveEncounter = useCallback(() => {
     setSubmitAttempted(true);
+    const participantsToSave = addedParticipants.map(participant => {
+      let newParticipant = {...participant};
+      delete newParticipant._tempId;
+      return newParticipant;
+    });
+
     if (editMode) {
       dispatch(
         actions.editEncounter(encounterId, {
           _id: encounterId,
-          name: encounterName
+          name: encounterName,
+          participants: participantsToSave
         })
       );
     } else {
-      dispatch(actions.editEncounter(null, { name: encounterName }));
+      dispatch(actions.editEncounter(null, { name: encounterName, participants: participantsToSave }));
     }
-  }, [dispatch, encounterName, editMode, encounterId]);
+  }, [dispatch, encounterName, editMode, encounterId, addedParticipants]);
 
   let view;
   if (submitAttempted && props.saveSuccess) {
@@ -67,17 +75,15 @@ const EditEncounter = props => {
     view = <Spinner />;
   } else {
     view = (
-      <div>
-        <div>Create encounter</div>
+      <div className={classes.Container}>
         <input
+          placeholder="Give it a name!"
           className={classes.EncounterName}
           value={encounterName}
           onChange={event => setEncounterName(event.target.value)}
         />
-        
-        <div className={classes.TemplatesPicker}>
-          <TemplatesPicker />
-        </div>
+
+        <EncounterParticipantsSelector participants={props.editedEncounter.participants} onParticipantsChanged={setAddedParticipants} />
 
         {props.saveError ? (
           <div>
@@ -85,7 +91,7 @@ const EditEncounter = props => {
             <ServerError serverError={props.saveError} />
           </div>
         ) : null}
-        <ItemsRow centered>
+        <ItemsRow className={classes.Buttons}>
           <Button type="button" onClick={history.goBack}>
             Cancel
           </Button>

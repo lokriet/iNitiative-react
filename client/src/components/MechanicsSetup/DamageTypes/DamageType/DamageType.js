@@ -82,28 +82,30 @@ const DamageType = ({
 
   return (
     <div className={classes.DamageType}>
-      <ItemsRow>
-        <InlineInput
-          hidingBorder
-          type="text"
-          name="name"
-          placeholder="Name"
-          defaultValue={damageType ? damageType.name : ''}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          ref={nameRef}
-        />
-        <IconButton onClick={() => onDelete(damageType._id)} icon={faTimes} />
+      <div style={{ position: 'relative' }}>
+        <ItemsRow alignCentered>
+          <InlineInput
+            hidingBorder
+            className={classes.NameInput}
+            type="text"
+            name="name"
+            placeholder="Name"
+            defaultValue={damageType ? damageType.name : ''}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            ref={nameRef}
+          />
+          <IconButton onClick={() => onDelete(damageType._id)} icon={faTimes} />
 
-        {showCancelButton ? (
-          <IconButton onClick={handleCancel} icon={faUndoAlt} />
-        ) : (
-          <div className={classes.Placeholder}></div>
-        )}
-
+          <div className={classes.CancelButton}>
+            {showCancelButton ? (
+              <IconButton onClick={handleCancel} icon={faUndoAlt} />
+            ) : null}
+          </div>
+        </ItemsRow>
         <SavedBadge show={showSavedBadge} onHide={handleHideSavedBadge} />
-      </ItemsRow>
-      {isNameValid ? null : <Error>Damage type already exists</Error>}
+      </div>
+      {isNameValid ? null : <Error>Damage type with this name already exists</Error>}
       {serverError ? <ServerValidationError serverError={serverError} /> : null}
       {serverError ? <ServerError serverError={serverError} /> : null}
     </div>

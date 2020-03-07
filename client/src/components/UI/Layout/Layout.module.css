@@ -3,7 +3,6 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
 }
 
 .Header {
@@ -13,7 +12,6 @@
 .Content {
   width: 100%;
   margin-top: 5rem;
-  text-align: center;
   flex-grow: 1;
   overflow: auto;
   padding-bottom: 2rem;

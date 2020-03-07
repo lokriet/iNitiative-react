@@ -1,12 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import classes from './TemplatesPickList.module.css';
-import FilterInput from '../../../UI/FilterInput/FilterInput';
-import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
-import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
+import FilterInput from '../../../../UI/FilterInput/FilterInput';
+import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
+import IconButton from '../../../../UI/Form/Button/IconButton/IconButton';
 import { faPlus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Popup from 'reactjs-popup';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TemplateDetailsPopup from './TemplateDetailsPopup/TemplateDetailsPopup';
 
 const TemplatesPickList = props => {
@@ -46,7 +45,7 @@ const TemplatesPickList = props => {
               <IconButton
                 icon={faPlus}
                 type="button"
-                onClick={() => props.onAdd(template._id)}
+                onClick={() => props.onAdd(template)}
               >
                 Add
               </IconButton>

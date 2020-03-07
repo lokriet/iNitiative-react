@@ -13,10 +13,7 @@ export const ConditionActionTypes = {
   SET_SHARED_CONDITIONS: 'SET_SHARED_CONDITIONS',
   SET_HOMEBREW_CONDITIONS: 'SET_HOMEBREW_CONDITIONS',
   FETCH_SHARED_CONDITIONS_FAILED: 'FETCH_SHARED_CONDITIONS_FAILED',
-  FETCH_HOMEBREW_CONDITIONS_FAILED: 'FETCH_HOMEBREW_CONDITIONS_FAILED',
-
-  REGISTER_SAVE_CONDITION_CALLBACK: 'REGISTER_SAVE_CONDITION_CALLBACK',
-  UNREGISTER_SAVE_CONDITION_CALLBACK: 'UNREGISTER_SAVE_CONDITION_CALLBACK'
+  FETCH_HOMEBREW_CONDITIONS_FAILED: 'FETCH_HOMEBREW_CONDITIONS_FAILED'
 };
 
 export const addCondition = (condition, isHomebrew, setSubmitted) => {
@@ -357,20 +354,5 @@ export const fetchHomebrewConditionsFailed = error => {
   return {
     type: ConditionActionTypes.FETCH_HOMEBREW_CONDITIONS_FAILED,
     error
-  };
-};
-
-export const registerSaveConditionCallback = (conditionId, callback) => {
-  return {
-    type: ConditionActionTypes.REGISTER_SAVE_CONDITION_CALLBACK,
-    conditionId,
-    callback
-  };
-};
-
-export const unregisterSaveConditionCallback = conditionId => {
-  return {
-    type: ConditionActionTypes.UNREGISTER_SAVE_CONDITION_CALLBACK,
-    conditionId
   };
 };

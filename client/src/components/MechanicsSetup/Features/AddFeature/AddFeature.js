@@ -1,4 +1,4 @@
-import React, { useState, useCallback, Fragment } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
@@ -43,7 +43,7 @@ const AddFeature = ({
       return;
     }
     if (!onValidateName(null, nameValue)) {
-      setNameError('Feature already exists');
+      setNameError('Feature with this name already exists');
       return;
     }
 
@@ -92,44 +92,46 @@ const AddFeature = ({
   return (
     <div className={classes.AddFeature}>
       {adding ? (
-        <Fragment>
-          <ItemsRow centered>
-            <InlineSelect
-              isCreatable
-              isClearable
-              options={featureTypeOptions}
-              onChange={handleTypeChanged}
-              placeholder="Type"
-              className={classes.Type}
-            />
+        <div className={classes.FeatureForm}>
+          <ItemsRow>
+            <ItemsRow className={classes.Inputs}>
+              <InlineSelect
+                isCreatable
+                isClearable
+                options={featureTypeOptions}
+                onChange={handleTypeChanged}
+                placeholder="Type"
+                className={classes.Type}
+              />
 
-            <InlineInput
-              hidingBorder
-              className={classes.Name}
-              type="text"
-              onKeyDown={handleKeyDown}
-              onChange={handleNameChanged}
-              defaultValue=""
-              placeholder="Name"
-              autoFocus
-            />
-            <InlineInput
-              hidingBorder
-              className={classes.Description}
-              inputType="textarea"
-              onKeyDown={handleKeyDown}
-              onChange={handleDescriptionChanged}
-              defaultValue=""
-              placeholder="Description"
-            />
-            <IconButton icon={faCheck} onClick={handleSave} />
+              <InlineInput
+                hidingBorder
+                className={classes.Name}
+                type="text"
+                onKeyDown={handleKeyDown}
+                onChange={handleNameChanged}
+                defaultValue=""
+                placeholder="Name"
+                autoFocus
+              />
+              <InlineInput
+                hidingBorder
+                className={classes.Description}
+                inputType="textarea"
+                onKeyDown={handleKeyDown}
+                onChange={handleDescriptionChanged}
+                defaultValue=""
+                placeholder="Description"
+              />
+            </ItemsRow>
+            <IconButton icon={faCheck} onClick={handleSave} className={classes.SaveButton} />
           </ItemsRow>
           {nameError ? <Error>{nameError}</Error> : null}
           {serverError ? (
             <ServerValidationError serverError={serverError} />
           ) : null}
           {serverError ? <ServerError serverError={serverError} /> : null}
-        </Fragment>
+        </div>
       ) : (
         <AddButton onClick={handleStartAdding} />
       )}

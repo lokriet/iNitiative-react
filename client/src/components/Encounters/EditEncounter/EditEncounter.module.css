@@ -1,5 +1,17 @@
-.TemplatesPicker {
-  width: 20rem;
+.Container {
+  
+}
+
+.EncounterName {
+  border: none;
+  border-bottom: 4px solid #aaa;
+  /* color: #333; */
+  font-size: 2rem;
+  margin-bottom: 2rem;
   padding: 0.5rem;
-  background-color: #eee;
+  width: 40rem;
+}
+
+.Buttons {
+  margin-top: 2rem;
 }

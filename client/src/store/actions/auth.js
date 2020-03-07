@@ -4,6 +4,7 @@ export const AuthActionTypes = {
   SET_FIREBASE: 'SET_FIREBASE',
 
   AUTHENTICATE: 'AUTHENTICATE',
+  AUTH_INIT: 'AUTH_INIT',
   AUTH_START: 'AUTH_START',
   AUTH_SUCCESS: 'AUTH_SUCCESS',
   AUTH_FAILED: 'AUTH_FAILED',
@@ -35,6 +36,12 @@ export const authenticate = (isRegister, payload) => {
     type: AuthActionTypes.AUTHENTICATE,
     isRegister,
     payload
+  };
+};
+
+export const authInit = () => {
+  return {
+    type: AuthActionTypes.AUTH_INIT
   };
 };
 

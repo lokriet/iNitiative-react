@@ -15,6 +15,8 @@ const authReducer = (state = initialState, action) => {
   switch (action.type) {
     case AuthActionTypes.SET_FIREBASE:
       return { ...state, firebase: action.firebase };
+    case ActionTypes.auth.AUTH_INIT:
+      return {...state, loading: false, error: null};
     case ActionTypes.auth.AUTH_START:
       return { ...state, error: null, loading: true };
     case ActionTypes.auth.AUTH_SUCCESS:

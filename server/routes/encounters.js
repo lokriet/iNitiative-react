@@ -53,24 +53,24 @@ const router = express.Router();
 router.post(
   '/encounter',
   isAuth,
-  [
-    body('encounter.name')
-      .exists()
-      .withMessage('Encounter name is required')
-      .trim()
-  ],
+  // [
+  //   body('encounter.name')
+  //     .exists()
+  //     .withMessage('Encounter name is required')
+  //     .trim()
+  // ],
   encounterController.createEncounter
 );
 
 router.put(
   '/encounter/:encounterId',
   isAuth,
-  [
-    body('encounter.name')
-      .exists()
-      .withMessage('Encounter name is required')
-      .trim()
-  ],
+  // [
+  //   body('encounter.name')
+  //     .exists()
+  //     .withMessage('Encounter name is required')
+  //     .trim()
+  // ],
   encounterController.updateEncounter
 );
 

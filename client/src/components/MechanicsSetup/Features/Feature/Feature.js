@@ -16,19 +16,21 @@ import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Error from '../../../UI/Errors/Error/Error';
 import SavedBadge from '../../../UI/SavedBadge/SavedBadge';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
-import * as actions from '../../../../store/actions/index';
+import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
 
 import classes from './Feature.module.css';
-import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
 
 class Feature extends Component {
   static propTypes = {
-    feature: PropTypes.object,
+    feature: PropTypes.object.isRequired,
     serverError: PropTypes.object,
-    onValidateName: PropTypes.func,
-    onSave: PropTypes.func,
-    onCancel: PropTypes.func,
-    onDelete: PropTypes.func
+    onValidateName: PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    onRegisterSaveCallback: PropTypes.func.isRequired,
+    onUnregisterSaveCallback: PropTypes.func.isRequired,
+    onHaveUnsavedChangesStateChange: PropTypes.func.isRequired
   };
 
   state = {
@@ -44,16 +46,17 @@ class Feature extends Component {
   };
 
   componentDidMount() {
-    this.props.registerSaveCallback(this.props.feature._id, this.handleSave);
+    this.props.onRegisterSaveCallback(this.props.feature._id, this.handleSave);
   }
 
   componentWillUnmount() {
-    this.props.unregisterSaveCallback(this.props.feature._id);
+    this.props.onUnregisterSaveCallback(this.props.feature._id);
   }
 
   setSubmitted = success => {
     if (success) {
       this.setState({ showSavedBadge: true, showSaveButtons: false });
+      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -74,8 +77,10 @@ class Feature extends Component {
       this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
     ) {
       this.setState({ showSaveButtons: true });
+      this.props.onHaveUnsavedChangesStateChange(true);
     } else if (!this.props.serverError) {
       this.setState({ showSaveButtons: false });
+      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -88,8 +93,10 @@ class Feature extends Component {
       this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
     ) {
       this.setState({ showSaveButtons: true });
+      this.props.onHaveUnsavedChangesStateChange(true);
     } else {
       this.setState({ showSaveButtons: false });
+      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -102,8 +109,10 @@ class Feature extends Component {
       this.getTypeValueValue(newValue) !== this.props.feature.type
     ) {
       this.setState({ showSaveButtons: true });
+      this.props.onHaveUnsavedChangesStateChange(true);
     } else {
       this.setState({ showSaveButtons: false });
+      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -146,6 +155,7 @@ class Feature extends Component {
           : { label: this.props.feature.type, value: this.props.feature.type },
       descriptionValue: this.props.feature.description
     });
+    this.props.onHaveUnsavedChangesStateChange(false);
 
     this.props.onCancel(this.props.feature._id);
   };
@@ -158,73 +168,79 @@ class Feature extends Component {
 
     return (
       <div className={classes.Feature}>
-        <ItemsRow className={classes.InputFieldsRow}>
-          <InlineSelect
-            options={featureTypeOptions}
-            onChange={this.handleTypeChanged}
-            isClearable
-            isCreatable
-            placeholder="Type"
-            className={classes.Type}
-            value={this.state.typeValue}
-          />
+        <div className={classes.FeatureForm}>
+          <ItemsRow className={classes.InputFieldsRow}>
+            <InlineSelect
+              options={featureTypeOptions}
+              onChange={this.handleTypeChanged}
+              isClearable
+              isCreatable
+              placeholder="Type"
+              className={classes.Type}
+              value={this.state.typeValue}
+            />
 
-          <InlineInput
-            hidingBorder
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={this.state.nameValue}
-            onChange={this.handleNameChanged}
-            className={classes.Name}
-          />
-          <InlineInput
-            hidingBorder
-            className={classes.Description}
-            inputType="textarea"
-            name="description"
-            placeholder="Description"
-            value={this.state.descriptionValue}
-            onChange={this.handleDescriptionChanged}
-          />
-          <IconButton
-            icon={faTimes}
-            onClick={() => this.props.onDelete(this.props.feature._id)}
-          />
-          {this.state.showSaveButtons ? (
-            <Fragment>
-              <IconButton icon={faCheck} onClick={this.handleSave} />
-              <IconButton icon={faUndoAlt} onClick={this.handleCancel} />
-            </Fragment>
-          ) : null}
+            <InlineInput
+              hidingBorder
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={this.state.nameValue}
+              onChange={this.handleNameChanged}
+              className={classes.Name}
+            />
+            <InlineInput
+              hidingBorder
+              className={classes.Description}
+              inputType="textarea"
+              name="description"
+              placeholder="Description"
+              value={this.state.descriptionValue}
+              onChange={this.handleDescriptionChanged}
+            />
+            <IconButton
+              icon={faTimes}
+              onClick={() => this.props.onDelete(this.props.feature._id)}
+            />
+            <ItemsRow className={classes.SaveButtons}>
+              {this.state.showSaveButtons ? (
+                <>
+                  <IconButton icon={faCheck} onClick={this.handleSave} />
+                  <IconButton icon={faUndoAlt} onClick={this.handleCancel} />
+                </>
+              ) : null}
+            </ItemsRow>
+          </ItemsRow>
           <SavedBadge
             show={this.state.showSavedBadge}
             onHide={this.handleHideSavedBadge}
           />
-        </ItemsRow>
-        {this.state.nameError ? <Error>{this.state.nameError}</Error> : null}
-        {this.props.serverError ? (
-          <ServerValidationError serverError={this.props.serverError} />
-        ) : null}
-        {this.props.serverError ? (
-          <ServerError serverError={this.props.serverError} />
-        ) : null}
+          {this.state.nameError ? <Error>{this.state.nameError}</Error> : null}
+          {this.props.serverError ? (
+            <ServerValidationError serverError={this.props.serverError} />
+          ) : null}
+          {this.props.serverError ? (
+            <ServerError serverError={this.props.serverError} />
+          ) : null}
+        </div>
 
         <br />
-        <FontAwesomeIcon
-          icon={faFish}
-          className={classes.Fish}
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          icon={faFish}
-          flip={'horizontal'}
-          className={classes.Fish}
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          icon={faFish}
-          flip={'horizontal'}
-          className={classes.Fish}
-        ></FontAwesomeIcon>
+        <ItemsRow>
+          <FontAwesomeIcon
+            icon={faFish}
+            className={classes.Fish}
+          ></FontAwesomeIcon>
+          <FontAwesomeIcon
+            icon={faFish}
+            flip={'horizontal'}
+            className={classes.Fish}
+          ></FontAwesomeIcon>
+          <FontAwesomeIcon
+            icon={faFish}
+            flip={'horizontal'}
+            className={classes.Fish}
+          ></FontAwesomeIcon>
+        </ItemsRow>
       </div>
     );
   }
@@ -236,13 +252,4 @@ const mapStateToProps = state => {
   };
 };
 
-const mapActionsToProps = dispatch => {
-  return {
-    registerSaveCallback: (featureId, callback) =>
-      dispatch(actions.registerSaveFeatureCallback(featureId, callback)),
-    unregisterSaveCallback: featureId =>
-      dispatch(actions.unregisterSaveFeatureCallback(featureId))
-  };
-};
-
-export default connect(mapStateToProps, mapActionsToProps)(Feature);
+export default connect(mapStateToProps)(Feature);

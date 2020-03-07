@@ -3,7 +3,7 @@
 }
 
 .EncounterRow td {
-  text-align: left;
+  /* text-align: left; */
   vertical-align: top;
   padding: 0.5rem 1rem;
 }

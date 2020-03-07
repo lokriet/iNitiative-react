@@ -1,4 +1,4 @@
-import React, { useState, useCallback, Fragment } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
@@ -49,23 +49,21 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
   return (
     <div className={classes.AddDamageType}>
       {adding ? (
-        <Fragment>
-          <div>
-            <InlineInput
-              hidingBorder
-              type="text"
-              onKeyDown={handleKeyDown}
-              defaultValue=""
-              placeholder="Name"
-              autoFocus
-            />
-          </div>
-          {isNameValid ? null : <Error>Damage type already exists</Error>}
+        <>
+          <InlineInput
+            hidingBorder
+            type="text"
+            onKeyDown={handleKeyDown}
+            defaultValue=""
+            placeholder="Name"
+            autoFocus
+          />
+          {isNameValid ? null : <Error>Damage type with this name already exists</Error>}
           {serverError ? (
             <ServerValidationError serverError={serverError} />
           ) : null}
           {serverError ? <ServerError serverError={serverError} /> : null}
-        </Fragment>
+        </>
       ) : (
         <AddButton onClick={handleStartAdding} />
       )}

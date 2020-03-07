@@ -19,6 +19,7 @@ const Register = props => {
   useEffect(() => {
     setRedirectPath(props.redirectPath);
     dispatch(actions.setAuthRedirectPath('/'));
+    dispatch(actions.authInit());
   }, [props.redirectPath, dispatch]);
 
   const handleSubmit = useCallback(
@@ -81,6 +82,7 @@ const Register = props => {
             name="email"
             type="text"
             placeholder="E-mail"
+            autoComplete="username"
             serverError={props.error}
             component={FormikInput}
           />
@@ -89,6 +91,7 @@ const Register = props => {
             name="password"
             type="password"
             placeholder="Password"
+            autoComplete="new-password"
             serverError={props.error}
             component={FormikInput}
           />
@@ -96,6 +99,7 @@ const Register = props => {
           <Field
             name="confirmPassword"
             type="password"
+            autoComplete="new-password"
             placeholder="Confirm password"
             component={FormikInput}
           />

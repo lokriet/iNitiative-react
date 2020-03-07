@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   faTimes,
@@ -7,9 +7,6 @@ import {
   faFish
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { connect } from 'react-redux';
-
-import * as actions from '../../../../store/actions/index';
 
 import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
@@ -28,7 +25,10 @@ class Condition extends Component {
     onValidateName: PropTypes.func,
     onSave: PropTypes.func,
     onCancel: PropTypes.func,
-    onDelete: PropTypes.func
+    onDelete: PropTypes.func,
+    onRegisterSaveCallback: PropTypes.func.isRequired,
+    onUnregisterSaveCallback: PropTypes.func.isRequired,
+    onHaveUnsavedChangesStateChange: PropTypes.func.isRequired
   };
 
   state = {
@@ -40,16 +40,17 @@ class Condition extends Component {
   };
 
   componentDidMount() {
-    this.props.registerSaveCallback(this.props.condition._id, this.handleSave);
+    this.props.onRegisterSaveCallback(this.props.condition._id, this.handleSave);
   }
 
   componentWillUnmount() {
-    this.props.unregisterSaveCallback(this.props.condition._id);
+    this.props.onUnregisterSaveCallback(this.props.condition._id);
   }
 
   setSubmitted = success => {
     if (success) {
       this.setState({ showSavedBadge: true, showSaveButtons: false });
+      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -65,8 +66,10 @@ class Condition extends Component {
       this.state.descriptionValue !== this.props.condition.description
     ) {
       this.setState({ showSaveButtons: true });
+      this.props.onHaveUnsavedChangesStateChange(true);
     } else if (!this.props.serverError) {
       this.setState({ showSaveButtons: false });
+      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -78,8 +81,10 @@ class Condition extends Component {
       event.target.value !== this.props.condition.description
     ) {
       this.setState({ showSaveButtons: true });
+      this.props.onHaveUnsavedChangesStateChange(true);
     } else {
       this.setState({ showSaveButtons: false });
+      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -95,7 +100,7 @@ class Condition extends Component {
     if (
       !this.props.onValidateName(this.props.condition._id, this.state.nameValue)
     ) {
-      this.setState({ nameError: 'Condition already exists' });
+      this.setState({ nameError: 'Condition with this name already exists' });
       return;
     }
 
@@ -117,6 +122,7 @@ class Condition extends Component {
       nameValue: this.props.condition.name,
       descriptionValue: this.props.condition.description
     });
+    this.props.onHaveUnsavedChangesStateChange(false);
 
     this.props.onCancel(this.props.condition._id);
   };
@@ -124,73 +130,71 @@ class Condition extends Component {
   render() {
     return (
       <div className={classes.Condition}>
-        <ItemsRow className={classes.InputFieldsRow}>
-          <InlineInput
-            hidingBorder
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={this.state.nameValue}
-            onChange={this.handleNameChanged}
-          />
-          <InlineInput
-            hidingBorder
-            className={classes.Description}
-            inputType="textarea"
-            name="description"
-            placeholder="Description"
-            value={this.state.descriptionValue}
-            onChange={this.handleDescriptionChanged}
-          />
-          <IconButton
-            icon={faTimes}
-            onClick={() => this.props.onDelete(this.props.condition._id)}
-          />
-          {this.state.showSaveButtons ? (
-            <Fragment>
-              <IconButton icon={faCheck} onClick={this.handleSave} />
-              <IconButton icon={faUndoAlt} onClick={this.handleCancel} />
-            </Fragment>
-          ) : null}
+        <div className={classes.ConditionForm}> 
+          <ItemsRow className={classes.InputFieldsRow}>
+            <InlineInput
+              hidingBorder
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={this.state.nameValue}
+              onChange={this.handleNameChanged}
+            />
+            <InlineInput
+              hidingBorder
+              className={classes.Description}
+              inputType="textarea"
+              name="description"
+              placeholder="Description"
+              value={this.state.descriptionValue}
+              onChange={this.handleDescriptionChanged}
+            />
+            <IconButton
+              icon={faTimes}
+              onClick={() => this.props.onDelete(this.props.condition._id)}
+            />
+
+            <ItemsRow className={classes.SaveButtons}>
+              {this.state.showSaveButtons ? (
+                <>
+                  <IconButton icon={faCheck} onClick={this.handleSave} />
+                  <IconButton icon={faUndoAlt} onClick={this.handleCancel} />
+                </>
+              ) : null}
+            </ItemsRow>
+          </ItemsRow>
           <SavedBadge
             show={this.state.showSavedBadge}
             onHide={this.handleHideSavedBadge}
           />
-        </ItemsRow>
-        {this.state.nameError ? <Error>{this.state.nameError}</Error> : null}
-        {this.props.serverError ? (
-          <ServerValidationError serverError={this.props.serverError} />
-        ) : null}
-        {this.props.serverError ? (
-          <ServerError serverError={this.props.serverError} />
-        ) : null}
+          {this.state.nameError ? <Error>{this.state.nameError}</Error> : null}
+          {this.props.serverError ? (
+            <ServerValidationError serverError={this.props.serverError} />
+          ) : null}
+          {this.props.serverError ? (
+            <ServerError serverError={this.props.serverError} />
+          ) : null}
+        </div>
 
         <br />
-        <FontAwesomeIcon
-          icon={faFish}
-          className={classes.Fish}
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          icon={faFish}
-          className={classes.Fish}
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          icon={faFish}
-          flip={'horizontal'}
-          className={classes.Fish}
-        ></FontAwesomeIcon>
+        <ItemsRow>
+          <FontAwesomeIcon
+            icon={faFish}
+            className={classes.Fish}
+          ></FontAwesomeIcon>
+          <FontAwesomeIcon
+            icon={faFish}
+            className={classes.Fish}
+          ></FontAwesomeIcon>
+          <FontAwesomeIcon
+            icon={faFish}
+            flip={'horizontal'}
+            className={classes.Fish}
+          ></FontAwesomeIcon>
+        </ItemsRow>
       </div>
     );
   }
 }
 
-const mapActionsToProps = dispatch => {
-  return {
-    registerSaveCallback: (conditionId, callback) =>
-      dispatch(actions.registerSaveConditionCallback(conditionId, callback)),
-    unregisterSaveCallback: conditionId =>
-      dispatch(actions.unregisterSaveConditionCallback(conditionId))
-  };
-};
-
-export default connect(null, mapActionsToProps)(Condition);
+export default Condition;

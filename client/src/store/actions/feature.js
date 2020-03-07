@@ -11,10 +11,7 @@ export const FeatureActionTypes = {
   START_FETCHING_FEATURES: 'START_FETCHING_FEATURES',
   SET_SHARED_FEATURES: 'SET_SHARED_FEATURES',
   SET_HOMEBREW_FEATURES: 'SET_HOMEBREW_FEATURES',
-  FETCH_FEATURES_FAILED: 'FETCH_FEATURES_FAILED',
-
-  REGISTER_SAVE_FEATURE_CALLBACK: 'REGISTER_SAVE_FEATURE_CALLBACK',
-  UNREGISTER_SAVE_FEATURE_CALLBACK: 'UNREGISTER_SAVE_FEATURE_CALLBACK'
+  FETCH_FEATURES_FAILED: 'FETCH_FEATURES_FAILED'
 };
 
 export const addFeature = (feature, isHomebrew, setSubmitted) => {
@@ -338,20 +335,5 @@ export const fetchFeaturesFailed = error => {
   return {
     type: FeatureActionTypes.FETCH_FEATURES_FAILED,
     error
-  };
-};
-
-export const registerSaveFeatureCallback = (featureId, callback) => {
-  return {
-    type: FeatureActionTypes.REGISTER_SAVE_FEATURE_CALLBACK,
-    featureId,
-    callback
-  };
-};
-
-export const unregisterSaveFeatureCallback = featureId => {
-  return {
-    type: FeatureActionTypes.UNREGISTER_SAVE_FEATURE_CALLBACK,
-    featureId
   };
 };

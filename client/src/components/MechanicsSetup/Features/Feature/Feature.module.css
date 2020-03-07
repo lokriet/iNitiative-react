@@ -1,9 +1,33 @@
 .Feature {
+  margin: 1rem auto;
+
+  width: 80%;
+  min-width: 40rem;
+  max-width: 70rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.FeatureForm {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
 }
 
 .InputFieldsRow {
   width: 100%;
+}
+
+.Type {
+  width: 16rem;
+  flex-shrink: 0;
+}
+
+.Name {
+  width: 12rem;
 }
 
 .Description {
@@ -11,16 +35,11 @@
   flex-grow: 1;
 }
 
-.Name {
-  width: 12rem;
+.SaveButtons {
+  width: 2rem;
 }
 
 .Fish {
   margin: 0 1rem 1rem 1rem;
   color: #aaa;
-}
-
-.Type {
-  width: 12rem;
-  flex-shrink: 0;
 }

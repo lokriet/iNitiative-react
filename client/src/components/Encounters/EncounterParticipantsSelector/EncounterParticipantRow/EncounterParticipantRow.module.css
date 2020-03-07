@@ -1,0 +1,54 @@
+.Container {
+  width: 33rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.Container:hover {
+  border-color: #aaa;
+}
+
+.AvatarContainer {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.Avatar {
+  max-width: 2rem;
+  max-height: 2rem;
+}
+
+.ColorButton {
+  cursor: pointer;
+}
+
+.NameInput {
+  width: 12rem;
+}
+
+.Divider {
+  color: #ccc;
+}
+
+.InitiativeSum {
+  display: flex;
+  align-items: center;
+}
+
+.InitiativeInput {
+  width: 3rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.RollButton {
+  margin: 0.3rem 0.5rem 0 0.5rem;
+}
+
+.ControlButtons {
+  flex-grow: 1;
+  justify-content: flex-end;
+}

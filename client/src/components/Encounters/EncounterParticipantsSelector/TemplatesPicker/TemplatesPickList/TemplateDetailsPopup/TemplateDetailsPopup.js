@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
-import List from '../../../../UI/Table/List/List';
+import ItemsRow from '../../../../../UI/ItemsRow/ItemsRow';
+import List from '../../../../../UI/Table/List/List';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFish } from '@fortawesome/free-solid-svg-icons';
 

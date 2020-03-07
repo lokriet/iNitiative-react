@@ -23,7 +23,7 @@
 
 .DetailsColumn {
   width: 50%;
-  text-align: left;
+  /* text-align: left; */
 }
 
 .DetailsLabel {
@@ -32,7 +32,7 @@
 }
 
 .ExtraSpeeds {
-  margin-left: 1rem;
+  margin-left: 0.5rem;
 }
 
 .DetailsList {
