@@ -9,7 +9,6 @@ const encounterValidationSchema = Joi.object({
   _tempId: Joi.any().forbidden(),
   _id: Joi.any().optional(),
   name: Joi.string()
-    .alphanum()
     .max(200)
     .trim()
     .required(),

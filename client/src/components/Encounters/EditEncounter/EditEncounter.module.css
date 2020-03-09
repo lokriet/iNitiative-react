@@ -10,8 +10,9 @@
   margin-bottom: 2rem;
   padding: 0.5rem;
   width: 40rem;
+  text-overflow: ellipsis;
 }
 
-.Buttons {
-  margin-top: 2rem;
+.Errors {
+  margin-bottom: 1rem;
 }

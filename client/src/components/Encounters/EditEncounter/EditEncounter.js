@@ -10,15 +10,18 @@ import ServerValidationError from '../../UI/Errors/ServerValidationError/ServerV
 
 import classes from './EditEncounter.module.css';
 import { useDispatch, connect } from 'react-redux';
-import { Redirect, useHistory, useParams } from 'react-router-dom';
+import { Redirect, useHistory, useParams, Prompt } from 'react-router-dom';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import Spinner from '../../UI/Spinner/Spinner';
 import EncounterParticipantsSelector from '../EncounterParticipantsSelector/EncounterParticipantsSelector';
+import Error from '../../UI/Errors/Error/Error';
 
 const EditEncounter = props => {
   const [encounterName, setEncounterName] = useState('');
   const [addedParticipants, setAddedParticipants] = useState([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
   const { encounterId } = useParams();
@@ -45,10 +48,55 @@ const EditEncounter = props => {
     }
   }, [props.editedEncounter]);
 
+  const handleParticipantsChanged = useCallback(participants => {
+    console.log('changed!');
+    setAddedParticipants(participants);
+    setHasUnsavedChanges(true);
+  }, []);
+
   const handleSaveEncounter = useCallback(() => {
+    let newEncounterName = encounterName.trim();
+    setEncounterName(newEncounterName);
+
+    let validationErrors = [];
+
+    if (newEncounterName === '') {
+      validationErrors.push('Encounter name should not be empty');
+    }
+    for (let i = 0; i < addedParticipants.length; i++) {
+      const checkedParticipant = addedParticipants[i];
+      if (checkedParticipant.name.trim() === '') {
+        validationErrors.push(`#${i}: participant name should not be empty`);
+      } else if (
+        addedParticipants.some(participant => {
+          return (
+            ((participant._id && participant._id !== checkedParticipant._id) ||
+              (participant._tempId &&
+                participant._tempId !== checkedParticipant._tempId)) &&
+            participant.name.trim() === checkedParticipant.name.trim()
+          );
+        })
+      ) {
+        validationErrors.push(`${checkedParticipant.name}: participant with this name already exists in the encounter`);
+      }
+
+      if (checkedParticipant.rolledInitiative != null && checkedParticipant.rolledInitiative !== '') {
+        let ini = parseFloat(checkedParticipant.rolledInitiative);
+        if (ini < 1 || ini > 20) {
+          const name = (checkedParticipant.name != null && checkedParticipant.name.trim() !== '') ? checkedParticipant.name : `#${i}`;
+          validationErrors.push(`${name}: rolled initiative should be between 1 and 20`);
+        }
+      }
+    }
+
+    setValidationErrors(validationErrors);
+    if (validationErrors.length > 0) {
+      return;
+    }
+
     setSubmitAttempted(true);
     const participantsToSave = addedParticipants.map(participant => {
-      let newParticipant = {...participant};
+      let newParticipant = { ...participant };
       delete newParticipant._tempId;
       return newParticipant;
     });
@@ -62,7 +110,12 @@ const EditEncounter = props => {
         })
       );
     } else {
-      dispatch(actions.editEncounter(null, { name: encounterName, participants: participantsToSave }));
+      dispatch(
+        actions.editEncounter(null, {
+          name: encounterName,
+          participants: participantsToSave
+        })
+      );
     }
   }, [dispatch, encounterName, editMode, encounterId, addedParticipants]);
 
@@ -76,27 +129,42 @@ const EditEncounter = props => {
   } else {
     view = (
       <div className={classes.Container}>
+        <Prompt
+          when={
+            editMode &&
+            (hasUnsavedChanges || encounterName !== props.editedEncounter.name)
+          }
+          message="Confirm leaving the page? All unsaved changes will be lost. "
+        />
         <input
           placeholder="Give it a name!"
           className={classes.EncounterName}
           value={encounterName}
           onChange={event => setEncounterName(event.target.value)}
         />
-
-        <EncounterParticipantsSelector participants={props.editedEncounter.participants} onParticipantsChanged={setAddedParticipants} />
-
-        {props.saveError ? (
-          <div>
-            <ServerValidationError serverError={props.saveError} for="name" />
-            <ServerError serverError={props.saveError} />
-          </div>
-        ) : null}
-        <ItemsRow className={classes.Buttons}>
+        <ItemsRow>
           <Button type="button" onClick={history.goBack}>
             Cancel
           </Button>
           <Button onClick={handleSaveEncounter}>Save</Button>
         </ItemsRow>
+
+        <div className={classes.Errors}>
+          {validationErrors.map((error, index) => (
+            <Error key={index}>{error}</Error>
+          ))}
+          {props.saveError ? (
+            <div>
+              <ServerValidationError serverError={props.saveError} for="name" />
+              <ServerError serverError={props.saveError} />
+            </div>
+          ) : null}
+        </div>
+
+        <EncounterParticipantsSelector
+          participants={editMode ? props.editedEncounter.participants : []}
+          onParticipantsChanged={handleParticipantsChanged}
+        />
       </div>
     );
   }

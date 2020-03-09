@@ -14,17 +14,14 @@ const Color = React.forwardRef((props, ref) => {
   if (className != null) {
     classList.push(className);
   }
-  return props.color == null ? (
-    <div className={classList.join(' ')} ref={ref} {...htmlProps}>
-      <FontAwesomeIcon icon={faBan} className={classes.NoColorIcon} />
+  return (
+    <div 
+        className={classList.join(' ')} 
+        ref={ref} 
+        {...htmlProps} 
+        style={props.color == null || props.color === '' ? {} : { backgroundColor: props.color }} >
+      { props.color == null || props.color === '' ? <FontAwesomeIcon icon={faBan} className={classes.NoColorIcon} /> : null }
     </div>
-  ) : (
-    <div
-      ref={ref}
-      {...htmlProps}
-      style={{ backgroundColor: props.color }}
-      className={classList.join(' ')}
-    ></div>
   );
 });
 

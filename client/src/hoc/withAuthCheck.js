@@ -9,13 +9,13 @@ import * as actions from '../store/actions';
 const withAuthCheck = WrappedComponent => {
   return connect(mapStateToProps)(props => {
     const dispatch = useDispatch();
-    const { path } = useRouteMatch();
+    const routeMatch = useRouteMatch();
     const history = useHistory();
 
     const handleLogin = useCallback(() => {
-      dispatch(actions.setAuthRedirectPath(path));
+      dispatch(actions.setAuthRedirectPath(routeMatch.url));
       history.push('/login');
-    }, [dispatch, path, history]);
+    }, [dispatch, routeMatch.url, history]);
 
 
     if (!props.initialAuthCheckDone) {

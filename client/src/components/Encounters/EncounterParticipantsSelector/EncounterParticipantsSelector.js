@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import classes from './EncounterParticipantsSelector.module.css';
-import TemplatesPicker from './TemplatesPicker/TemplatesPicker';
-import Button from '../../UI/Form/Button/Button';
 import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import TemplatesPicker from './TemplatesPicker/TemplatesPicker';
+import Button from '../../UI/Form/Button/Button';
 import EncounterParticipantRow from './EncounterParticipantRow/EncounterParticipantRow';
+
+import classes from './EncounterParticipantsSelector.module.css';
 
 const convertToEncounterParticipant = (participantTemplate, name) => {
   return {
@@ -52,16 +54,19 @@ const convertToEncounterParticipant = (participantTemplate, name) => {
   };
 };
 
-const generageInitiative = () => Math.ceil(Math.random() * 20);
+const generateInitiative = () => Math.ceil(Math.random() * 20);
 
-const EncounterParticipantsSelector = ({participants, onParticipantsChanged}) => {
+const EncounterParticipantsSelector = ({
+  participants,
+  onParticipantsChanged
+}) => {
   const [addedParticipants, setAddedParticipants] = useState(
     participants || []
   );
 
-  useEffect(() => {
-    onParticipantsChanged(addedParticipants);
-  }, [addedParticipants, onParticipantsChanged])
+  // useEffect(() => {
+  //   onParticipantsChanged(addedParticipants);
+  // }, [addedParticipants, onParticipantsChanged]);
 
   const handleParticipantUpdate = useCallback((partialUpdate, participant) => {
     setAddedParticipants(previousAddedParticipants => {
@@ -69,29 +74,34 @@ const EncounterParticipantsSelector = ({participants, onParticipantsChanged}) =>
       const index = newParticipants.indexOf(participant);
       newParticipants[index] = { ...newParticipants[index], ...partialUpdate };
 
+      onParticipantsChanged(newParticipants);
       return newParticipants;
     });
-  }, []);
+  }, [onParticipantsChanged]);
 
-  const handleParticipantDelete = useCallback(
-    (index) => {
-      setAddedParticipants(previousAddedParticipants => {
-        const newParticipants = [...previousAddedParticipants];
-        newParticipants.splice(index, 1);
-        return newParticipants;
-      });
-    },
-    [],
-  )
+  const handleParticipantDelete = useCallback(index => {
+    setAddedParticipants(previousAddedParticipants => {
+      const newParticipants = [...previousAddedParticipants];
+      newParticipants.splice(index, 1);
+
+      onParticipantsChanged(newParticipants);
+      return newParticipants;
+    });
+  }, [onParticipantsChanged]);
 
   const handleRollEmptyInitiatives = useCallback(() => {
     setAddedParticipants(previousAddedParticipants => {
       let newParticipants = previousAddedParticipants.map(item => {
-        return {...item, rolledInitiative: item.rolledInitiative || generageInitiative()}
+        return {
+          ...item,
+          rolledInitiative: item.rolledInitiative || generateInitiative()
+        };
       });
+
+      onParticipantsChanged(newParticipants);
       return newParticipants;
     });
-  }, []);
+  }, [onParticipantsChanged]);
 
   const findUnusedName = useCallback(
     name => {
@@ -116,12 +126,15 @@ const EncounterParticipantsSelector = ({participants, onParticipantsChanged}) =>
     participantTemplate => {
       setAddedParticipants(previousAddedParticipants => {
         const name = findUnusedName(participantTemplate.name);
-        return previousAddedParticipants.concat(
+        const newParticipants = previousAddedParticipants.concat(
           convertToEncounterParticipant(participantTemplate, name)
         );
+
+        onParticipantsChanged(newParticipants);
+        return newParticipants;
       });
     },
-    [findUnusedName]
+    [findUnusedName, onParticipantsChanged]
   );
 
   return (

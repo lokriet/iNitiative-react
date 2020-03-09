@@ -8,6 +8,7 @@ import { faFish } from '@fortawesome/free-solid-svg-icons';
 
 import classes from './TemplateDetailsPopup.module.css';
 
+
 const TemplateDetailsPopup = ({ template }) => {
   return (
     <div className={classes.Container}>
@@ -34,6 +35,10 @@ const TemplateDetailsPopup = ({ template }) => {
           <ItemsRow>
             <label className={classes.DetailsLabel}>Map Size:</label>
             <div>{template.mapSize}</div>
+          </ItemsRow>
+          <ItemsRow>
+            <label className={classes.DetailsLabel}>Comment</label>
+            <div>{template.comment == null || template.comment === '' ? '-' : template.comment}</div>
           </ItemsRow>
         </div>
         <div className={classes.DetailsColumn}>
