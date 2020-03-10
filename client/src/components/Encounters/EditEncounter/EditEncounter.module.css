@@ -1,18 +1,27 @@
 .Container {
-  
+  margin: auto;
+  width: 65rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  height: calc(100vh - 7rem);
 }
 
 .EncounterName {
   border: none;
   border-bottom: 4px solid #aaa;
-  /* color: #333; */
   font-size: 2rem;
   margin-bottom: 2rem;
   padding: 0.5rem;
-  width: 40rem;
+  width: 35.5rem;
   text-overflow: ellipsis;
 }
 
 .Errors {
   margin-bottom: 1rem;
+}
+
+.ParticipantsSelector {
+  flex-grow: 1;
+  position: relative;
 }

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ const ParticipantTemplates = props => {
   let { path, url } = useRouteMatch();
 
   return props.isAuthenticated ? (
-    <Fragment>
+    <>
       <TabbedNavigation>
         <TabbedNavigationItem link={`${url}/players`}>
           Players
@@ -41,7 +41,7 @@ const ParticipantTemplates = props => {
           <Redirect to='/404' />
         </Route>
       </Switch>
-    </Fragment>
+    </>
   ) : null;
 };
 

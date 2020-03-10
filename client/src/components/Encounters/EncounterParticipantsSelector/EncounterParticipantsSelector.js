@@ -8,6 +8,7 @@ import Button from '../../UI/Form/Button/Button';
 import EncounterParticipantRow from './EncounterParticipantRow/EncounterParticipantRow';
 
 import classes from './EncounterParticipantsSelector.module.css';
+import IconButton from '../../UI/Form/Button/IconButton/IconButton';
 
 const convertToEncounterParticipant = (participantTemplate, name) => {
   return {
@@ -68,26 +69,36 @@ const EncounterParticipantsSelector = ({
   //   onParticipantsChanged(addedParticipants);
   // }, [addedParticipants, onParticipantsChanged]);
 
-  const handleParticipantUpdate = useCallback((partialUpdate, participant) => {
-    setAddedParticipants(previousAddedParticipants => {
-      const newParticipants = [...previousAddedParticipants];
-      const index = newParticipants.indexOf(participant);
-      newParticipants[index] = { ...newParticipants[index], ...partialUpdate };
+  const handleParticipantUpdate = useCallback(
+    (partialUpdate, participant) => {
+      setAddedParticipants(previousAddedParticipants => {
+        const newParticipants = [...previousAddedParticipants];
+        const index = newParticipants.indexOf(participant);
+        newParticipants[index] = {
+          ...newParticipants[index],
+          ...partialUpdate
+        };
 
-      onParticipantsChanged(newParticipants);
-      return newParticipants;
-    });
-  }, [onParticipantsChanged]);
+        onParticipantsChanged(newParticipants);
+        console.log('participants updated', newParticipants);
+        return newParticipants;
+      });
+    },
+    [onParticipantsChanged]
+  );
 
-  const handleParticipantDelete = useCallback(index => {
-    setAddedParticipants(previousAddedParticipants => {
-      const newParticipants = [...previousAddedParticipants];
-      newParticipants.splice(index, 1);
+  const handleParticipantDelete = useCallback(
+    index => {
+      setAddedParticipants(previousAddedParticipants => {
+        const newParticipants = [...previousAddedParticipants];
+        newParticipants.splice(index, 1);
 
-      onParticipantsChanged(newParticipants);
-      return newParticipants;
-    });
-  }, [onParticipantsChanged]);
+        onParticipantsChanged(newParticipants);
+        return newParticipants;
+      });
+    },
+    [onParticipantsChanged]
+  );
 
   const handleRollEmptyInitiatives = useCallback(() => {
     setAddedParticipants(previousAddedParticipants => {
@@ -138,14 +149,19 @@ const EncounterParticipantsSelector = ({
   );
 
   return (
+    // <>
     <div className={classes.Container}>
       <div className={classes.TemplatesPicker}>
         <TemplatesPicker onAdd={handleAddParticipant} />
       </div>
       <div className={classes.SelectedTemplatesContainer}>
-        <Button onClick={handleRollEmptyInitiatives}>
-          <FontAwesomeIcon icon={faDiceD6} /> Roll empty initiatives
-        </Button>
+        <IconButton
+          bordered
+          icon={faDiceD6}
+          onClick={handleRollEmptyInitiatives}
+        >
+          Roll empty initiatives
+        </IconButton>
         <div className={classes.Header}>Added Participants</div>
         {addedParticipants.length === 0 ? (
           <div className={classes.EmptyList}>Start adding</div>
@@ -163,6 +179,7 @@ const EncounterParticipantsSelector = ({
         )}
       </div>
     </div>
+    // </>
   );
 };
 

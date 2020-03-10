@@ -65,8 +65,9 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
   );
 
   const handleChangeDetails = useCallback(
-    (formValues) => {
+    (formValues, close) => {
       onInfoChanged(formValues);
+      close();
     },
     [onInfoChanged],
   )
@@ -93,7 +94,7 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
           )}
         </Popup>
 
-        {participant.avatarUrl ? (
+        {participant.avatarUrl != null && participant.avatarUrl !== '' ? (
           <div className={classes.AvatarContainer}>
             <img
               className={classes.Avatar}
@@ -134,13 +135,13 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
           {participant.initiativeModifier})
         </div>
 
-        <ItemsRow className={classes.ControlButtons}>
+        <ItemsRow className={classes.ControlButtons} alignCentered>
           <Popup
             on="hover"
             position="bottom right"
             offsetX={60}
             arrow={false}
-            trigger={open => <IconButton icon={faInfoCircle} />}
+            trigger={open => <IconButton icon={faInfoCircle} className={classes.InfoButton} />}
             contentStyle={{ width: 'auto' }}
           >
             <ParticipantDetailsPopup participant={participant} />
@@ -155,7 +156,7 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
             {close => (
               <EditEncounterParticipant
                 participant={participant}
-                onSave={handleChangeDetails}
+                onSave={formValues => handleChangeDetails(formValues, close)}
                 onCancel={close}
               />
             )}

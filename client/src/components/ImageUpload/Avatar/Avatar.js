@@ -12,7 +12,7 @@ const Avatar = ({
   form,
   ...props
 }) => {
-  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(field.value);
   const isMonster = form.values.type === ParticipantType.Monster;
 
   const avatarUploadedHandler = url => {
@@ -27,7 +27,7 @@ const Avatar = ({
   };
 
   const imgSrc =
-    avatarUrl || (isMonster ? defaultMonsterImg : defaultPlayerImg);
+    avatarUrl == null || avatarUrl === '' ?  (isMonster ? defaultMonsterImg : defaultPlayerImg) : avatarUrl;
   return (
     <div>
       <ImageUpload
@@ -38,7 +38,7 @@ const Avatar = ({
       >
         <img src={imgSrc} className={classes.AvatarImg} alt="avatar" />
       </ImageUpload>
-      {avatarUrl ? (
+      {avatarUrl != null && avatarUrl !== '' ? (
         <div>
           <IconButton type="button" onClick={avatarDeletedHandler} icon={faTimes}>
             Delete avatar

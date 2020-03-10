@@ -21,19 +21,19 @@ const encounterValidationSchema = Joi.object({
           .required(),
         avatarUrl: Joi.string()
           .uri()
-          .allow(null),
+          .allow(null, ''),
         name: Joi.string()
           .max(200)
           .trim()
           .required(),
         color: Joi.string()
           .regex(/^#[0-9a-f]{6}/i)
-          .allow(null),
+          .allow(null, ''),
         initiativeModifier: Joi.number().required(),
         rolledInitiative: Joi.number()
           .min(1)
           .max(20)
-          .allow(null),
+          .allow(null, ''),
         maxHp: Joi.number()
           .min(1)
           .required(),
@@ -42,37 +42,37 @@ const encounterValidationSchema = Joi.object({
           .required(),
         temporaryHp: Joi.number()
           .min(1)
-          .allow(null),
+          .allow(null, ''),
         armorClass: Joi.number()
           .min(0)
           .required(),
         temporaryArmorClass: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         speed: Joi.number()
           .min(1)
           .required(),
         swimSpeed: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         climbSpeed: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         flySpeed: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         temporarySpeed: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         temporarySwimSpeed: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         temporaryClimbSpeed: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         temporaryFlySpeed: Joi.number()
           .min(0)
-          .allow(null),
+          .allow(null, ''),
         mapSize: Joi.number()
           .min(1)
           .required(),

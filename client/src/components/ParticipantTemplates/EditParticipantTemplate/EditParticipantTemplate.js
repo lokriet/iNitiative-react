@@ -43,42 +43,9 @@ const EditParticipantTemplate = props => {
     };
   }, [dispatch, editMode, templateId]);
 
-  const [dropdownValues, setDropdownValues] = useState({ initialized: false });
-
-  useEffect(() => {
-    if (editMode && props.editedTemplate) {
-      const editedImmunities = {
-        damageTypes: props.editedTemplate.immunities.damageTypes.map(item =>
-          item._id.toString()
-        ),
-        conditions: props.editedTemplate.immunities.conditions.map(item =>
-          item._id.toString()
-        )
-      };
-      const editedVulnerabilities = props.editedTemplate.vulnerabilities.map(
-        item => item._id.toString()
-      );
-      const editedResistances = props.editedTemplate.resistances.map(item =>
-        item._id.toString()
-      );
-      const editedFeatures = props.editedTemplate.features.map(item =>
-        item._id.toString()
-      );
-
-      setDropdownValues({
-        initialized: true,
-        editedImmunities,
-        editedVulnerabilities,
-        editedResistances,
-        editedFeatures
-      });
-    }
-  }, [editMode, props.editedTemplate]);
-
   const submitHandler = useCallback(
     (values, setSubmitting) => {
       console.log('submit!', values);
-      // setSubmittingForm(true);
       dispatch(
         actions.editParticipantTemplate(
           editMode ? templateId : null,
@@ -94,13 +61,13 @@ const EditParticipantTemplate = props => {
 
   if (
     !editMode ||
-    (props.editedTemplate != null && dropdownValues.initialized)
+    (props.editedTemplate != null)
   ) {
     form = (
       <Formik
         initialValues={{
           type: editMode ? props.editedTemplate.type : participantType,
-          avatarUrl: editMode ? props.editedTemplate.avatarUrl : null,
+          avatarUrl: editMode ? props.editedTemplate.avatarUrl || '' : '',
           name: editMode ? props.editedTemplate.name : '',
           initiativeModifier: editMode
             ? props.editedTemplate.initiativeModifier
@@ -108,21 +75,22 @@ const EditParticipantTemplate = props => {
           maxHp: editMode ? props.editedTemplate.maxHp : '',
           armorClass: editMode ? props.editedTemplate.armorClass : '',
           speed: editMode ? props.editedTemplate.speed : '',
-          swimSpeed: editMode ? props.editedTemplate.swimSpeed : '',
-          climbSpeed: editMode ? props.editedTemplate.climbSpeed : '',
-          flySpeed: editMode ? props.editedTemplate.flySpeed : '',
+          swimSpeed: editMode ? props.editedTemplate.swimSpeed || '' : '',
+          climbSpeed: editMode ? props.editedTemplate.climbSpeed || '' : '',
+          flySpeed: editMode ? props.editedTemplate.flySpeed || '' : '',
           mapSize: editMode ? props.editedTemplate.mapSize : 1,
           immunities: editMode
-            ? dropdownValues.editedImmunities
+            ? props.editedTemplate.immunities
             : { damageTypes: [], conditions: [] },
-          vulnerabilities: editMode ? dropdownValues.editedVulnerabilities : [],
-          resistances: editMode ? dropdownValues.editedResistances : [],
-          features: editMode ? dropdownValues.editedFeatures : [],
+          vulnerabilities: editMode ? props.editedTemplate.vulnerabilities : [],
+          resistances: editMode ? props.editedTemplate.resistances : [],
+          features: editMode ? props.editedTemplate.features : [],
           comment: editMode ? props.editedTemplate.comment : ''
         }}
         validationSchema={Yup.object({
           type: Yup.string().required('Type is required'),
           name: Yup.string().required('Name is required'),
+          avatarUrl: Yup.string(),
           initiativeModifier: Yup.number().required('Ini Mod is required'),
           maxHp: Yup.number()
             .required('HP is required')
@@ -141,9 +109,9 @@ const EditParticipantTemplate = props => {
             .min(1, 'Map size should be more than 0'),
           comment: Yup.string().trim(),
           immunities: Yup.object(),
-          vulnerabilities: Yup.array().of(Yup.string()),
-          resistances: Yup.array().of(Yup.string()),
-          features: Yup.array().of(Yup.string())
+          vulnerabilities: Yup.array().of(Yup.object()),
+          resistances: Yup.array().of(Yup.object()),
+          features: Yup.array().of(Yup.object())
         })}
         onSubmit={(values, { setSubmitting }) =>
           submitHandler(values, setSubmitting)

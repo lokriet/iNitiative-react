@@ -31,8 +31,8 @@ const EncountersList = props => {
   }, [history]);
 
   const handlePlayEncounter = useCallback((encounterId) => {
-    console.log('wanna play', encounterId);
-  }, []);
+    history.push(`/encounters/play/${encounterId}`);
+  }, [history]);
   
   const handleDeleteEncounter = useCallback((encounterId) => {
     console.log('deleting');

@@ -62,7 +62,7 @@ const TemplatesPicker = props => {
   }
 
   return (
-    <>
+    <div className={classes.Container}>
       <ItemsRow className={classes.Tabs} centered>
         <button
           className={`${classes.TabButton} ${templatesType === ParticipantType.Player ? classes.Active : ''}`}
@@ -78,7 +78,7 @@ const TemplatesPicker = props => {
         </button>
       </ItemsRow>
       <div className={classes.TemplatesList}>{templatesList}</div>
-    </>
+    </div>
   );
 };
 

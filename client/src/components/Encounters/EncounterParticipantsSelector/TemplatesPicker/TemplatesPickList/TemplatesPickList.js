@@ -28,7 +28,7 @@ const TemplatesPickList = props => {
         filteredTemplates.map(template => (
           <ItemsRow className={classes.TemplateRow} key={template._id}>
             <div className={classes.AvatarContainer}>
-              {template.avatarUrl ? (
+              {template.avatarUrl != null && template.avatarUrl !== '' ? (
                 <img
                   className={classes.Avatar}
                   src={template.avatarUrl}
@@ -37,8 +37,18 @@ const TemplatesPickList = props => {
               ) : null}
             </div>
             <div className={classes.Name}>{template.name}</div>
-            <ItemsRow className={classes.Buttons}>
-              <Popup on="hover" position="right top" trigger={open => <IconButton icon={faInfoCircle} />} contentStyle={{width: "auto"}}>
+            <ItemsRow className={classes.Buttons} alignCentered>
+              <Popup
+                on="hover"
+                position="right top"
+                trigger={open => (
+                  <IconButton
+                    icon={faInfoCircle}
+                    className={classes.InfoButton}
+                  />
+                )}
+                contentStyle={{ width: 'auto' }}
+              >
                 <TemplateDetailsPopup template={template} />
               </Popup>
 

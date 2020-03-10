@@ -3,18 +3,18 @@ import PropTypes from 'prop-types';
 
 import * as actions from '../../../store/actions';
 import withAuthCheck from '../../../hoc/withAuthCheck';
+import { useDispatch, connect } from 'react-redux';
+import { Redirect, useHistory, useParams, Prompt } from 'react-router-dom';
 
 import Button from '../../UI/Form/Button/Button';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import ServerValidationError from '../../UI/Errors/ServerValidationError/ServerValidationError';
-
-import classes from './EditEncounter.module.css';
-import { useDispatch, connect } from 'react-redux';
-import { Redirect, useHistory, useParams, Prompt } from 'react-router-dom';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import Spinner from '../../UI/Spinner/Spinner';
 import EncounterParticipantsSelector from '../EncounterParticipantsSelector/EncounterParticipantsSelector';
 import Error from '../../UI/Errors/Error/Error';
+
+import classes from './EditEncounter.module.css';
 
 const EditEncounter = props => {
   const [encounterName, setEncounterName] = useState('');
@@ -161,17 +161,21 @@ const EditEncounter = props => {
           ) : null}
         </div>
 
-        <EncounterParticipantsSelector
-          participants={editMode ? props.editedEncounter.participants : []}
-          onParticipantsChanged={handleParticipantsChanged}
-        />
+        <div className={classes.ParticipantsSelector}>
+          <EncounterParticipantsSelector
+            participants={editMode ? props.editedEncounter.participants : []}
+            onParticipantsChanged={handleParticipantsChanged}
+          />
+        </div>
       </div>
     );
   }
   return view;
 };
 
-EditEncounter.propTypes = {};
+EditEncounter.propTypes = {
+  isNew: PropTypes.bool
+};
 
 const mapStateToProps = state => {
   return {

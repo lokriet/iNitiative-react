@@ -13,11 +13,13 @@ const FormikSelect = ({
   const { serverError, options, isMulti, isGrouped, ...selectProps } = props;
 
   const onChange = option => {
-    const fieldValue = isMulti ? (option ? option.map(item => item.value) : []) : (option ? option.value : '');
-      
+    let value = option;
+    if (value == null) {
+      value = isMulti ? [] : '';
+    };
     setFieldValue(
       field.name,
-      fieldValue
+      value
     );
   };
 
@@ -28,8 +30,8 @@ const FormikSelect = ({
         options.forEach(group => {
           value = value.concat(
             isMulti
-            ? (field.value ? group.options.filter(option => field.value.indexOf(option.value) >= 0) : [])
-            : group.options.find(option => option.value === field.value)
+            ? (field.value ? group.options.filter(option => field.value.some(item => item._id === option._id)) : [])
+            : group.options.find(option => option._id === field._id)
           );
         });
 
@@ -37,8 +39,8 @@ const FormikSelect = ({
         return result;
       } else {
         return isMulti
-          ? (field.value ? options.filter(option => field.value.indexOf(option.value) >= 0) : [])
-          : options.find(option => option.value === field.value);
+          ? (field.value ? options.filter(option => field.value.some(item => item._id === option._id)) : [])
+          : options.find(option => option._id === field._id);
       }
     } else {
       return isMulti ? [] : '';

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classes from './IconButton.module.css';
 
 const IconButton = React.forwardRef((props, ref) => {
-  const { icon, className, ...htmlProps } = props;
+  const { icon, bordered, className, ...htmlProps } = props;
 
   const childrenNo = React.Children.count(props.children);
   const iconClasses = [classes.Icon];
@@ -11,7 +11,7 @@ const IconButton = React.forwardRef((props, ref) => {
     iconClasses.push(classes.PaddedIcon)
   }
 
-  const classList = [classes.IconButton];
+  const classList = [bordered ? classes.BorderedIconButton : classes.IconButton];
   if (className) {
     classList.push(className);
   }

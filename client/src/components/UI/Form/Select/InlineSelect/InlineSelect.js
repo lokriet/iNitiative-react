@@ -6,19 +6,29 @@ import './InlineSelect.module.css';
 import GroupedMenu from './GroupedMenu/GroupedMenu';
 
 const InlineSelect = props => {
-  const {isCreatable, isClearable, isMulti, isGrouped, options, className, ...htmlProps } = props;
+  const {
+    isCreatable,
+    isClearable,
+    isMulti,
+    isGrouped,
+    options,
+    className,
+    ...htmlProps
+  } = props;
 
   const SelectComponent = isCreatable ? CreatableSelect : Select;
 
   return (
     <SelectComponent
       options={options}
+      getOptionLabel={item => item.name}
+      getOptionValue={item => item._id}
       isClearable={isClearable}
       isMulti={isMulti}
       closeMenuOnSelect={!isMulti}
       className={`InlineSelectContainer ${className}`}
       classNamePrefix="InlineSelect"
-      components={isGrouped ? {MenuList: GroupedMenu} : {}}
+      components={isGrouped ? { MenuList: GroupedMenu } : {}}
       {...htmlProps}
     />
   );

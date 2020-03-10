@@ -14,13 +14,15 @@ const FormikSelect = ({
   const onChange = selectedOptions => {
     const damageTypes = [];
     const conditions = [];
-    selectedOptions.forEach(selectedOption => {
-      if (options[0].options.findIndex(option => option.value === selectedOption.value) >= 0) {
-        damageTypes.push(selectedOption.value);
-      } else {
-        conditions.push(selectedOption.value);
-      }
-    });
+    if (selectedOptions) {
+      selectedOptions.forEach(selectedOption => {
+        if (options[0].options.some(option => option._id === selectedOption._id)) {
+          damageTypes.push(selectedOption);
+        } else {
+          conditions.push(selectedOption);
+        }
+      });
+    }
     
     setFieldValue(
       field.name,
@@ -38,7 +40,7 @@ const FormikSelect = ({
 
         options.forEach(group => {
           value = value.concat(
-            fieldValueCombined ? group.options.filter(option => fieldValueCombined.indexOf(option.value) >= 0) : []
+            fieldValueCombined ? group.options.filter(option => fieldValueCombined.some(item => item._id === option._id)) : []
           );
         });
 

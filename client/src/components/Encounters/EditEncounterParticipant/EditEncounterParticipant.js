@@ -10,6 +10,7 @@ import Select from '../../UI/Form/Select/FormikSelect/FormikSelect';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import Button from '../../UI/Form/Button/Button';
 import ImmunitiesSelect from '../../UI/Form/Select/ImmunitiesSelect/ImmunitiesSelect';
+import Avatar from '../../ImageUpload/Avatar/Avatar';
 
 import classes from './EditEncounterParticipant.module.css';
 import IconButton from '../../UI/Form/Button/IconButton/IconButton';
@@ -21,7 +22,7 @@ const generateInitiative = () => Math.ceil(Math.random() * 20);
 const EditEncounterParticipant = ({ participant, onCancel, onSave }) => {
   const [damageTypes, combined, features, conditions] = useDropdownValues();
 
-  const submitHandler = (values) => {
+  const submitHandler = values => {
     onSave(values);
   };
 
@@ -30,6 +31,7 @@ const EditEncounterParticipant = ({ participant, onCancel, onSave }) => {
       initialValues={{
         color: participant.color || '',
         name: participant.name,
+        avatarUrl: participant.avatarUrl || '',
         rolledInitiative: participant.rolledInitiative || '',
         initiativeModifier: participant.initiativeModifier,
         maxHp: participant.maxHp,
@@ -39,26 +41,20 @@ const EditEncounterParticipant = ({ participant, onCancel, onSave }) => {
         climbSpeed: participant.climbSpeed || '',
         flySpeed: participant.flySpeed || '',
         mapSize: participant.mapSize,
-        immunities: {
-          damageTypes: participant.immunities.damageTypes.map(item =>
-            item._id.toString()
-          ),
-          conditions: participant.immunities.conditions.map(item =>
-            item._id.toString()
-          )
-        },
-        vulnerabilities: participant.vulnerabilities.map(item =>
-          item._id.toString()
-        ),
-        resistances: participant.resistances.map(item => item._id.toString()),
-        features: participant.features.map(item => item._id.toString()),
-        conditions: participant.conditions.map(item => item._id.toString()),
+        immunities: participant.immunities,
+        vulnerabilities: participant.vulnerabilities,
+        resistances: participant.resistances,
+        features: participant.features,
+        conditions: participant.conditions,
         advantages: participant.advantages || '',
         comment: participant.comment || ''
       }}
       validationSchema={Yup.object({
         color: Yup.string(),
-        name: Yup.string().required('Name is required'),
+        name: Yup.string()
+          .required('Name is required')
+          .trim(),
+        avatarUrl: Yup.string(),
         rolledInitiative: Yup.number()
           .min(1, 'Rolled value should be between 1 and 20')
           .max(20, 'Rolled value should be between 1 and 20'),
@@ -89,21 +85,20 @@ const EditEncounterParticipant = ({ participant, onCancel, onSave }) => {
         resistances: Yup.array().of(Yup.string()),
         conditions: Yup.array().of(Yup.string()),
         features: Yup.array().of(Yup.string()),
-        advantages: Yup.string(),
+        advantages: Yup.string().trim(),
         comment: Yup.string().trim()
       })}
-      onSubmit={values =>
-        submitHandler(values)
-      }
+      onSubmit={values => submitHandler(values)}
     >
       {formProps => (
         <Form className={classes.EditEncounterParticipantForm}>
           <label htmlFor="color">Color</label>
-          <Field
-            id="color"
-            name="color"
-            component={FormikColorPicker}
-          />
+          <Field id="color" name="color" component={FormikColorPicker} />
+
+          <label className={classes.Avatar} htmlFor="avatarUrl">Avatar</label>
+          <div className={classes.Avatar}>
+            <Field id="avatarUrl" name="avatarUrl" component={Avatar} />
+          </div>
 
           <label htmlFor="name">Name</label>
           <Field
@@ -127,7 +122,15 @@ const EditEncounterParticipant = ({ participant, onCancel, onSave }) => {
               hidingBorder
               component={Input}
             />
-            <IconButton icon={faDiceD6} onClick={() => formProps.setFieldValue("rolledInitiative", generateInitiative())} />
+            <IconButton
+              icon={faDiceD6}
+              onClick={() =>
+                formProps.setFieldValue(
+                  'rolledInitiative',
+                  generateInitiative()
+                )
+              }
+            />
           </ItemsRow>
 
           <label htmlFor="initiativeModifier">Initiative Modifier</label>

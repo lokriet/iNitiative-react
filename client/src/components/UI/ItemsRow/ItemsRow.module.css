@@ -1,5 +1,5 @@
 .ItemsRow {
-  position: relative;
+  /* position: relative; */
   display: flex;
   align-items: flex-start;
 }

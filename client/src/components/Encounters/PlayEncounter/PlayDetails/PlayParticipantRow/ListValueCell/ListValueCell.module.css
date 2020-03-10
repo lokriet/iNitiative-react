@@ -1,0 +1,41 @@
+.ListItem {
+  margin-bottom: 0.5rem;
+}
+
+.Name {
+  white-space: nowrap;
+}
+
+.HidingButton {
+  color: transparent;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ListItem:hover .DeleteButton {
+  color: #ccc;
+}
+
+.ListItem .DeleteButton:hover {
+  color: #aaa;
+}
+
+.List:hover .AddButton {
+  color: #ccc;
+}
+
+.List .AddButton:hover {
+  color: #aaa;
+}
+
+.Popup {
+  margin: 1rem 2rem;
+}
+
+.Dropdown {
+  width: 15rem;
+  margin-bottom: 0.5rem;
+}

@@ -27,7 +27,7 @@
 }
 
 .NameInput {
-  width: 12rem;
+  width: 11rem;
 }
 
 .Divider {
@@ -51,4 +51,9 @@
 .ControlButtons {
   flex-grow: 1;
   justify-content: flex-end;
+}
+
+.InfoButton {
+  padding: 0.5rem 1rem;
+  margin: 0;
 }

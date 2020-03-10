@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../store/actions';
@@ -6,9 +6,7 @@ import * as actions from '../store/actions';
 const useDropdownValues = () => {
   const dispatch = useDispatch();
 
-  // const [vulnerabilities, setVulnerabilities] = useState([]);
   const [immunities, setImmunities] = useState([]);
-  // const [resistances, setResistances] = useState([]);
   const [features, setFeatures] = useState([]);
   const [conditions, setConditions] = useState([]);
   const [damageTypes, setDamageTypes] = useState([]);
@@ -38,23 +36,9 @@ const useDropdownValues = () => {
     dispatch(actions.getHomebrewFeatures());
   }, [dispatch]);
 
-  const makeSortedOptionsList = useCallback(items => {
-    return items
-      .map(item => ({ label: item.name, value: item._id }))
-      .sort((a, b) =>
-        a.label.toLowerCase().localeCompare(b.label.toLowerCase())
-      );
-  }, []);
-
   useEffect(() => {
-    const damageTypes = makeSortedOptionsList([
-      ...sharedDamageTypes,
-      ...homebrewDamageTypes
-    ]);
-    const conditions = makeSortedOptionsList([
-      ...sharedConditions,
-      ...homebrewConditions
-    ]);
+    const damageTypes = [...sharedDamageTypes, ...homebrewDamageTypes].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    const conditions = [...sharedConditions, ...homebrewConditions].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
     setImmunities([
       { label: 'Damage Types', options: damageTypes },
@@ -67,8 +51,7 @@ const useDropdownValues = () => {
     sharedDamageTypes,
     homebrewDamageTypes,
     sharedConditions,
-    homebrewConditions,
-    makeSortedOptionsList
+    homebrewConditions
   ]);
 
   useEffect(() => {
@@ -83,8 +66,7 @@ const useDropdownValues = () => {
         feature => feature.type === groupName
       );
       if (groupFeatures.length > 0) {
-        const options = groupFeatures.map(feature => ({label: feature.name, value: feature._id}));
-        groupedFeatures.push({ label: groupName, options });
+        groupedFeatures.push({ label: groupName, options: groupFeatures });
       }
     });
     setFeatures(groupedFeatures);

@@ -13,7 +13,7 @@ const ParticipantDetailsPopup = ({ participant }) => {
   return (
     <div className={classes.Container}>
       <ItemsRow className={classes.NameRow}>
-        {participant.avatarUrl ? (
+        {participant.avatarUrl != null && participant.avatarUrl !== '' ? (
           <img
             className={classes.Avatar}
             style={participant.color == null ? {} : {borderColor: participant.color}}

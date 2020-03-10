@@ -13,7 +13,7 @@ const TemplateDetailsPopup = ({ template }) => {
   return (
     <div className={classes.Container}>
       <ItemsRow className={classes.NameRow}>
-        {template.avatarUrl ? (
+        {template.avatarUrl != null && template.avatarUrl !== '' ? (
           <img
             className={classes.Avatar}
             src={template.avatarUrl}

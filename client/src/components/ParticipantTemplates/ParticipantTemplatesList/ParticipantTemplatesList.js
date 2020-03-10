@@ -68,7 +68,7 @@ const ParticipantTemplatesList = props => {
             <th>Spd</th>
             <th>Immune</th>
             <th>Resist</th>
-            <th>Weak</th>
+            <th>Vulnerable</th>
             <th>Features</th>
             <th>Size</th>
             <th>Comment</th>

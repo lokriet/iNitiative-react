@@ -12,7 +12,7 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete }) => {
   return (
     <tr className={classes.ParticipantTemplateRow}>
       <td className={classes.AvatarCell}>
-        {template.avatarUrl ? (
+        {template.avatarUrl != null && template.avatarUrl !== '' ? (
           <img
             src={template.avatarUrl}
             className={classes.Avatar}

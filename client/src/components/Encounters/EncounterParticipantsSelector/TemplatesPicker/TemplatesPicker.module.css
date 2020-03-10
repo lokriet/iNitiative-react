@@ -1,3 +1,19 @@
+.Container {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.Container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+.Container {
+  -ms-overflow-style: none;
+}
+
 .TabButton {
   border: none;
   border-bottom: 2px solid transparent;
