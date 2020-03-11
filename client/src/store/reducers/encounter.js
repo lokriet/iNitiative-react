@@ -24,6 +24,9 @@ const encounterReducer = (state = initialState, action) => {
     case ActionTypes.encounter.DELETE_ENCOUNTER_SUCCESS:
       return deleteEncounterSuccess(state, action);
 
+    case ActionTypes.encounter.ENCOUNTER_PARTICIPANT_UPDATE_SUCCESS:
+      return encounterParticipantUpdateSuccess(state, action);
+
     case ActionTypes.encounter.ENCOUNTER_OPERATION_FAILED:
       return encounterOperationFailed(state, action);
 
@@ -79,17 +82,21 @@ const updateEncounterSuccess = (state, action) => {
         createdAt: new Date(action.encounter.createdAt),
         updatedAt: new Date(action.encounter.updatedAt)
       },
-      ...state.encounters.filter(item => item._id.toString() !== action.encounter._id.toString())
+      ...state.encounters.filter(
+        item => item._id.toString() !== action.encounter._id.toString()
+      )
     ],
     operationError: null,
     operationSuccess: true
-  }
-}
+  };
+};
 
 const deleteEncounterSuccess = (state, action) => {
   return {
     ...state,
-    encounters: state.encounters.filter(item => item._id.toString() !== action.encounterId),
+    encounters: state.encounters.filter(
+      item => item._id.toString() !== action.encounterId
+    ),
     operationError: null,
     operationSuccess: true
   };
@@ -141,6 +148,29 @@ const setEditedEncounter = (state, action) => {
     fetching: false,
     fetchingError: null
   };
+};
+
+const encounterParticipantUpdateSuccess = (state, action) => {
+  if (
+    !state.editedEncounter ||
+    state.editedEncounter._id !== action.encounterId ||
+    !state.editedEncounter.participants.some(
+      participant => participant._id.toString() === action.participantId
+    )
+  ) {
+    console.log("I'm confused :(");
+    return state;
+  }
+
+  const newParticipants = [...state.editedEncounter.participants];
+  const index = state.editedEncounter.participants.findIndex(participant => participant._id.toString() === action.participantId);
+  newParticipants[index] = {...newParticipants[index], ...action.partialUpdate};
+  const newEncounter = {...state.editedEncounter, participants: newParticipants};
+
+  return {
+    ...state, 
+    editedEncounter: newEncounter
+  }
 };
 
 export default encounterReducer;

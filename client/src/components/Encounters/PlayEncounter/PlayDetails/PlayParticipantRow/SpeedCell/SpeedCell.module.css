@@ -1,0 +1,60 @@
+.PaddedRow {
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+}
+
+.ShortNumberInput {
+  width: 2.5rem;
+  height: 2rem;
+  padding: 0.25rem;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input.ShortNumberInput::-webkit-outer-spin-button,
+input.ShortNumberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.ShortNumberInput[type=number] {
+  -moz-appearance: textfield;
+}
+
+.PopupTrigger {
+  cursor: pointer;
+}
+
+.PopupHeader {
+  text-align: center;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.PopupInput {
+  width: 9rem;
+}
+
+.PopupButtons {
+  margin: 1rem 0;
+}
+
+.SpeedPopupLabel {
+  width: 3.6rem;
+  text-align: right;
+}
+
+.Popup {
+  position: relative;
+  padding: 0.5rem 1rem;
+}
+
+.CloseIconButton {
+  position: absolute;
+  top: 0.25rem;
+  right: 1rem;
+}
+
+.ErrorMessage {
+  padding: 0.5rem 1rem;
+}

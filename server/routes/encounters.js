@@ -6,6 +6,12 @@ const isAuth = require('../middleware/auth');
 
 const router = express.Router();
 
+router.put(
+  '/encounter/:encounterId/participant/:participantId',
+  isAuth,
+  encounterController.updateEncounterParticipant
+);
+
 /**
  * Create Encounter
  * http://localhost:3001/encounters/encounter POST
@@ -37,13 +43,9 @@ const router = express.Router();
  * status: 401
  * message: Not Authenticated
  *
- * status: 422
- * message: 'Validation failed'
- *  data: [ (array of them!) {
- *    value: '111',
- *    msg: 'Template with this name already exists',
- *    param: 'name'
- *  }]
+ * status: 500
+ * message: 'Joi Validation failed'
+ *  data: ...
  *
  * internal server error:
  * status: 500
@@ -53,24 +55,55 @@ const router = express.Router();
 router.post(
   '/encounter',
   isAuth,
-  // [
-  //   body('encounter.name')
-  //     .exists()
-  //     .withMessage('Encounter name is required')
-  //     .trim()
-  // ],
   encounterController.createEncounter
 );
 
+/**
+ * Update Encounter
+ * http://localhost:3001/encounters/encounter PUT
+ *
+ * ==Request==
+ * data: {
+ *  encounter: {
+ *    name: ...
+ *    ...
+ *  }
+ * }
+ *
+ * ==Response==
+ * Success:
+ * status: 200
+ * body: {
+ *  message: encounter updated
+ *  data: {
+ *    name
+ *    ...
+ *    creator
+ *    _id
+ *    createdAt:  "2020-03-04T22:00:15.057Z"
+ *    updatedAt:  "2020-05-06T23:00:15.057Z"
+ *  }
+ * }
+ *
+ * Failure:
+ * status: 401
+ * message: Not Authenticated
+ * 
+ * status: 403
+ * message: 'Not authorized'
+ *
+ * status: 500
+ * message: 'Joi Validation failed'
+ *  data: ...
+ *
+ * internal server error:
+ * status: 500
+ * message
+ *
+ */
 router.put(
   '/encounter/:encounterId',
   isAuth,
-  // [
-  //   body('encounter.name')
-  //     .exists()
-  //     .withMessage('Encounter name is required')
-  //     .trim()
-  // ],
   encounterController.updateEncounter
 );
 

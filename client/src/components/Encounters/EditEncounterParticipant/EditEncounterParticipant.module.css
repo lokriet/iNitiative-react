@@ -2,6 +2,13 @@
   max-height: 40rem;
   overflow: auto;
   padding: 2rem;
+  position: relative;
+}
+
+.CloseIconButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
 }
 
 .EditEncounterParticipantForm {

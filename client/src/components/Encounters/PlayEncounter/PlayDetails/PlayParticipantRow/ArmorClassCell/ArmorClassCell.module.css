@@ -1,0 +1,17 @@
+.PopupTrigger {
+  cursor: pointer;
+}
+
+.PopupHeader {
+  text-align: center;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.PopupInput {
+  width: 9rem;
+}
+
+.PopupButtons {
+  margin: 1rem 0;
+}

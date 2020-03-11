@@ -45,11 +45,11 @@ const EditEncounter = props => {
   useEffect(() => {
     if (props.editedEncounter) {
       setEncounterName(props.editedEncounter.name);
+      setAddedParticipants(props.editedEncounter.participants);
     }
   }, [props.editedEncounter]);
 
   const handleParticipantsChanged = useCallback(participants => {
-    console.log('changed!');
     setAddedParticipants(participants);
     setHasUnsavedChanges(true);
   }, []);

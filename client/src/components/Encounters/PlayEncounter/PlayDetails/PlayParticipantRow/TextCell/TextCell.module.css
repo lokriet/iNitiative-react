@@ -1,0 +1,9 @@
+.Textarea {
+  background-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.Textarea:hover, 
+.Textarea:focus {
+  border-bottom-color: #ccc;
+}

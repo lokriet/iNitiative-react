@@ -1,14 +1,13 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import TemplatesPicker from './TemplatesPicker/TemplatesPicker';
-import Button from '../../UI/Form/Button/Button';
 import EncounterParticipantRow from './EncounterParticipantRow/EncounterParticipantRow';
 
 import classes from './EncounterParticipantsSelector.module.css';
 import IconButton from '../../UI/Form/Button/IconButton/IconButton';
+import { generateInitiative } from '../../../util/helper-methods';
 
 const convertToEncounterParticipant = (participantTemplate, name) => {
   return {
@@ -54,8 +53,6 @@ const convertToEncounterParticipant = (participantTemplate, name) => {
     comment: participantTemplate.comment
   };
 };
-
-const generateInitiative = () => Math.ceil(Math.random() * 20);
 
 const EncounterParticipantsSelector = ({
   participants,

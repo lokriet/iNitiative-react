@@ -1,22 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { connect, useDispatch } from 'react-redux';
+import { faPlay, faDiceD6 } from '@fortawesome/free-solid-svg-icons';
 
 import * as actions from '../../../../store/actions';
-import withAuthCheck from '../../../../hoc/withAuthCheck';
-import { useDispatch, connect } from 'react-redux';
-import { Redirect, useHistory, useParams, Prompt } from 'react-router-dom';
 
 import Spinner from '../../../UI/Spinner/Spinner';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
-
-import classes from './PlayDetails.module.css';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
-import { faPlay, faDiceD6 } from '@fortawesome/free-solid-svg-icons';
 import Button from '../../../UI/Form/Button/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PlayParticipantRow from './PlayParticipantRow/PlayParticipantRow';
+
+import classes from './PlayDetails.module.css';
 import useDropdownValues from '../../../../hooks/useDropdownValues';
+import { generateInitiative, isEmpty } from '../../../../util/helper-methods';
 
 const getIni = participant => {
   const rolledInitiative =
@@ -40,49 +38,73 @@ const PlayDetails = props => {
   const [showDead, setShowDead] = useState(false);
   const [filteredParticipants, setFilteredParticipants] = useState([]);
 
-  // TODO: change to a database update
-  const [playParticipants, setPlayParticipants] = useState([]);
-  useEffect(() => {
-    if (props.editedEncounter) {
-      setPlayParticipants(props.editedEncounter.participants);
-    }
-  }, [props.editedEncounter]);
-  // End of TODO
+  const [damageTypes, combined, features, conditions] = useDropdownValues();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (props.editedEncounter) {
-      if (showDead) {
+      if (!showDead) {
         setFilteredParticipants(
           props.editedEncounter.participants
             .filter(item => item.currentHp > 0)
             .sort(compareParticipants)
         );
+      } else {
+        setFilteredParticipants(
+          props.editedEncounter.participants.sort(compareParticipants)
+        );
       }
-      setFilteredParticipants(
-        props.editedEncounter.participants.sort(compareParticipants)
-      );
     }
   }, [props.editedEncounter, showDead]);
 
   const handleParticipantUpdate = useCallback(
     (partialUpdate, participant) => {
-      setPlayParticipants(previousAddedParticipants => {
-        const newParticipants = [...previousAddedParticipants];
-        const index = newParticipants.indexOf(participant);
-        if (index >= 0) {
-          newParticipants[index] = {
-            ...newParticipants[index],
-            ...partialUpdate
-          };
-        }
-
-        // onParticipantsChanged(newParticipants);
-        console.log('participants updated', newParticipants);
-        return newParticipants;
-      });
+      if (props.editedEncounter) {
+        dispatch(
+          actions.updateEncounterParticipantDetails(
+            props.editedEncounter._id,
+            participant._id,
+            partialUpdate
+          )
+        );
+      }
     },
-    []
+    [props.editedEncounter, dispatch]
   );
+
+  const handleValidateName = useCallback(
+    (newName, participantId) => {
+      if (props.editedEncounter) {
+        const result = !props.editedEncounter.participants.some(
+          participant =>
+            participant._id !== participantId &&
+            participant.name === newName.trim()
+        );
+        console.log('validating name', newName, result);
+        return result;
+      } else {
+        return false;
+      }
+    },
+    [props.editedEncounter]
+  );
+
+  const handleRollEmptyInitiatives = useCallback(() => {
+    if (props.editedEncounter) {
+      props.editedEncounter.participants.forEach(participant => {
+        if (isEmpty(participant.rolledInitiative)) {
+          dispatch(
+            actions.updateEncounterParticipantDetails(
+              props.editedEncounter._id,
+              participant._id,
+              { rolledInitiative: generateInitiative() }
+            )
+          );
+        }
+      });
+    }
+  }, [dispatch, props.editedEncounter]);
 
   let view;
   if (!props.editedEncounter && !props.fetchingEncounterError) {
@@ -96,12 +118,16 @@ const PlayDetails = props => {
           {props.editedEncounter.name}
         </div>
 
-        <div>
+        <div className={classes.TableDetailsContainer}>
           <ItemsRow alignCentered className={classes.ButtonsRow}>
             <IconButton icon={faPlay} bordered>
               Next
             </IconButton>
-            <IconButton icon={faDiceD6} bordered>
+            <IconButton
+              icon={faDiceD6}
+              bordered
+              onClick={handleRollEmptyInitiatives}
+            >
               Roll empty initiatives
             </IconButton>
             <Button>Summon!</Button>
@@ -110,8 +136,10 @@ const PlayDetails = props => {
                 type="checkbox"
                 name="showDead"
                 id="showDead"
-                value={showDead}
-                onChange={event => setShowDead(event.target.value)}
+                checked={showDead}
+                onChange={event => {
+                  setShowDead(event.target.checked);
+                }}
               />
               <label htmlFor="showDead">Show dead</label>
             </div>
@@ -142,7 +170,13 @@ const PlayDetails = props => {
                   key={participant._id}
                   participant={participant}
                   isActive={index === 3}
-                  onInfoChanged={(partialUpdate) => handleParticipantUpdate(partialUpdate, participant)}
+                  dropdownValues={[damageTypes, combined, features, conditions]}
+                  onInfoChanged={partialUpdate =>
+                    handleParticipantUpdate(partialUpdate, participant)
+                  }
+                  isNameValid={newName =>
+                    handleValidateName(newName, participant._id)
+                  }
                 />
               ))}
             </tbody>

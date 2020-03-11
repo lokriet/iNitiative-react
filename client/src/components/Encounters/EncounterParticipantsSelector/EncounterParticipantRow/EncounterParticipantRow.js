@@ -19,8 +19,7 @@ import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import ParticipantDetailsPopup from './ParticipantDetailsPopup/ParticipantDetailsPopup';
 import EditEncounterParticipant from '../../EditEncounterParticipant/EditEncounterParticipant';
 import Error from '../../../UI/Errors/Error/Error';
-
-const generateInitiative = () => Math.ceil(Math.random() * 20);
+import { generateInitiative } from '../../../../util/helper-methods';
 
 const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
   const [name, setName] = useState(participant.name);
@@ -152,6 +151,7 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
             trigger={open => <IconButton icon={faCog} />}
             contentStyle={{ width: 'auto' }}
             closeOnEscape={false}
+            closeOnDocumentClick={false}
           >
             {close => (
               <EditEncounterParticipant

@@ -1,0 +1,9 @@
+.Avatar {
+  cursor: pointer;
+  min-width: 1rem;
+  min-height: 1rem;
+
+  max-width: 3rem;
+  max-height: 3rem;
+  border: 2px solid transparent;
+}

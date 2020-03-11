@@ -9,6 +9,7 @@ import InlineSelect from '../../../../../UI/Form/Select/InlineSelect/InlineSelec
 import classes from './ListValueCell.module.css';
 import Button from '../../../../../UI/Form/Button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ListItem from './ListItem/ListItem';
 
 const ListValueCell = ({
   itemsList,
@@ -144,40 +145,16 @@ const ListValueCell = ({
       {isImmunitiesList ? (
         <>
           {items.damageTypes.map(item => (
-            <ItemsRow key={item._id} alignCentered className={classes.ListItem}>
-              <div className={classes.Name}>{item.name} </div>
-              <button
-                onClick={() => handleDeleteItem(item)}
-                className={`${classes.HidingButton} ${classes.DeleteButton}`}
-              >
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </ItemsRow>
+            <ListItem item={item} onDelete={handleDeleteItem} key={item._id} />
           ))}
           {items.damageTypes.length > 0 && items.conditions.length > 0 ? <div>—</div> : null}
           {items.conditions.map(item => (
-            <ItemsRow key={item._id} alignCentered className={classes.ListItem}>
-              <div className={classes.Name}>{item.name} </div>
-              <button
-                onClick={() => handleDeleteItem(item)}
-                className={`${classes.HidingButton} ${classes.DeleteButton}`}
-              >
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </ItemsRow>
+            <ListItem item={item} onDelete={handleDeleteItem} key={item._id} />
           ))}
         </>
       ) : (
         items.map(item => (
-          <ItemsRow key={item._id} alignCentered className={classes.ListItem}>
-            <div className={classes.Name}>{item.name} </div>
-            <button
-              onClick={() => handleDeleteItem(item)}
-              className={`${classes.HidingButton} ${classes.DeleteButton}`}
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
-          </ItemsRow>
+          <ListItem item={item} onDelete={handleDeleteItem} key={item._id} />
         ))
       )}
       <Popup

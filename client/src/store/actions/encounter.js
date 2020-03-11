@@ -6,6 +6,7 @@ export const EncounterActionTypes = {
   ADD_ENCOUNTER_SUCCESS: 'ADD_ENCOUNTER_SUCCESS',
   UPDATE_ENCOUNTER_SUCCESS: 'UPDATE_ENCOUNTER_SUCCESS',
   DELETE_ENCOUNTER_SUCCESS: 'DELETE_ENCOUNTER_SUCCESS',
+  ENCOUNTER_PARTICIPANT_UPDATE_SUCCESS: 'ENCOUNTER_PARTICIPANT_UPDATE_SUCCESS',
   ENCOUNTER_OPERATION_FAILED: 'ENCOUNTER_OPERATION_FAILED',
 
   START_FETCHING_ENCOUNTERS: 'START_FETCHING_ENCOUNTERS',
@@ -16,23 +17,20 @@ export const EncounterActionTypes = {
 
 const INTERNAL_ERROR_MESSAGE = 'Internal error occured. Please try again.';
 
-export const editEncounter = (encounterId, encounter) => {
+export const editEncounter = (encounterId, encounterData, setEdited = false) => {
   return async (dispatch, getState) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       let response;
       if (encounterId == null) {
-        response = await fetch(
-          'http://localhost:3001/encounters/encounter',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${idToken}`
-            },
-            body: JSON.stringify({ encounter })
-          }
-        );
+        response = await fetch('http://localhost:3001/encounters/encounter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ encounter: encounterData })
+        });
       } else {
         // update
         response = await fetch(
@@ -43,7 +41,7 @@ export const editEncounter = (encounterId, encounter) => {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${idToken}`
             },
-            body: JSON.stringify({ encounter })
+            body: JSON.stringify({ partialUpdate: encounterData })
           }
         );
       }
@@ -59,7 +57,10 @@ export const editEncounter = (encounterId, encounter) => {
         dispatch(
           encounterOperationFailed({
             type: ErrorType[response.status],
-            message: response.status === 500 ? INTERNAL_ERROR_MESSAGE : responseData.message
+            message:
+              response.status === 500
+                ? INTERNAL_ERROR_MESSAGE
+                : responseData.message
           })
         );
       } else if (response.status === 422) {
@@ -75,6 +76,9 @@ export const editEncounter = (encounterId, encounter) => {
           dispatch(addEncounterSuccess(responseData.data));
         } else {
           dispatch(updateEncounterSuccess(responseData.data));
+          if (setEdited) {
+            dispatch(setEditedEncounter(responseData.data));
+          }
         }
       } else {
         console.log('Unexpected response status');
@@ -85,7 +89,7 @@ export const editEncounter = (encounterId, encounter) => {
           })
         );
       }
-    } catch(error) {
+    } catch (error) {
       dispatch(
         encounterOperationFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
@@ -93,13 +97,13 @@ export const editEncounter = (encounterId, encounter) => {
         })
       );
     }
-  }
+  };
 };
 
-export const deleteEncounter = (encounterId) => {
+export const deleteEncounter = encounterId => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/encounters/encounter/${encounterId}`,
         {
@@ -120,7 +124,10 @@ export const deleteEncounter = (encounterId) => {
         dispatch(
           encounterOperationFailed({
             type: ErrorType[response.status],
-            message: response.status === 500 ? INTERNAL_ERROR_MESSAGE : responseData.message
+            message:
+              response.status === 500
+                ? INTERNAL_ERROR_MESSAGE
+                : responseData.message
           })
         );
       } else if (response.status === 200) {
@@ -145,26 +152,29 @@ export const deleteEncounter = (encounterId) => {
   };
 };
 
-export const getEncounterById = (encounterId) => {
+export const getEncounterById = encounterId => {
   return async (dispatch, getState) => {
     try {
       dispatch(startFetchingEncounters());
-      const idToken =  await getState().auth.firebase.doGetIdToken();
-      const response = await fetch(`http://localhost:3001/encounters/${encounterId}`, {
-        headers: {
-          Authorization: `Bearer ${idToken}`
+      const idToken = await getState().auth.firebase.doGetIdToken();
+      const response = await fetch(
+        `http://localhost:3001/encounters/${encounterId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
         }
-      });
+      );
 
-      if (
-        response.status === 500 ||
-        response.status === 401
-      ) {
+      if (response.status === 500 || response.status === 401) {
         const responseData = await response.json();
         dispatch(
           fetchEncountersFailed({
             type: ErrorType[response.status],
-            message: response.status === 500 ? 'Fetching encounter failed' : responseData.message
+            message:
+              response.status === 500
+                ? 'Fetching encounter failed'
+                : responseData.message
           })
         );
       } else if (response.status === 200) {
@@ -195,29 +205,29 @@ export const getEncounters = () => {
     if (
       getState().encounter.encountersInitialised &&
       new Date().getTime() - getState().encounter.encountersInitialised <
-      constants.refreshDataTimeout
+        constants.refreshDataTimeout
     ) {
       return;
     }
 
     try {
       dispatch(startFetchingEncounters());
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch('http://localhost:3001/encounters', {
         headers: {
           Authorization: `Bearer ${idToken}`
         }
       });
 
-      if (
-        response.status === 500 ||
-        response.status === 401
-      ) {
+      if (response.status === 500 || response.status === 401) {
         const responseData = await response.json();
         dispatch(
           fetchEncountersFailed({
             type: ErrorType[response.status],
-            message: response.status === 500 ? 'Fetching encounters failed' : responseData.message
+            message:
+              response.status === 500
+                ? 'Fetching encounters failed'
+                : responseData.message
           })
         );
       } else if (response.status === 200) {
@@ -237,6 +247,80 @@ export const getEncounters = () => {
         fetchEncountersFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
           message: 'Fetching encounters failed'
+        })
+      );
+    }
+  };
+};
+
+export const updateEncounterParticipantDetails = (
+  encounterId,
+  participantId,
+  partialUpdate
+) => {
+  return async (dispatch, getState) => {
+    try {
+      const idToken = await getState().auth.firebase.doGetIdToken();
+      let response;
+      response = await fetch(
+        `http://localhost:3001/encounters/encounter/${encounterId}/participant/${participantId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ partialUpdate })
+        }
+      );
+
+      const responseData = await response.json();
+      console.log('got response for encounter participant edit', responseData);
+
+      if (
+        response.status === 500 ||
+        response.status === 401 ||
+        response.status === 403
+      ) {
+        dispatch(
+          encounterOperationFailed({
+            type: ErrorType[response.status],
+            message:
+              response.status === 500
+                ? INTERNAL_ERROR_MESSAGE
+                : responseData.message
+          })
+        );
+      } else if (response.status === 422) {
+        dispatch(
+          encounterOperationFailed({
+            type: ErrorType.VALIDATION_ERROR,
+            data: responseData.data
+          })
+        );
+      } else if (response.status === 201 || response.status === 200) {
+        dispatch(
+          encounterParticipantUpdateSuccess(
+            encounterId,
+            participantId,
+            partialUpdate
+          )
+        );
+      } else {
+        console.log('Unexpected response status');
+        dispatch(
+          encounterOperationFailed({
+            type: ErrorType.INTERNAL_SERVER_ERROR,
+            message: INTERNAL_ERROR_MESSAGE
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        encounterOperationFailed({
+          type: ErrorType.INTERNAL_CLIENT_ERROR,
+          message: INTERNAL_ERROR_MESSAGE
         })
       );
     }
@@ -270,7 +354,7 @@ export const deleteEncounterSuccess = encounterId => {
   };
 };
 
-export const encounterOperationFailed = (error) => {
+export const encounterOperationFailed = error => {
   return {
     type: EncounterActionTypes.ENCOUNTER_OPERATION_FAILED,
     error
@@ -308,5 +392,18 @@ export const resetEditedEncounter = () => {
   return {
     type: EncounterActionTypes.SET_EDITED_ENCOUNTER,
     encounter: null
+  };
+};
+
+export const encounterParticipantUpdateSuccess = (
+  encounterId,
+  participantId,
+  partialUpdate
+) => {
+  return {
+    type: EncounterActionTypes.ENCOUNTER_PARTICIPANT_UPDATE_SUCCESS,
+    encounterId,
+    participantId,
+    partialUpdate
   };
 };

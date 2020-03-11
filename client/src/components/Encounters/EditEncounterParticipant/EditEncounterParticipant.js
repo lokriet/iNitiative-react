@@ -14,10 +14,9 @@ import Avatar from '../../ImageUpload/Avatar/Avatar';
 
 import classes from './EditEncounterParticipant.module.css';
 import IconButton from '../../UI/Form/Button/IconButton/IconButton';
-import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
+import { faDiceD6, faTimes } from '@fortawesome/free-solid-svg-icons';
 import FormikColorPicker from '../../UI/Color/ColorPicker/FormikColorPicker';
-
-const generateInitiative = () => Math.ceil(Math.random() * 20);
+import { generateInitiative } from '../../../util/helper-methods';
 
 const EditEncounterParticipant = ({ participant, onCancel, onSave }) => {
   const [damageTypes, combined, features, conditions] = useDropdownValues();
@@ -303,6 +302,8 @@ const EditEncounterParticipant = ({ participant, onCancel, onSave }) => {
               Cancel
             </Button>
           </div>
+
+          <IconButton icon={faTimes} className={classes.CloseIconButton} onClick={onCancel} />
         </Form>
       )}
     </Formik>
