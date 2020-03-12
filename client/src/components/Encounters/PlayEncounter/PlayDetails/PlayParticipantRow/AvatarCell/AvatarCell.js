@@ -6,6 +6,8 @@ import Color from '../../../../../UI/Color/Color';
 import Popup from 'reactjs-popup';
 import ColorPicker from '../../../../../UI/Color/ColorPicker/ColorPicker';
 import { isEmpty } from '../../../../../../util/helper-methods';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBan } from '@fortawesome/free-solid-svg-icons';
 
 const AvatarCell = ({ participant, onColorChanged }) => {
   const handleColorChange = useCallback(
@@ -34,7 +36,14 @@ const AvatarCell = ({ participant, onColorChanged }) => {
             />
           ) : !isEmpty(participant.color) ? (
             <Color color={participant.color} />
-          ) : null}
+          ) : (
+            <div className={classes.Empty}>
+              <FontAwesomeIcon
+                icon={faBan}
+                className={classes.HidingColorIcon}
+              />
+            </div>
+          )}
         </div>
       )}
       position="bottom left"

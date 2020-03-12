@@ -188,7 +188,7 @@ const PlayDetails = props => {
 
 Check your Internet connection and try 'attempt fix' button below. If the problem persists contact our hardworking developers.
 
-Please note, you can continue you work, but if you reload the page before the problem is fixed, all unsaved changes will be lost.`}
+Please note, you can continue working, but if you reload the page before the problem is fixed, all unsaved changes will be lost.`}
               </div>
               <br />
               <div>
