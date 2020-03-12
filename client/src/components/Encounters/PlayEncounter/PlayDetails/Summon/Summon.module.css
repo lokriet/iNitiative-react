@@ -10,4 +10,5 @@
 .SummonView {
   flex-grow: 1;
   position: relative;
+  margin-bottom: 1rem;
 }

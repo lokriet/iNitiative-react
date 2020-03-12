@@ -52,11 +52,7 @@ router.put(
  * message
  *
  */
-router.post(
-  '/encounter',
-  isAuth,
-  encounterController.createEncounter
-);
+router.post('/encounter', isAuth, encounterController.createEncounter);
 
 /**
  * Update Encounter
@@ -88,7 +84,7 @@ router.post(
  * Failure:
  * status: 401
  * message: Not Authenticated
- * 
+ *
  * status: 403
  * message: 'Not authorized'
  *

@@ -24,11 +24,14 @@ const encounterReducer = (state = initialState, action) => {
     case ActionTypes.encounter.DELETE_ENCOUNTER_SUCCESS:
       return deleteEncounterSuccess(state, action);
 
+    case ActionTypes.encounter.ENCOUNTER_OPERATION_FAILED:
+      return encounterOperationFailed(state, action);
+
     case ActionTypes.encounter.ENCOUNTER_PARTICIPANT_UPDATE_SUCCESS:
       return encounterParticipantUpdateSuccess(state, action);
 
-    case ActionTypes.encounter.ENCOUNTER_OPERATION_FAILED:
-      return encounterOperationFailed(state, action);
+    case ActionTypes.encounter.ENCOUNTER_PARTICIPANT_OPERATION_FAILED:
+      return encounterParticipantOperationFailed(state, action);
 
     case ActionTypes.encounter.START_FETCHING_ENCOUNTERS:
       return startFetchingEncounters(state, action);
@@ -38,6 +41,9 @@ const encounterReducer = (state = initialState, action) => {
 
     case ActionTypes.encounter.SET_EDITED_ENCOUNTER:
       return setEditedEncounter(state, action);
+
+    case ActionTypes.encounter.UPDATE_EDITED_ENCOUNTER:
+      return updateEditedEncounter(state, action);   
 
     case ActionTypes.encounter.FETCH_ENCOUNTERS_FAILED:
       return fetchEncountersFailed(state, action);
@@ -86,7 +92,7 @@ const updateEncounterSuccess = (state, action) => {
         item => item._id.toString() !== action.encounter._id.toString()
       )
     ],
-    operationError: null,
+    operationError: action.overwriteError ? null : state.operationError,
     operationSuccess: true
   };
 };
@@ -150,10 +156,18 @@ const setEditedEncounter = (state, action) => {
   };
 };
 
+const updateEditedEncounter = (state, action) => {
+  return {
+    ...state,
+    editedEncounter: {...state.editedEncounter, ...action.partialUpdate},
+    fetching: false,
+    fetchingError: null
+  };
+};
+
 const encounterParticipantUpdateSuccess = (state, action) => {
   if (
     !state.editedEncounter ||
-    state.editedEncounter._id !== action.encounterId ||
     !state.editedEncounter.participants.some(
       participant => participant._id.toString() === action.participantId
     )
@@ -162,15 +176,48 @@ const encounterParticipantUpdateSuccess = (state, action) => {
     return state;
   }
 
-  const newParticipants = [...state.editedEncounter.participants];
-  const index = state.editedEncounter.participants.findIndex(participant => participant._id.toString() === action.participantId);
-  newParticipants[index] = {...newParticipants[index], ...action.partialUpdate};
-  const newEncounter = {...state.editedEncounter, participants: newParticipants};
-
   return {
-    ...state, 
-    editedEncounter: newEncounter
-  }
+    ...state,
+    editedEncounter: applyParticipantUpdate(
+      state.editedEncounter,
+      action.participantId,
+      action.partialUpdate
+    )
+  };
+};
+
+const encounterParticipantOperationFailed = (state, action) => {
+  let newEditedEncounter = action.applyChangesOnError
+    ? applyParticipantUpdate(
+        state.editedEncounter,
+        action.participantId,
+        action.partialUpdate
+      )
+    : state.editedEncounter;
+  return {
+    ...state,
+    editedEncounter: newEditedEncounter,
+    operationSuccess: false,
+    operationError: action.error
+  };
+};
+
+const applyParticipantUpdate = (
+  editedEncounter,
+  participantId,
+  partialUpdate
+) => {
+  const newParticipants = [...editedEncounter.participants];
+  const index = editedEncounter.participants.findIndex(
+    participant => participant._id.toString() === participantId
+  );
+  newParticipants[index] = { ...newParticipants[index], ...partialUpdate };
+  const newEncounter = {
+    ...editedEncounter,
+    participants: newParticipants,
+    updatedAt: new Date()
+  };
+  return newEncounter;
 };
 
 export default encounterReducer;

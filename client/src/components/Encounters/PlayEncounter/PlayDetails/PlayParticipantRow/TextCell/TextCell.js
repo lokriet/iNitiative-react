@@ -6,19 +6,22 @@ import classes from './TextCell.module.css';
 
 const TextCell = ({ value, onValueChanged }) => {
   const [currentText, setCurrentText] = useState(value);
-  const debouncedName = useDebounce(currentText, 10000);
+  const [lastSent, setLastSent] = useState(value);
+  const debouncedText = useDebounce(currentText, 10000);
 
   useEffect(() => {
-    if (debouncedName !== value) {
-      onValueChanged(debouncedName);
+    if (debouncedText !== value && debouncedText !== lastSent) {
+      onValueChanged(debouncedText);
+      setLastSent(debouncedText);
     }
-  }, [debouncedName, value, onValueChanged]);
+  }, [debouncedText, lastSent, value, onValueChanged]);
 
   const handleSaveTextValue = useCallback(() => {
-    if (currentText !== (value || '')) {
+    if (currentText !== (value || '') && currentText !== lastSent) {
       onValueChanged(currentText);
+      setLastSent(currentText);
     }
-  }, [onValueChanged, currentText, value]);
+  }, [onValueChanged, currentText, value, lastSent]);
 
   return (
     <InlineInput

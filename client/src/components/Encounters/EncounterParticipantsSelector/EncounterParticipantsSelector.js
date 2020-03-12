@@ -68,11 +68,14 @@ const EncounterParticipantsSelector = ({
       setAddedParticipants(previousAddedParticipants => {
         const newParticipants = [...previousAddedParticipants];
         const index = newParticipants.indexOf(participant);
-        newParticipants[index] = {
+        const newParticipant = {
           ...newParticipants[index],
           ...partialUpdate
         };
-
+        if ("_tempId" in newParticipant && newParticipant.maxHp !== newParticipant.currentHp)  {
+          newParticipant.currentHp = newParticipant.maxHp;
+        }
+        newParticipants[index] = newParticipant;
         onParticipantsChanged(newParticipants);
         console.log('participants updated', newParticipants);
         return newParticipants;

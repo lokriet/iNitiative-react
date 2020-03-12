@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';
-import { faPlay, faDiceD6 } from '@fortawesome/free-solid-svg-icons';
-
+import {
+  faPlay,
+  faDiceD6,
+  faExclamationTriangle
+} from '@fortawesome/free-solid-svg-icons';
+import { EditedEncounterAction } from '../../../../store/actions/encounter';
 import * as actions from '../../../../store/actions';
 
 import Spinner from '../../../UI/Spinner/Spinner';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
-import Button from '../../../UI/Form/Button/Button';
 import PlayParticipantRow from './PlayParticipantRow/PlayParticipantRow';
 
 import classes from './PlayDetails.module.css';
@@ -17,6 +20,9 @@ import useDropdownValues from '../../../../hooks/useDropdownValues';
 import { generateInitiative, isEmpty } from '../../../../util/helper-methods';
 import { Link } from 'react-router-dom';
 import Summon from './Summon/Summon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Button from '../../../UI/Form/Button/Button';
+import Popup from 'reactjs-popup';
 
 const getIni = participant => {
   const rolledInitiative =
@@ -67,7 +73,8 @@ const PlayDetails = props => {
           actions.updateEncounterParticipantDetails(
             props.editedEncounter._id,
             participant._id,
-            partialUpdate
+            partialUpdate,
+            true
           )
         );
       }
@@ -100,7 +107,8 @@ const PlayDetails = props => {
             actions.updateEncounterParticipantDetails(
               props.editedEncounter._id,
               participant._id,
-              { rolledInitiative: generateInitiative() }
+              { rolledInitiative: generateInitiative() },
+              true
             )
           );
         }
@@ -134,12 +142,28 @@ const PlayDetails = props => {
           actions.editEncounter(
             props.editedEncounter._id,
             { activeParticipantId: activeParticipantId },
-            true
+            {
+              editedEncounterAction: EditedEncounterAction.Update,
+              applyChangesOnError: true,
+              overwriteError: false
+            }
           )
         );
       }
     }
   }, [dispatch, filteredParticipants, props.editedEncounter]);
+
+  const handleAttemptErrorFix = useCallback(() => {
+    dispatch(
+      actions.editEncounter(
+        props.editedEncounter._id,
+        {
+          ...props.editedEncounter
+        },
+        { editedEncounterAction: EditedEncounterAction.Set }
+      )
+    );
+  }, [dispatch, props.editedEncounter]);
 
   let view;
   if (!props.editedEncounter && !props.fetchingEncounterError) {
@@ -152,8 +176,26 @@ const PlayDetails = props => {
         <div className={classes.EncounterName}>
           {props.editedEncounter.name}
         </div>
-
         <div className={classes.TableDetailsContainer}>
+          {props.saveError ? (
+            <div className={classes.SavingError}>
+              <div className={classes.SavingErrorText}>
+                <FontAwesomeIcon
+                  icon={faExclamationTriangle}
+                  className={classes.SavingErrorIcon}
+                />
+                {` An error occured while saving changes to database. 
+
+Check your Internet connection and try 'attempt fix' button below. If the problem persists contact our hardworking developers.
+
+Please note, you can continue you work, but if you reload the page before the problem is fixed, all unsaved changes will be lost.`}
+              </div>
+              <br />
+              <div>
+                <Button onClick={handleAttemptErrorFix}>Attempt fix</Button>
+              </div>
+            </div>
+          ) : null}
           <ItemsRow alignCentered className={classes.ButtonsRow}>
             <IconButton icon={faPlay} bordered onClick={handleNextMove}>
               {isEmpty(props.editedEncounter.activeParticipantId)
@@ -167,7 +209,13 @@ const PlayDetails = props => {
             >
               Roll empty initiatives
             </IconButton>
-            <Summon />
+            {props.saveError ? (
+              <Popup on="hover" trigger={<Button disabled>Summon</Button>}>
+                <div>Summon functionality is unavailable in error state</div>
+              </Popup>
+            ) : (
+              <Summon />
+            )}
             <div>
               <input
                 type="checkbox"
@@ -211,7 +259,11 @@ const PlayDetails = props => {
               </thead>
               <tbody>
                 {filteredParticipants.length === 0 ? (
-                  <tr><td colSpan={15}><div>Everyone is dead {'><'} </div></td></tr>
+                  <tr>
+                    <td colSpan={15}>
+                      <div>Everyone is dead {'><'} </div>
+                    </td>
+                  </tr>
                 ) : (
                   filteredParticipants.map((participant, index) => (
                     <PlayParticipantRow

@@ -28,6 +28,7 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
 
   useEffect(() => {
     if (debouncedName !== participant.name) {
+      console.log('changing info on debounced name change');
       onInfoChanged({ name: debouncedName });
     }
   }, [debouncedName, onInfoChanged, participant.name]);
@@ -65,6 +66,7 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
 
   const handleChangeDetails = useCallback(
     (formValues, close) => {
+      setName(formValues.name);
       onInfoChanged(formValues);
       close();
     },

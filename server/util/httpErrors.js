@@ -32,7 +32,7 @@ module.exports.validationError = errorData => {
 
 module.exports.joiValidationError = errorData => {
   const error = new Error('Validation failed');
-  error.statusCode = 500;
+  error.statusCode = 422;
   error.responseCode = responseCodes.VALIDATION_ERROR;
   error.data = errorData
   return error;
