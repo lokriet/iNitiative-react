@@ -87,7 +87,9 @@ const encounterSchema = new Schema(
       required: true
     },
 
-    participants: [encounterParticipantSchema]
+    participants: [encounterParticipantSchema],
+
+    activeParticipantId: String
   },
   { timestamps: true }
 );

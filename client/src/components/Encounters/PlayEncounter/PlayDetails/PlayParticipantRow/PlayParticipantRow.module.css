@@ -13,6 +13,10 @@ td {
   justify-content: center;
 }
 
+.Name {
+  white-space: nowrap;
+}
+
 .PaddedRow {
   margin-bottom: 0.5rem;
 }

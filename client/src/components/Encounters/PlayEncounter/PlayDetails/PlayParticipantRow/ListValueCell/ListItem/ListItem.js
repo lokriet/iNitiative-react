@@ -14,6 +14,7 @@ const ListItem = ({ item, onDelete }) => {
           on="hover"
           mouseEnterDelay={500}
           trigger={open => <div className={classes.Name}>{item.name}</div>}
+          contentStyle={{width: 'auto'}}
         >
           <div className={classes.Description}>{item.description}</div>
         </Popup>

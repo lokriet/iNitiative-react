@@ -66,7 +66,7 @@ const PlayParticipantRow = ({
           onColorChanged={newColor => handleFieldChanged('color', newColor)}
         />
       </td>
-      <td>{participant.name}</td>
+      <td className={classes.Name}>{participant.name}</td>
       <td>
         <Popup
           on="hover"
@@ -84,9 +84,9 @@ const PlayParticipantRow = ({
         >
           <>
             <div className={classes.PaddedRow}>
-              rolled:{participant.rolledInitiative}
+              Rolled: {participant.rolledInitiative}
             </div>
-            <div>modifier:{participant.initiativeModifier}</div>
+            <div>Modifier: {participant.initiativeModifier}</div>
           </>
         </Popup>
       </td>

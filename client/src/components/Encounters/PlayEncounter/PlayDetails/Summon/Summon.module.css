@@ -1,0 +1,13 @@
+.Container {
+  margin: auto;
+  width: 60rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  height: calc(100vh - 7rem);
+}
+
+.SummonView {
+  flex-grow: 1;
+  position: relative;
+}

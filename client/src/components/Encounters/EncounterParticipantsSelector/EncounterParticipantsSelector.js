@@ -55,16 +55,13 @@ const convertToEncounterParticipant = (participantTemplate, name) => {
 };
 
 const EncounterParticipantsSelector = ({
+  nameCheckParticipants,
   participants,
   onParticipantsChanged
 }) => {
   const [addedParticipants, setAddedParticipants] = useState(
     participants || []
   );
-
-  // useEffect(() => {
-  //   onParticipantsChanged(addedParticipants);
-  // }, [addedParticipants, onParticipantsChanged]);
 
   const handleParticipantUpdate = useCallback(
     (partialUpdate, participant) => {
@@ -113,21 +110,31 @@ const EncounterParticipantsSelector = ({
 
   const findUnusedName = useCallback(
     name => {
-      if (!addedParticipants.some(participant => participant.name === name)) {
+      if (!addedParticipants.some(participant => participant.name === name)  &&
+      !(nameCheckParticipants &&
+        nameCheckParticipants.some(
+          participant => participant.name === name
+        ))) {
         return name;
       }
       let i = 2;
       while (true) {
         let newName = `${name} ${i}`;
         if (
-          !addedParticipants.some(participant => participant.name === newName)
+          !addedParticipants.some(
+            participant => participant.name === newName
+          ) &&
+          !(nameCheckParticipants &&
+            nameCheckParticipants.some(
+              participant => participant.name === newName
+            ))
         ) {
           return newName;
         }
         i++;
       }
     },
-    [addedParticipants]
+    [addedParticipants, nameCheckParticipants]
   );
 
   const handleAddParticipant = useCallback(
@@ -181,7 +188,8 @@ const EncounterParticipantsSelector = ({
 };
 
 EncounterParticipantsSelector.propTypes = {
-  participants: PropTypes.array
+  participants: PropTypes.array,
+  nameCheckParticipants: PropTypes.array
 };
 
 export default EncounterParticipantsSelector;

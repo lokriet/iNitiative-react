@@ -5,111 +5,118 @@ const Encounter = require('../model/encounter');
 const httpErrors = require('../util/httpErrors');
 const responseCodes = require('../util/responseCodes');
 
-const participantValidationSchema = Joi.object().keys({
-  _id: Joi.any().optional(),
-  type: Joi.string()
-    .equal('player', 'monster')
-    .required(),
-  avatarUrl: Joi.string()
-    .uri()
-    .allow(null, ''),
-  name: Joi.string()
-    .max(200)
-    .trim()
-    .required(),
-  color: Joi.string()
-    .regex(/^#[0-9a-f]{6}/i)
-    .allow(null, ''),
-  initiativeModifier: Joi.number().required(),
-  rolledInitiative: Joi.number()
-    .min(1)
-    .max(20)
-    .allow(null, ''),
-  maxHp: Joi.number()
-    .min(1)
-    .required(),
-  currentHp: Joi.number()
-    .min(0)
-    .required(),
-  temporaryHp: Joi.number()
-    .min(1)
-    .allow(null, ''),
-  armorClass: Joi.number()
-    .min(0)
-    .required(),
-  temporaryArmorClass: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  speed: Joi.number()
-    .min(1)
-    .required(),
-  swimSpeed: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  climbSpeed: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  flySpeed: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  temporarySpeed: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  temporarySwimSpeed: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  temporaryClimbSpeed: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  temporaryFlySpeed: Joi.number()
-    .min(0)
-    .allow(null, ''),
-  mapSize: Joi.number()
-    .min(1)
-    .required(),
+const participantValidationSchema = Joi.object()
+  .keys({
+    _id: Joi.any().optional(),
+    type: Joi.string()
+      .equal('player', 'monster')
+      .required(),
+    avatarUrl: Joi.string()
+      .uri()
+      .allow(null, ''),
+    name: Joi.string()
+      .max(200)
+      .trim()
+      .required(),
+    color: Joi.string()
+      .regex(/^#[0-9a-f]{6}/i)
+      .allow(null, ''),
+    initiativeModifier: Joi.number().required(),
+    rolledInitiative: Joi.number()
+      .min(1)
+      .max(20)
+      .allow(null, ''),
+    maxHp: Joi.number()
+      .min(1)
+      .required(),
+    currentHp: Joi.number()
+      .min(0)
+      .required(),
+    temporaryHp: Joi.number()
+      .min(1)
+      .allow(null, ''),
+    armorClass: Joi.number()
+      .min(0)
+      .required(),
+    temporaryArmorClass: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    speed: Joi.number()
+      .min(1)
+      .required(),
+    swimSpeed: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    climbSpeed: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    flySpeed: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    temporarySpeed: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    temporarySwimSpeed: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    temporaryClimbSpeed: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    temporaryFlySpeed: Joi.number()
+      .min(0)
+      .allow(null, ''),
+    mapSize: Joi.number()
+      .min(1)
+      .required(),
 
-  immunities: Joi.object({
-    damageTypes: Joi.array()
+    immunities: Joi.object()
+      .keys({
+        damageTypes: Joi.array()
+          .items(Joi.any())
+          .required(),
+        conditions: Joi.array()
+          .items(Joi.any())
+          .required()
+      })
+      .unknown(true),
+    vulnerabilities: Joi.array()
+      .items(Joi.any())
+      .required(),
+    resistances: Joi.array()
+      .items(Joi.any())
+      .required(),
+    features: Joi.array()
       .items(Joi.any())
       .required(),
     conditions: Joi.array()
       .items(Joi.any())
-      .required()
-  }),
-  vulnerabilities: Joi.array()
-    .items(Joi.any())
-    .required(),
-  resistances: Joi.array()
-    .items(Joi.any())
-    .required(),
-  features: Joi.array()
-    .items(Joi.any())
-    .required(),
-  conditions: Joi.array()
-    .items(Joi.any())
-    .required(),
+      .required(),
 
-  advantages: Joi.string()
-    .max(5000)
-    .trim()
-    .allow(null, ''),
-  comment: Joi.string()
-    .max(5000)
-    .trim()
-    .allow(null, '')
-}).unknown(true);
+    advantages: Joi.string()
+      .max(5000)
+      .trim()
+      .allow(null, ''),
+    comment: Joi.string()
+      .max(5000)
+      .trim()
+      .allow(null, '')
+  })
+  .unknown(true);
 
-const encounterValidationSchema = Joi.object().keys({
-  _tempId: Joi.any().forbidden(),
-  _id: Joi.any().optional(),
-  name: Joi.string()
-    .max(200)
-    .trim()
-    .required(),
-  participants: Joi.array()
-    .items(participantValidationSchema)
-    .unique((a, b) => a.name === b.name)
-}).unknown(true);
+const encounterValidationSchema = Joi.object()
+  .keys({
+    _tempId: Joi.any().forbidden(),
+    _id: Joi.any().optional(),
+    name: Joi.string()
+      .max(200)
+      .trim()
+      .required(),
+    participants: Joi.array()
+      .items(participantValidationSchema)
+      .unique((a, b) => a.name === b.name),
+    activeParticipantId: Joi.string().allow(null, '')
+  })
+  .unknown(true);
 
 module.exports.createEncounter = async (req, res, next) => {
   try {
@@ -177,8 +184,7 @@ module.exports.updateEncounter = async (req, res, next) => {
     }
 
     let encounterData = { ...encounter._doc, ...partialUpdate };
-    console.log('encounter data', encounterData);
-    
+
     const { error, value } = encounterValidationSchema.validate(encounterData, {
       abortEarly: false
     });
@@ -187,8 +193,6 @@ module.exports.updateEncounter = async (req, res, next) => {
       next(httpErrors.joiValidationError(error));
       return;
     }
-
-    console.log('validated data', value);
 
     encounterData = value;
 
@@ -212,7 +216,22 @@ module.exports.updateEncounter = async (req, res, next) => {
     }
 
     await Encounter.findOneAndUpdate({ _id: encounterId }, encounterData);
-    let savedEncounter = await Encounter.findById(encounterId);
+    let savedEncounter = await Encounter.findById(encounterId)
+      .populate({ path: 'participants.vulnerabilities', select: 'name' })
+      .populate({ path: 'participants.resistances', select: 'name' })
+      .populate({
+        path: 'participants.features',
+        select: 'name type description'
+      })
+      .populate({ path: 'participants.immunities.damageTypes', select: 'name' })
+      .populate({
+        path: 'participants.immunities.conditions',
+        select: 'name description'
+      })
+      .populate({
+        path: 'participants.conditions',
+        select: 'name description'
+      });
 
     res.status(200).json({
       statusCode: 200,
