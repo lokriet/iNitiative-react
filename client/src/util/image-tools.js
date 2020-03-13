@@ -24,13 +24,13 @@ const hasReaderSupport = (typeof FileReader !== 'undefined' || typeof URL !== 'u
 export default class ImageTools {
 
   static resize(file, maxDimensions, callback) {
-      if (typeof maxDimensions === 'function') {
-          callback = maxDimensions;
-          maxDimensions = {
-              width: 640,
-              height: 480
-          };
-      }
+    //   if (typeof maxDimensions === 'function') {
+    //       callback = maxDimensions;
+    //       maxDimensions = {
+    //           width: 640,
+    //           height: 480
+    //       };
+    //   }
 
 
       if (!ImageTools.isSupported() || !file.type.match(/image.*/)) {
@@ -59,7 +59,7 @@ export default class ImageTools {
         }
 
           if (!isTooLarge) {
-              callback(file, false);
+              callback(file, false, {width, height});
               return;
           }
 
@@ -79,11 +79,11 @@ export default class ImageTools {
 
           if (hasToBlobSupport) {
               canvas.toBlob((blob) => {
-                  callback(blob, true);
+                  callback(blob, true, {width, height});
               }, file.type);
           } else {
               const blob = ImageTools._toBlob(canvas, file.type);
-              callback(blob, true);
+              callback(blob, true, {width, height});
           }
       };
       ImageTools._loadImage(image, file);

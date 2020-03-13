@@ -5,6 +5,81 @@ const Encounter = require('../model/encounter');
 const httpErrors = require('../util/httpErrors');
 const responseCodes = require('../util/responseCodes');
 
+const mapValidationSchema = Joi.object()
+  .keys({
+    _id: Joi.any().optional(),
+    mapUrl: Joi.string()
+      .uri()
+      .required(),
+    mapWidth: Joi.number()
+      .min(1)
+      .max(2000)
+      .required(),
+    mapHeight: Joi.number()
+      .min(1)
+      .max(1500)
+      .required(),
+    gridWidth: Joi.number()
+      .min(1)
+      .max(1000)
+      .allow(null, ''),
+    gridHeight: Joi.number()
+      .min(1)
+      .max(1000)
+      .allow(null, ''),
+    gridColor: Joi.string().regex(/^#[0-9a-f]{6}/i).optional(),
+    showGrid: Joi.bool().optional(),
+    participantCoordinates: Joi.array()
+      .items(
+        Joi.object()
+          .keys({
+            _id: Joi.any().optional(),
+            participantId: Joi.any().required(),
+            mapX: Joi.number()
+              .min(0)
+              .max(Joi.ref('...mapWidth'))
+              .required(),
+            mapY: Joi.number()
+              .min(0)
+              .max(Joi.ref('...mapHeight'))
+              .required(),
+            infoX: Joi.number()
+              .min(0)
+              .required(),
+            infoY: Joi.number()
+              .min(0)
+              .required(),
+            gridX: Joi.number()
+              .min(0)
+              .max(Joi.ref('...gridWidth'))
+              .allow(null, ''),
+            gridY: Joi.number()
+              .min(0)
+              .max(Joi.ref('...gridHeight'))
+              .allow(null, '')
+          })
+          .unknown(true)
+      )
+      .unique((a, b) => {
+        let aId;
+        if ('_id' in a.participantId) {
+          aId = a.participantId._id;
+        } else {
+          aId = a.toString();
+        }
+
+        let bId;
+        if ('_id' in b.participantId) {
+          bId = b.participantId._id;
+        } else {
+          bId = b.toString();
+        }
+
+        return aId === bId;
+      })
+  })
+  .unknown(true);
+
 const participantValidationSchema = Joi.object()
   .keys({
     _id: Joi.any().optional(),
@@ -114,7 +189,8 @@ const encounterValidationSchema = Joi.object()
     participants: Joi.array()
       .items(participantValidationSchema)
       .unique((a, b) => a.name === b.name),
-    activeParticipantId: Joi.string().allow(null, '')
+    activeParticipantId: Joi.string().allow(null, ''),
+    map: mapValidationSchema.allow(null)
   })
   .unknown(true);
 
@@ -152,6 +228,7 @@ module.exports.createEncounter = async (req, res, next) => {
     let encounter = new Encounter({
       name: encounterData.name,
       participants: encounterData.participants,
+      map: null,
       creator: req.userId
     });
     encounter = await encounter.save();

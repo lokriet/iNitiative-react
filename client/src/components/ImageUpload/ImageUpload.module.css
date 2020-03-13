@@ -22,3 +22,10 @@
 .Details {
   margin-top: 0.5rem;
 }
+
+.FileName {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 10rem;
+}

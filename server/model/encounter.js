@@ -68,10 +68,51 @@ var encounterParticipantSchema = new Schema({
   vulnerabilities: [{ type: Schema.Types.ObjectId, ref: 'DamageType' }],
   resistances: [{ type: Schema.Types.ObjectId, ref: 'DamageType' }],
   features: [{ type: Schema.Types.ObjectId, ref: 'Feature' }],
-  conditions: [{type: Schema.Types.ObjectId, ref: 'Condition'}],
+  conditions: [{ type: Schema.Types.ObjectId, ref: 'Condition' }],
 
   advantages: String,
   comment: String
+});
+
+const mapSchema = new Schema({
+  mapUrl: {
+    type: String,
+    required: true
+  },
+  mapWidth: Number,
+  mapHeight: Number,
+  gridWidth: Number,
+  gridHeight: Number,
+  gridColor: String,
+  showGrid: Boolean,
+  participantCoordinates: [
+    {
+      participantId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Encounter.participants',
+        required: true
+      },
+
+      mapX: {
+        type: Number,
+        required: true
+      },
+      mapY: {
+        type: Number,
+        required: true
+      },
+      infoX: {
+        type: Number,
+        required: true
+      },
+      infoY: {
+        type: Number,
+        required: true
+      },
+      gridX: Number,
+      gridY: Number
+    }
+  ]
 });
 
 const encounterSchema = new Schema(
@@ -88,6 +129,8 @@ const encounterSchema = new Schema(
     },
 
     participants: [encounterParticipantSchema],
+
+    map: mapSchema,
 
     activeParticipantId: String
   },

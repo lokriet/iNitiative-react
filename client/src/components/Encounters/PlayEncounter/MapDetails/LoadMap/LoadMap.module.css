@@ -1,0 +1,39 @@
+.PopupContainer {
+  width: 20rem;
+}
+
+.PopupHeader {
+  font-weight: 500;
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.ChooseFileButton {
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background-color: white;
+  
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.ChooseFileButton:hover {
+  background-color: #eee;
+  box-shadow: 0 0 1px 2px #eee;
+}
+
+.FileSizeWarning {
+  color: #aaa;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.PaddedRow {
+  margin-bottom: 0.5rem;
+}
+
+.GridSizeInput {
+  width: 5rem;
+}

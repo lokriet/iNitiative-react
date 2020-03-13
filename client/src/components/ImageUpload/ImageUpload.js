@@ -4,12 +4,15 @@ import ImageTools from '../../util/image-tools';
 import { connect } from 'react-redux';
 import Error from '../UI/Errors/Error/Error';
 import classes from './ImageUpload.module.css';
+import ItemsRow from '../UI/ItemsRow/ItemsRow';
+import Popup from 'reactjs-popup';
 
 const ImageUpload = ({
   buttonClassName,
   maxWidth,
   maxHeight,
   maxFileSize, //kb,
+  showFileName,
   onUploadFailed,
   onUploadFinished,
   firebase,
@@ -19,6 +22,7 @@ const ImageUpload = ({
   const [errorMessage, setErrorMessage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(null);
+  const [fileName, setFileName] = useState(null);
 
   const uploadFailedHandler = onUploadFailed || (() => {});
 
@@ -31,15 +35,13 @@ const ImageUpload = ({
       }
 
       if (maxFileSize != null) {
-        const fileSize = this.file.size / 1024;
+        const fileSize = file.size / 1024;
         if (fileSize > maxFileSize) {
           const maxFileSizeString =
             maxFileSize > 1024
               ? (maxFileSize / 1024).toFixed(2) + 'M'
               : maxFileSize.toFixed(0) + 'K';
-          setErrorMessage(
-            `File size should be less than ${maxFileSizeString}`
-          );
+          setErrorMessage(`File size should be less than ${maxFileSizeString}`);
           uploadFailedHandler();
           return;
         }
@@ -52,8 +54,9 @@ const ImageUpload = ({
             width: maxWidth,
             height: maxHeight
           },
-          blob => {
-            const uploadTask = firebase.doUploadImage(blob);
+          (blob, didItResize, newSize) => {
+            const uploadTask = firebase.doUploadImage(blob, file.name);
+            console.log('blob!', blob);
             setIsUploading(true);
             setStatusMessage('Uploading...');
             setErrorMessage(null);
@@ -72,7 +75,7 @@ const ImageUpload = ({
                 //     setStatusMessage('Uploading...');
                 //     break;
                 //   default:
-                  // do nothing
+                // do nothing
                 // }
               },
 
@@ -111,7 +114,8 @@ const ImageUpload = ({
                     setStatusMessage(null);
                     setErrorMessage(null);
                     setProgress(null);
-                    onUploadFinished(downloadURL);
+                    setFileName(file.name);
+                    onUploadFinished(downloadURL, newSize);
                   });
               }
             );
@@ -138,16 +142,37 @@ const ImageUpload = ({
 
   return (
     <div>
-      <input type="file" id="file" name="file" className={classes.HiddenInput} onChange={startUploadImageHandler} />
-      <label htmlFor="file" className={buttonClassName || classes.UploadButton}>{children || 'Choose file'}</label>
-
+      <ItemsRow alignCentered>
+        <input
+          type="file"
+          id="file"
+          name="file"
+          className={classes.HiddenInput}
+          onChange={startUploadImageHandler}
+        />
+        <label
+          htmlFor="file"
+          className={buttonClassName || classes.UploadButton}
+        >
+          {children || 'Choose file'}
+        </label>
+        {showFileName && fileName && !progress ? (
+          <Popup
+            on="hover"
+            arrow={false}
+            contentStyle={{width: 'auto'}}
+            offsetY={10}
+            trigger={<span className={classes.FileName}> {fileName}</span>}
+          >
+            <div>{fileName}</div>
+          </Popup>
+        ) : null}
+      </ItemsRow>
       {statusMessage || errorMessage || isUploading ? (
         <div className={classes.Details}>
           {statusMessage ? <div>{statusMessage}</div> : null}
           {errorMessage ? <Error>{errorMessage}</Error> : null}
-          {isUploading ? (
-            <progress value={progress} max="100" />
-          ) : null}
+          {isUploading ? <progress value={progress} max="100" /> : null}
         </div>
       ) : null}
     </div>
@@ -160,7 +185,8 @@ ImageUpload.propTypes = {
   maxHeight: PropTypes.number,
   maxFileSize: PropTypes.number, //kb,
   onUploadFailed: PropTypes.func,
-  onUploadFinished: PropTypes.func.isRequired
+  onUploadFinished: PropTypes.func.isRequired,
+  showFileName: PropTypes.bool
 };
 
 const mapStateToProps = state => {

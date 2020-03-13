@@ -15,6 +15,7 @@ import PropTypes from 'prop-types';
 import PlayDetails from './PlayDetails/PlayDetails';
 import TabbedNavigation from '../../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
+import MapDetails from './MapDetails/MapDetails';
 
 const PlayEncounter = props => {
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ const PlayEncounter = props => {
           <PlayDetails />
         </Route>
         <Route path={`${path}/map`}>
-          <div>TODO!</div>
+          <MapDetails />
         </Route>
         <Route path="*">
           <Redirect to="/404" />
