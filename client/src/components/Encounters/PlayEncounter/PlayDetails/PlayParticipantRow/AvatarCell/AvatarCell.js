@@ -61,6 +61,9 @@ const AvatarCell = ({ participant, onColorChanged }) => {
   );
 };
 
-AvatarCell.propTypes = {};
+AvatarCell.propTypes = {
+  participant: PropTypes.object.isRequired,
+  onColorChanged: PropTypes.func.isRequired
+};
 
 export default AvatarCell;

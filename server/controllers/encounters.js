@@ -439,6 +439,9 @@ module.exports.updateEncounterParticipant = async (req, res, next) => {
       }
     );
 
+    await Encounter.findOneAndUpdate( {_id: encounterId }, {$set: {'updatedAt': new Date()}});
+
+
     res.status(200).json('Update successful');
   } catch (error) {
     next(error);

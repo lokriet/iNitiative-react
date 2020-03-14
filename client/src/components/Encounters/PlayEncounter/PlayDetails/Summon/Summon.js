@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
 import Button from '../../../../UI/Form/Button/Button';
 import EncounterParticipantSelector from '../../../EncounterParticipantsSelector/EncounterParticipantsSelector';

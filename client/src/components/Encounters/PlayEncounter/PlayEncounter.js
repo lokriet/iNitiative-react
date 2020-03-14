@@ -11,7 +11,6 @@ import {
   Switch
 } from 'react-router-dom';
 
-import PropTypes from 'prop-types';
 import PlayDetails from './PlayDetails/PlayDetails';
 import TabbedNavigation from '../../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';

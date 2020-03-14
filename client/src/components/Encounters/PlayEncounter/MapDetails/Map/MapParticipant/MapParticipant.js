@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Draggable from 'react-draggable';
 import classes from './MapParticipant.module.css';
-import { isEmpty } from '../../../../../../util/helper-methods';
+import { ParticipantType } from '../../../../../ParticipantTemplates/ParticipantTemplates';
+import List from '../../../../../UI/Table/List/List';
+import MapAvatar from '../MapAvatar/MapAvatar';
 
 const MapParticipant = ({
   participant,
@@ -13,6 +15,7 @@ const MapParticipant = ({
   onDrop,
   onInfoPosChanged,
   showDead,
+  showInfo,
   position
 }) => {
   const [width, setWidth] = useState(`${participant.mapSize}rem`);
@@ -76,43 +79,31 @@ const MapParticipant = ({
           }
         }
       >
-        <div
-          className={`MapParticipant ${classes.Avatar} ${
-            isEmpty(participant.avatarUrl) ? classes.FirstLetter : ''
-          }`}
-          style={{
-            backgroundColor:
-              isEmpty(participant.color) || isEmpty(participant.avatarUrl)
-                ? 'white'
-                : participant.color,
+        <div className={classes.DraggableAvatar}>
+          <MapAvatar participant={participant} width={width} height={height} />
+        </div>
+      </Draggable>
 
-            borderColor: isEmpty(participant.color)
-              ? 'transparent'
-              : participant.color,
-
-            backgroundImage: isEmpty(participant.avatarUrl)
-              ? 'unset'
-              : `url(${participant.avatarUrl})`,
-
-            fontSize: `${0.8 *
-              Math.min(parseFloat(width), parseFloat(height))}${
-              width.endsWith('rem') ? 'rem' : 'px'
-            }`,
-            width,
-            height
-          }}
+      {showInfo ? (
+        <Draggable
+          position={combinedInfoPosition}
+          onDrag={handleInfoDrag}
+          onStop={handleInfoDrop}
         >
-          {isEmpty(participant.avatarUrl)
-            ? participant.name.substring(0, 1).toUpperCase()
-            : null}
-        </div>
-      </Draggable>
-
-      <Draggable position={combinedInfoPosition} onDrag={handleInfoDrag} onStop={handleInfoDrop}>
-        <div className={classes.Info}>
-          HP: {participant.currentHp} / {participant.maxHp}
-        </div>
-      </Draggable>
+          <div className={classes.Info}>
+            <div className={classes.Hp}>
+              {participant.type === ParticipantType.Player
+                ? `HP: ${participant.currentHp} / ${participant.maxHp}`
+                : `Dmg: ${participant.maxHp - participant.currentHp}`}
+            </div>
+            {participant.conditions.length === 0 ? null : (
+              <div className={classes.Conditions}>
+                <List items={participant.conditions} />
+              </div>
+            )}
+          </div>
+        </Draggable>
+      ) : null}
     </div>
   );
 };
@@ -126,6 +117,7 @@ MapParticipant.propTypes = {
   onDrop: PropTypes.func.isRequired,
   onInfoPosChanged: PropTypes.func.isRequired,
   showDead: PropTypes.bool,
+  showInfo: PropTypes.bool,
   position: PropTypes.object
 };
 

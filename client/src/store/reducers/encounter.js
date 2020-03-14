@@ -182,7 +182,18 @@ const encounterParticipantUpdateSuccess = (state, action) => {
       state.editedEncounter,
       action.participantId,
       action.partialUpdate
-    )
+    ),
+    encounters: [
+      {
+        _id: state.editedEncounter._id,
+        name: state.editedEncounter.name,
+        createdAt: new Date(state.editedEncounter.createdAt),
+        updatedAt: new Date()
+      },
+      ...state.encounters.filter(
+        item => item._id.toString() !== state.editedEncounter._id.toString()
+      )
+    ],
   };
 };
 

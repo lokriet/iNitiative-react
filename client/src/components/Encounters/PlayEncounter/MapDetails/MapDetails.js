@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import PropTypes from 'prop-types';
 
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import Button from '../../../UI/Form/Button/Button';
@@ -195,8 +194,8 @@ const MapDetails = props => {
                 <div>Are you sure?</div>
                 <br />
                 <ItemsRow>
-                  <Button onClick={close}>Nooo!</Button>
                   <Button onClick={() => handleDeleteMap(close)}>Yes!</Button>
+                  <Button onClick={close}>Nooo!</Button>
                 </ItemsRow>
               </>
             )}

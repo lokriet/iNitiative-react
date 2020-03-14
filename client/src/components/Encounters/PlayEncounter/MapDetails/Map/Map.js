@@ -11,6 +11,7 @@ import MapParticipant from './MapParticipant/MapParticipant';
 
 import classes from './Map.module.css';
 import MapSettings from './MapSettings/MapSettings';
+import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
 
 const Map = ({
   editedEncounter,
@@ -258,8 +259,34 @@ const Map = ({
 
   return (
     <>
+    
       {editedEncounter && editedEncounter.map ? (
         <div className={classes.Container}>
+          <ItemsRow className={classes.Controls}>
+            {mapImageLoaded
+              ? editedEncounter.participants.map(participant => (
+                  <AddMapParticipant
+                    key={participant._id}
+                    participant={participant}
+                    isOnMap={editedEncounter.map.participantCoordinates.some(
+                      coordinate =>
+                        coordinate.participantId.toString() ===
+                        participant._id.toString()
+                    )}
+                    dropContainerRef={participantsContainerRef}
+                    onDropped={(mouseEvent, position) =>
+                      handleNewParticipantDropped(
+                        participant,
+                        mouseEvent,
+                        position
+                      )
+                    }
+                  />
+                ))
+              : null}
+          </ItemsRow>
+
+
           <div className={classes.MapContainer}>
             <img
               src={editedEncounter.map.mapUrl}
@@ -324,6 +351,7 @@ const Map = ({
                           )
                         }
                         showDead={mapSettings.showDead}
+                        showInfo={mapSettings.showInfo}
                       />
                     )
                   )
@@ -340,29 +368,7 @@ const Map = ({
             ) : null}
           </div>
 
-          <div className={classes.Controls}>
-            {mapImageLoaded
-              ? editedEncounter.participants.map(participant => (
-                  <AddMapParticipant
-                    key={participant._id}
-                    participant={participant}
-                    isOnMap={editedEncounter.map.participantCoordinates.some(
-                      coordinate =>
-                        coordinate.participantId.toString() ===
-                        participant._id.toString()
-                    )}
-                    dropContainerRef={participantsContainerRef}
-                    onDropped={(mouseEvent, position) =>
-                      handleNewParticipantDropped(
-                        participant,
-                        mouseEvent,
-                        position
-                      )
-                    }
-                  />
-                ))
-              : null}
-          </div>
+          
         </div>
       ) : null}
     </>

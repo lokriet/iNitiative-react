@@ -31,6 +31,9 @@ const ListItem = ({ item, onDelete }) => {
   );
 };
 
-ListItem.propTypes = {};
+ListItem.propTypes = {
+  item: PropTypes.object.isRequired,
+  onDelete: PropTypes.func.isRequired
+};
 
 export default ListItem;

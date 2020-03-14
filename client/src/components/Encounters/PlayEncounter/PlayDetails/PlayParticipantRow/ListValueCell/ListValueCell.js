@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import Popup from 'reactjs-popup';
 import ItemsRow from '../../../../../UI/ItemsRow/ItemsRow';

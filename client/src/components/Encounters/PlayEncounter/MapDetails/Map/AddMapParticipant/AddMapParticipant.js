@@ -1,15 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from '../../../../../../util/helper-methods';
-import ItemsRow from '../../../../../UI/ItemsRow/ItemsRow';
 import Draggable from 'react-draggable';
 import classes from './AddMapParticipant.module.css';
+import MapAvatar from '../MapAvatar/MapAvatar';
+import Popup from 'reactjs-popup';
 
-const AddMapParticipant = ({
-  participant,
-  isOnMap,
-  onDropped
-}) => {
+const AddMapParticipant = ({ participant, isOnMap, onDropped }) => {
   const [draggablePosition, setDraggablePosition] = useState({ x: 0, y: 0 });
 
   const handleDrag = useCallback((mouseEvent, position) => {
@@ -18,7 +14,6 @@ const AddMapParticipant = ({
 
   const handleDrop = useCallback(
     (mouseEvent, position) => {
-      
       onDropped(mouseEvent, position);
       setDraggablePosition({ x: 0, y: 0 });
     },
@@ -26,56 +21,35 @@ const AddMapParticipant = ({
   );
 
   return (
-    <ItemsRow alignCentered className={classes.Container}>
-      <div
-        className={classes.Avatar}
-        style={{
-          backgroundColor: isEmpty(participant.color)
-            ? 'transparent'
-            : participant.color,
-          bprderColor: isEmpty(participant.color)
-            ? 'transparent'
-            : participant.color,
-          backgroundImage: isEmpty(participant.avatarUrl)
-            ? 'unset'
-            : `url(${participant.avatarUrl})`
-        }}
-      >
-        {isEmpty(participant.avatarUrl) ? (
-          <div className={classes.FirstLetter}>
-            {participant.name.substring(0, 1).toUpperCase()}
-          </div>
-        ) : null}
-      </div>
-      <div className={classes.Name}>{participant.name}</div>
-      <Draggable
-        onDrag={handleDrag}
-        onStop={handleDrop}
-        position={draggablePosition}
-        defaultClassNameDragging={classes.Dragging}
-        disabled={isOnMap}
-      >
-        <div
-          className={`${classes.Avatar} ${classes.Draggable} ${
-            isOnMap ? classes.DraggingDisabled : null
-          }`}
-          style={{
-            backgroundColor: isEmpty(participant.color)
-              ? 'transparent'
-              : participant.color,
-            backgroundImage: isEmpty(participant.avatarUrl)
-              ? 'unset'
-              : `url(${participant.avatarUrl})`
-          }}
-        >
-          {isEmpty(participant.avatarUrl) ? (
-            <div className={classes.FirstLetter}>
-              {participant.name.substring(0, 1).toUpperCase()}
+    <Popup
+      on="hover"
+      position="top center"
+      arrow={false}
+      contentStyle={{ width: 'auto', zIndex: 11 }}
+      offsetY={10}
+      trigger={
+        <div className={`${classes.Container}`}>
+          <MapAvatar participant={participant} width="3rem" height="3rem" />
+          <Draggable
+            onDrag={handleDrag}
+            onStop={handleDrop}
+            position={draggablePosition}
+            defaultClassNameDragging={classes.Dragging}
+            disabled={isOnMap}
+          >
+            <div
+              className={`${classes.Draggable} ${
+                isOnMap ? classes.DraggingDisabled : null
+              }`}
+            >
+              <MapAvatar participant={participant} width="3rem" height="3rem" className={isOnMap ? classes.DisabledAvatar : null} />
             </div>
-          ) : null}
+          </Draggable>
         </div>
-      </Draggable>
-    </ItemsRow>
+      }
+    >
+      <div className={classes.PopupName}>{participant.name}</div>
+    </Popup>
   );
 };
 

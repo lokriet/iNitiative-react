@@ -4,23 +4,11 @@
   left: 0;
 }
 
-.Avatar {
+.DraggableAvatar {
   display: inline-block;
-  width: 3rem;
-  height: 3rem;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  border: 2px solid transparent;
+  position: relative;
   cursor: move;
   z-index: 10;
-}
-
-.FirstLetter {
-  font-weight: 500;
-  display: flex;
-  align-content: center;
-  justify-content: center;
 }
 
 .Info {
@@ -32,10 +20,20 @@
   flex-direction: column;
   
   background-color: #ffffff8e;
-  padding: 0.25rem;
+  padding: 0.25rem 0;
   box-shadow: 0 0 2px 1px #ffffff8e;
   border-radius: 4px;
   
   cursor: move;
   z-index: 10;
 }
+
+.Hp {
+  white-space: nowrap;
+  margin: 0 0.5rem;
+}
+
+.Conditions {
+  margin-top: 0.5rem;
+}
+

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useDispatch, connect } from 'react-redux';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 

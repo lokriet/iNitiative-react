@@ -1,6 +1,7 @@
 .Container {
   display: flex;
   align-items: flex-start;
+  flex-direction: column;
 }
 
 .MapContainer {
@@ -24,19 +25,7 @@
 }
 
 .Controls {
-  display: inline-block;
-  padding: 2.5rem 1rem;
-}
-
-.AddParticipantsList {
-  position: relative;
-  height: 50vh;
-  width: 5rem;
-  padding-right: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: auto;
+  margin: 1.5rem 0 0 2rem;
 }
 
 .MapSettings {

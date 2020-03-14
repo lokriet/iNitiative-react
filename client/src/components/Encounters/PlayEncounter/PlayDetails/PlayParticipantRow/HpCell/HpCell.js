@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import InlineInput from '../../../../../UI/Form/Input/InlineInput/InlineInput';
 
@@ -6,7 +6,6 @@ import classes from './HpCell.module.css';
 import ItemsRow from '../../../../../UI/ItemsRow/ItemsRow';
 import Button from '../../../../../UI/Form/Button/Button';
 import Popup from 'reactjs-popup';
-import useDebounce from '../../../../../../hooks/useDebounce';
 import { isEmpty } from '../../../../../../util/helper-methods';
 
 const HpCell = ({ participant, onInfoChanged }) => {
@@ -80,9 +79,9 @@ const HpCell = ({ participant, onInfoChanged }) => {
     [
       dmgHealHp,
       onInfoChanged,
-      participant.currentHp,
       participant.maxHp,
-      participant.temporaryHp
+      hpValues.currentHp,
+      hpValues.temporaryHp
     ]
   );
 
