@@ -79,7 +79,8 @@ const LoadMap = ({ onNewMapLoaded, firebase }) => {
       position="bottom left"
       closeOnEscape={false}
       closeOnDocumentClick={false}
-      contentStyle={{ width: 'auto' }}
+      modal
+      contentStyle={{ width: 'auto', zIndex: "100" }}
     >
       {close => (
         <div className={classes.PopupContainer}>

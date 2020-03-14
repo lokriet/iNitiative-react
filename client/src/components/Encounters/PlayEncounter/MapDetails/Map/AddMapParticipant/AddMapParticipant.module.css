@@ -1,0 +1,43 @@
+.Container {
+  margin: 0.5rem;
+  position: relative;
+}
+
+.Avatar {
+  width: 3rem;
+  height: 3rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: 2px solid transparent;
+  cursor: move;
+}
+
+.FirstLetter {
+  width: calc(3rem - 4px);
+  height: calc(3rem - 4px);
+  padding: 2px;
+  background-color: white;
+  font-size: 2.5rem;
+  font-weight: 500;
+  cursor: move;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+.Draggable {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.Dragging {
+  opacity: 0.9;
+}
+
+.Draggable.DraggingDisabled,
+.DraggingDisabled .FirstLetter {
+  cursor: not-allowed;
+}

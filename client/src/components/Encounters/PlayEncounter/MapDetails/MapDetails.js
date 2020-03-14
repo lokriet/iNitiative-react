@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
@@ -71,6 +71,109 @@ const MapDetails = props => {
     [dispatch, props.editedEncounter, props.firebase]
   );
 
+  const handleAddParticipantOnMap = useCallback(
+    newMapParticipant => {
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...props.editedEncounter.map,
+              participantCoordinates: props.editedEncounter.map.participantCoordinates.concat(
+                newMapParticipant
+              )
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
+    },
+    [dispatch, props.editedEncounter]
+  );
+
+  const handleMapParticipantChanged = useCallback(
+    editedMapParticipant => {
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...props.editedEncounter.map,
+              participantCoordinates: props.editedEncounter.map.participantCoordinates.map(
+                participantCoordinate =>
+                  participantCoordinate.participantId.toString() ===
+                  editedMapParticipant.participantId.toString()
+                    ? editedMapParticipant
+                    : participantCoordinate
+              )
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
+    },
+    [dispatch, props.editedEncounter]
+  );
+
+  const handleMapParticipantDeleted = useCallback(
+    participantId => {
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...props.editedEncounter.map,
+              participantCoordinates: props.editedEncounter.map.participantCoordinates.filter(
+                participantCoordinate =>
+                  participantCoordinate.participantId.toString() !==
+                  participantId.toString()
+              )
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
+    },
+    [dispatch, props.editedEncounter]
+  );
+
+  const handleMapSettingsChanged = useCallback(
+    (mapSettings) => {
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...props.editedEncounter.map,
+              gridColor: mapSettings.gridColor,
+              gridWidth: mapSettings.gridWidth,
+              gridHeight: mapSettings.gridHeight,
+              showGrid: mapSettings.showGrid
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
+    },
+    [dispatch, props.editedEncounter],
+  )
+
   let view;
   if (!props.editedEncounter && !props.fetchingEncounterError) {
     view = <Spinner />;
@@ -91,17 +194,20 @@ const MapDetails = props => {
               <>
                 <div>Are you sure?</div>
                 <br />
-                <Button onClick={() => handleDeleteMap(close)}>Yes!</Button>
+                <ItemsRow>
+                  <Button onClick={close}>Nooo!</Button>
+                  <Button onClick={() => handleDeleteMap(close)}>Yes!</Button>
+                </ItemsRow>
               </>
             )}
           </Popup>
         </ItemsRow>
-        {/* <div>
-          {props.editedEncounter.map ? (
-            <img src={props.editedEncounter.map.mapUrl} alt="map" />
-          ) : null}
-        </div> */}
-        <Map />
+        <Map
+          onMapSettingsChanged={handleMapSettingsChanged}
+          onMapParticipantAdded={handleAddParticipantOnMap}
+          onMapParticipantChanged={handleMapParticipantChanged}
+          onMapParticipantDeleted={handleMapParticipantDeleted}
+        />
       </div>
     );
   }

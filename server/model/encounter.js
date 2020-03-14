@@ -109,8 +109,8 @@ const mapSchema = new Schema({
         type: Number,
         required: true
       },
-      gridX: Number,
-      gridY: Number
+      gridX: String,
+      gridY: String
     }
   ]
 });

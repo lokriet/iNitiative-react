@@ -33,7 +33,9 @@ const PlayEncounter = props => {
   return (
     <>
       <TabbedNavigation>
-        <TabbedNavigationItem link={`${url}/details`}>Details</TabbedNavigationItem>
+        <TabbedNavigationItem link={`${url}/details`}>
+          Details
+        </TabbedNavigationItem>
         <TabbedNavigationItem link={`${url}/map`}>Map</TabbedNavigationItem>
       </TabbedNavigation>
 

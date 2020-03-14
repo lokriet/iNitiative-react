@@ -27,7 +27,9 @@ const mapValidationSchema = Joi.object()
       .min(1)
       .max(1000)
       .allow(null, ''),
-    gridColor: Joi.string().regex(/^#[0-9a-f]{6}/i).optional(),
+    gridColor: Joi.string()
+      .regex(/^#[0-9a-f]{6}/i)
+      .optional(),
     showGrid: Joi.bool().optional(),
     participantCoordinates: Joi.array()
       .items(
@@ -37,44 +39,35 @@ const mapValidationSchema = Joi.object()
             participantId: Joi.any().required(),
             mapX: Joi.number()
               .min(0)
-              .max(Joi.ref('...mapWidth'))
+              .max(Joi.ref('....mapWidth'))
               .required(),
             mapY: Joi.number()
               .min(0)
-              .max(Joi.ref('...mapHeight'))
+              .max(Joi.ref('....mapHeight'))
               .required(),
-            infoX: Joi.number()
-              .min(0)
-              .required(),
-            infoY: Joi.number()
-              .min(0)
-              .required(),
-            gridX: Joi.number()
-              .min(0)
-              .max(Joi.ref('...gridWidth'))
-              .allow(null, ''),
-            gridY: Joi.number()
-              .min(0)
-              .max(Joi.ref('...gridHeight'))
-              .allow(null, '')
+            infoX: Joi.number().required(),
+            infoY: Joi.number().required(),
+            gridX: Joi.string().allow(null, ''),
+            gridY: Joi.string().allow(null, '')
           })
           .unknown(true)
       )
       .unique((a, b) => {
         let aId;
-        if ('_id' in a.participantId) {
-          aId = a.participantId._id;
+        if (typeof a.participantId === 'object' && '_id' in a.participantId) {
+          aId = a.participantId._id.toString();
         } else {
-          aId = a.toString();
+          aId = a.participantId.toString();
         }
 
         let bId;
-        if ('_id' in b.participantId) {
-          bId = b.participantId._id;
+        if (typeof b.participantId === 'object' && '_id' in b.participantId) {
+          bId = b.participantId._id.toString();
         } else {
-          bId = b.toString();
+          bId = b.participantId.toString();
         }
 
+        console.log('comparator', aId, bId);
         return aId === bId;
       })
   })

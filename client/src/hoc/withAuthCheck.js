@@ -3,19 +3,19 @@ import React, { Fragment, useCallback } from 'react';
 
 import { connect, useDispatch } from 'react-redux';
 import Spinner from '../components/UI/Spinner/Spinner';
-import { useRouteMatch, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import * as actions from '../store/actions';
 
 const withAuthCheck = WrappedComponent => {
   return connect(mapStateToProps)(props => {
     const dispatch = useDispatch();
-    const routeMatch = useRouteMatch();
     const history = useHistory();
 
     const handleLogin = useCallback(() => {
-      dispatch(actions.setAuthRedirectPath(routeMatch.url));
+      console.log('auth check', history);
+      dispatch(actions.setAuthRedirectPath(history.location.pathname + history.location.search));
       history.push('/login');
-    }, [dispatch, routeMatch.url, history]);
+    }, [dispatch, history]);
 
 
     if (!props.initialAuthCheckDone) {

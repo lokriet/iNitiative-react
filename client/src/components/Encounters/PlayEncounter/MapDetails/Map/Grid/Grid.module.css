@@ -1,0 +1,33 @@
+.GridContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  gap: 0px;
+  z-index: 1;
+
+  width: 100%;
+  height: 100%;
+}
+
+.GridCell {
+  border: 1px solid transparent;
+}
+
+.DragFromCell {
+  background-color: #233980c2;
+}
+
+.ColumnName {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.25rem;
+}
+
+.RowName {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.25rem;
+}
