@@ -76,11 +76,15 @@ class Feature extends Component {
       this.state.descriptionValue !== this.props.feature.description ||
       this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
     ) {
+      if (!this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(true);
+      }
       this.setState({ showSaveButtons: true });
-      this.props.onHaveUnsavedChangesStateChange(true);
     } else if (!this.props.serverError) {
+      if (this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(false);
+      }
       this.setState({ showSaveButtons: false });
-      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -92,15 +96,20 @@ class Feature extends Component {
       event.target.value !== this.props.feature.description ||
       this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
     ) {
+      if (!this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(true);
+      }
       this.setState({ showSaveButtons: true });
-      this.props.onHaveUnsavedChangesStateChange(true);
     } else {
+      if (this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(false);
+      }
       this.setState({ showSaveButtons: false });
-      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
   handleTypeChanged = (newValue, action) => {
+    console.log(newValue)
     this.setState({ typeValue: newValue });
 
     if (
@@ -175,6 +184,7 @@ class Feature extends Component {
               onChange={this.handleTypeChanged}
               isClearable
               isCreatable
+              isObjectBased={false}
               placeholder="Type"
               className={classes.Type}
               value={this.state.typeValue}

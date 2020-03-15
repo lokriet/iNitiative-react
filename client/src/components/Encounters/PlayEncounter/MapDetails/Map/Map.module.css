@@ -21,7 +21,7 @@
   height: calc(100% - 2rem);
   bottom: 0;
   right: 0;
-  z-index: 2;
+  z-index: 3;
 }
 
 .ControlsContailer {
@@ -64,5 +64,5 @@
   display: flex;
   padding-top: 0.75rem;
   padding-left: 0.75rem;
-  z-index: 3;
+  z-index: 4;
 }

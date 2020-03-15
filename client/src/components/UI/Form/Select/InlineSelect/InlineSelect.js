@@ -7,6 +7,8 @@ import GroupedMenu from './GroupedMenu/GroupedMenu';
 
 const InlineSelect = props => {
   const {
+    isObjectBased = true,
+    isStringBased = false,
     isCreatable,
     isClearable,
     isMulti,
@@ -17,12 +19,16 @@ const InlineSelect = props => {
   } = props;
 
   const SelectComponent = isCreatable ? CreatableSelect : Select;
-
+  let callbacks = {};
+  if (isObjectBased) {
+    callbacks = { getOptionLabel: item => item.name, getOptionValue: item => item._id }
+  } else if (isStringBased) {
+    callbacks = { getOptionLabel: item => item, getOptionValue: item => item };
+  }
   return (
     <SelectComponent
       options={options}
-      getOptionLabel={item => item.name}
-      getOptionValue={item => item._id}
+      {...callbacks}
       isClearable={isClearable}
       isMulti={isMulti}
       closeMenuOnSelect={!isMulti}

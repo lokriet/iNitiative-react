@@ -18,7 +18,7 @@ import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 
 const Features = props => {
   const [saveCallbacks, setSaveCallbacks] = useState({});
-  const [changedFeaturesCount, setChangedFeaturesCount] = useState(0);
+  const [changedFeatures, setChangedFeatures] = useState(new Set());
 
   const dispatch = useDispatch();
   const allFeatures = props.isHomebrew
@@ -96,12 +96,18 @@ const Features = props => {
     setFilteredFeatures(filteredItems);
   }, []);
 
-  const handleUnsavedChangesStateChange = useCallback(hasUnsavedChanges => {
-    setChangedFeaturesCount(previousChangedFeaturesCount => {
-      const result = hasUnsavedChanges
-        ? previousChangedFeaturesCount + 1
-        : previousChangedFeaturesCount - 1;
-      return result;
+  const handleUnsavedChangesStateChange = useCallback((featureId, hasUnsavedChanges) => {
+    setChangedFeatures(previousChangedFeatures => {
+      const newChangedFeatures = new Set(previousChangedFeatures);
+      if (hasUnsavedChanges) {
+        newChangedFeatures.add(featureId);
+      } else {
+        newChangedFeatures.delete(featureId);
+      }
+
+      console.log('new changes count', newChangedFeatures.size);
+
+      return newChangedFeatures;
     });
   }, []);
 
@@ -120,7 +126,7 @@ const Features = props => {
     view = (
       <>
         <Prompt
-          when={changedFeaturesCount > 0}
+          when={changedFeatures.size > 0}
           message="You have unsaved changes. Are you sure you want to leave?"
         />
         <AddFeature
@@ -152,7 +158,7 @@ const Features = props => {
             onCancel={handleCancelChangingFeature}
             onRegisterSaveCallback={handleRegisterSaveCallback}
             onUnregisterSaveCallback={handleUnregisterSaveCallback}
-            onHaveUnsavedChangesStateChange={handleUnsavedChangesStateChange}
+            onHaveUnsavedChangesStateChange={(hasUnsavedChanges) => handleUnsavedChangesStateChange(feature._id.toString(), hasUnsavedChanges)}
             serverError={props.errors[feature._id]}
           />
         ))}

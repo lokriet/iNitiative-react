@@ -14,6 +14,8 @@ import MapSettings from './MapSettings/MapSettings';
 import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
 import IconButton from '../../../../UI/Form/Button/IconButton/IconButton';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
+import AreaEffectsSetup from './AreaEffects/AreaEffectsSetup/AreaEffectsSetup';
+import AreaEffectEdit from './AreaEffects/AreaEffectEdit/AreaEffectEdit';
 
 const Map = ({
   editedEncounter,
@@ -28,7 +30,7 @@ const Map = ({
   const [showSettings, setShowSettings] = useState(false);
 
   const [gridCellSize, setGridCellSize] = useState(null);
-  const [mapImageWidth, setMapImageWidth] = useState(0);
+  const [mapImageSize, setMapImageSize] = useState({ x: 0, y: 0 });
   const [mapImageLoaded, setMapImageLoaded] = useState(false);
   const [dragFromCell, setDragFromCell] = useState(null);
   // const [mapParticipantPositions, setMapParticipantPositions] = useState({});
@@ -43,14 +45,14 @@ const Map = ({
     );
   }, [editedEncounter]);
 
-  const handleMapImageLoaded = useCallback(
-    () => {
-      setMapImageLoaded(true);
-      const mapRect = participantsContainerRef.current.getBoundingClientRect();
-      setMapImageWidth(mapRect.right - mapRect.left);
-    },
-    [],
-  )
+  const handleMapImageLoaded = useCallback(() => {
+    setMapImageLoaded(true);
+    const mapRect = participantsContainerRef.current.getBoundingClientRect();
+    setMapImageSize({
+      x: mapRect.right - mapRect.left,
+      y: mapRect.bottom - mapRect.top
+    });
+  }, []);
 
   useEffect(() => {
     if (hasGrid()) {
@@ -71,18 +73,15 @@ const Map = ({
 
   useEffect(() => {
     if (mapImageLoaded && hasGrid()) {
-      const mapRect = participantsContainerRef.current.getBoundingClientRect();
-      const gridCellWidth =
-        (mapRect.right - mapRect.left) / editedEncounter.map.gridWidth;
-      const gridCellHeight =
-        (mapRect.bottom - mapRect.top) / editedEncounter.map.gridHeight;
+      const gridCellWidth = mapImageSize.x / editedEncounter.map.gridWidth;
+      const gridCellHeight = mapImageSize.y / editedEncounter.map.gridHeight;
 
       const newGridCellSize = { x: gridCellWidth, y: gridCellHeight };
       setGridCellSize(newGridCellSize);
     } else if (mapImageLoaded && editedEncounter && editedEncounter.map) {
       setGridCellSize(null);
     }
-  }, [editedEncounter, mapImageLoaded, hasGrid]);
+  }, [editedEncounter, mapImageLoaded, mapImageSize, hasGrid]);
 
   const isOverMap = useCallback((mouseEvent, mapRect) => {
     return (
@@ -177,7 +176,7 @@ const Map = ({
       if (isOverMap(mouseEvent, mapRect)) {
         let gridPos = null;
 
-        let mapPos = {x: position.x, y: position.y}
+        let mapPos = { x: position.x, y: position.y };
 
         if (hasGrid()) {
           gridPos = getGridCoords(mapPos);
@@ -228,10 +227,17 @@ const Map = ({
     [onMapParticipantChanged]
   );
 
+  const [areaEffect, setAreaEffect] = useState(null);
+
   return (
     <>
       {editedEncounter && editedEncounter.map ? (
-        <div className={classes.Container} style={{width: mapImageWidth + 'px'}}>
+        <div
+          className={classes.Container}
+          style={{ width: mapImageSize.x + 'px' }}
+        >
+          <AreaEffectsSetup onAreaEffectAdd={setAreaEffect} />
+
           <details className={classes.ControlsContailer}>
             <summary>Participants</summary>
             <div className={classes.ControlsInsides}>
@@ -261,7 +267,10 @@ const Map = ({
             </div>
           </details>
 
-          <MapSettings onSettingsChanged={onMapSettingsChanged} showSettings={showSettings} />
+          <MapSettings
+            onSettingsChanged={onMapSettingsChanged}
+            showSettings={showSettings}
+          />
 
           <div className={classes.MapContainer}>
             <img
@@ -274,7 +283,10 @@ const Map = ({
 
             {mapImageLoaded ? (
               <div className={classes.MapSettingsIcon}>
-                <IconButton icon={faCog} onClick={() => setShowSettings(prev => !prev)} />
+                <IconButton
+                  icon={faCog}
+                  onClick={() => setShowSettings(prev => !prev)}
+                />
               </div>
             ) : null}
 
@@ -303,22 +315,10 @@ const Map = ({
                             participant._id.toString() ===
                             participantCoordinate.participantId.toString()
                         )}
-                        // position={
-                        //   mapParticipantPositions[
-                        //     participantCoordinate.participantId
-                        //   ]
-                        // }
                         gridCellSize={gridCellSize}
                         onStartDrag={() =>
                           handleMapParticipantStartDrag(participantCoordinate)
                         }
-                        // onDrag={(mouseEvent, position) =>
-                        //   handleMapParticipantDrag(
-                        //     participantCoordinate,
-                        //     mouseEvent,
-                        //     position
-                        //   )
-                        // }
                         onDrop={(mouseEvent, position) =>
                           handleMapMarticipantDropped(
                             participantCoordinate,
@@ -339,6 +339,14 @@ const Map = ({
                   )
                 : null}
             </div>
+
+            {areaEffect ? (
+              <AreaEffectEdit
+                areaEffect={areaEffect}
+                gridCellSize={gridCellSize}
+                mapImageSize={mapImageSize}
+              />
+            ) : null}
           </div>
         </div>
       ) : null}

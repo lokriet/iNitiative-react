@@ -65,11 +65,15 @@ class Condition extends Component {
       event.target.value !== this.props.condition.name ||
       this.state.descriptionValue !== this.props.condition.description
     ) {
+      if (!this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(true);
+      }
       this.setState({ showSaveButtons: true });
-      this.props.onHaveUnsavedChangesStateChange(true);
     } else if (!this.props.serverError) {
+      if (this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(false);
+      }
       this.setState({ showSaveButtons: false });
-      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 
@@ -80,11 +84,15 @@ class Condition extends Component {
       this.state.nameValue !== this.props.condition.name ||
       event.target.value !== this.props.condition.description
     ) {
+      if (!this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(true);
+      }
       this.setState({ showSaveButtons: true });
-      this.props.onHaveUnsavedChangesStateChange(true);
     } else {
+      if (this.state.showSaveButtons) {
+        this.props.onHaveUnsavedChangesStateChange(false);
+      }
       this.setState({ showSaveButtons: false });
-      this.props.onHaveUnsavedChangesStateChange(false);
     }
   };
 

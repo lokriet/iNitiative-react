@@ -96,6 +96,7 @@ const AddFeature = ({
           <ItemsRow>
             <ItemsRow className={classes.Inputs}>
               <InlineSelect
+                isObjectBased={false}
                 isCreatable
                 isClearable
                 options={featureTypeOptions}

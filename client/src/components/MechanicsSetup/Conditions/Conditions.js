@@ -18,7 +18,7 @@ import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 
 const Conditions = props => {
   const [saveCallbacks, setSaveCallbacks] = useState({});
-  const [changedFeaturesCount, setChangedFeaturesCount] = useState(0);
+  const [changedConditions, setChangedConditions] = useState(new Set());
 
   const dispatch = useDispatch();
   const allConditions = props.isHomebrew
@@ -48,14 +48,22 @@ const Conditions = props => {
     });
   }, []);
 
-  const handleUnsavedChangesStateChange = useCallback(hasUnsavedChanges => {
-    setChangedFeaturesCount(previousChangedFeaturesCount => {
-      const result = hasUnsavedChanges
-        ? previousChangedFeaturesCount + 1
-        : previousChangedFeaturesCount - 1;
-      return result;
-    });
-  }, []);
+  const handleUnsavedChangesStateChange = useCallback(
+    (conditionId, hasUnsavedChanges) => {
+      setChangedConditions(previousChangedConditions => {
+        const newChangedConditions = new Set(previousChangedConditions);
+        if (hasUnsavedChanges) {
+          newChangedConditions.add(conditionId);
+        } else {
+          newChangedConditions.delete(conditionId);
+        }
+        
+        console.log('new changes count', newChangedConditions.size);
+        return newChangedConditions;
+      });
+    },
+    []
+  );
 
   const validateName = useCallback(
     (_id, name) => {
@@ -122,7 +130,7 @@ const Conditions = props => {
     view = (
       <>
         <Prompt
-          when={changedFeaturesCount > 0}
+          when={changedConditions.size > 0}
           message="You have unsaved changes. Are you sure you want to leave?"
         />
         <AddCondition
@@ -154,7 +162,12 @@ const Conditions = props => {
             onCancel={handleCancelChangingCondition}
             onRegisterSaveCallback={handleRegisterSaveCallback}
             onUnregisterSaveCallback={handleUnregisterSaveCallback}
-            onHaveUnsavedChangesStateChange={handleUnsavedChangesStateChange}
+            onHaveUnsavedChangesStateChange={hasUnsavedChanges =>
+              handleUnsavedChangesStateChange(
+                condition._id.toString(),
+                hasUnsavedChanges
+              )
+            }
             serverError={props.errors[condition._id]}
           />
         ))}
