@@ -9,6 +9,7 @@ import { useDispatch, connect } from 'react-redux';
 import * as actions from '../../../../../store/actions';
 import Error from '../../../../UI/Errors/Error/Error';
 import ServerError from '../../../../UI/Errors/ServerError/ServerError';
+import { EditedEncounterAction } from '../../../../../store/actions';
 
 const emptyFunc = () => {};
 const Summon = props => {
@@ -85,34 +86,37 @@ const Summon = props => {
         }
 
         console.log('validated summon', validationErrors);
-
-        setValidationErrors(validationErrors);
-        if (validationErrors.length > 0) {
-          return;
-        }
-
-        setSubmitAttempted(true);
-        const participantsToSave = summonedParticipants.map(participant => {
-          let newParticipant = { ...participant };
-          delete newParticipant._tempId;
-          return newParticipant;
-        });
-
-        const updatedEncounter = {
-          ...props.editedEncounter,
-          participants: [
-            ...props.editedEncounter.participants,
-            ...participantsToSave
-          ]
-        };
-        dispatch(
-          actions.editEncounter(
-            props.editedEncounter._id,
-            updatedEncounter,
-            true
-          )
-        );
       }
+
+      setValidationErrors(validationErrors);
+      if (validationErrors.length > 0) {
+        return;
+      }
+
+      setSubmitAttempted(true);
+      const participantsToSave = summonedParticipants.map(participant => {
+        let newParticipant = { ...participant };
+        delete newParticipant._tempId;
+        return newParticipant;
+      });
+
+      const updatedEncounter = {
+        ...props.editedEncounter,
+        participants: [
+          ...props.editedEncounter.participants,
+          ...participantsToSave
+        ]
+      };
+
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          updatedEncounter,
+          {
+            editedEncounterAction: EditedEncounterAction.Set
+          }
+        )
+      );
     },
     [summonedParticipants, props.editedEncounter, dispatch]
   );

@@ -30,7 +30,10 @@ const mapValidationSchema = Joi.object()
     gridColor: Joi.string()
       .regex(/^#[0-9a-f]{6}/i)
       .optional(),
-    showGrid: Joi.bool().optional(),
+    showGrid: Joi.bool().required(),
+    showInfo: Joi.bool().required(),
+    showDead: Joi.bool().required(),
+    snapToGrid: Joi.bool().required(),
     participantCoordinates: Joi.array()
       .items(
         Joi.object()

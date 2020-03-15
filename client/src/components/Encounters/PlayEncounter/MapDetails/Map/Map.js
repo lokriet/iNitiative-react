@@ -12,6 +12,8 @@ import MapParticipant from './MapParticipant/MapParticipant';
 import classes from './Map.module.css';
 import MapSettings from './MapSettings/MapSettings';
 import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
+import IconButton from '../../../../UI/Form/Button/IconButton/IconButton';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 
 const Map = ({
   editedEncounter,
@@ -20,18 +22,16 @@ const Map = ({
   onMapParticipantDeleted,
   onMapSettingsChanged
 }) => {
-  const [mapSettings, setMapSettings] = useState(null);
-
   const [horizontalIndices, setHorizontalIndices] = useState([]);
   const [verticalIndices, setVerticalIndices] = useState([]);
 
+  const [showSettings, setShowSettings] = useState(false);
+
   const [gridCellSize, setGridCellSize] = useState(null);
+  const [mapImageWidth, setMapImageWidth] = useState(0);
   const [mapImageLoaded, setMapImageLoaded] = useState(false);
-
   const [dragFromCell, setDragFromCell] = useState(null);
-
-  const [mapParticipantPositions, setMapParticipantPositions] = useState({});
-
+  // const [mapParticipantPositions, setMapParticipantPositions] = useState({});
   const participantsContainerRef = useRef();
 
   const hasGrid = useCallback(() => {
@@ -43,27 +43,14 @@ const Map = ({
     );
   }, [editedEncounter]);
 
-  useEffect(() => {
-    if (!mapSettings && editedEncounter && editedEncounter.map) {
-      setMapSettings({
-        gridColor: editedEncounter.map.gridColor,
-        snapToGrid: true,
-        showGrid: editedEncounter.map.showGrid,
-        showInfo: true,
-        showDead: false,
-        gridWidth: editedEncounter.map.gridWidth,
-        gridHeight: editedEncounter.map.gridHeight
-      });
-    }
-  }, [editedEncounter, mapSettings]);
-
-  const handleMapSettingsChanged = useCallback(
-    newSettings => {
-      setMapSettings(newSettings);
-      onMapSettingsChanged(newSettings);
+  const handleMapImageLoaded = useCallback(
+    () => {
+      setMapImageLoaded(true);
+      const mapRect = participantsContainerRef.current.getBoundingClientRect();
+      setMapImageWidth(mapRect.right - mapRect.left);
     },
-    [onMapSettingsChanged]
-  );
+    [],
+  )
 
   useEffect(() => {
     if (hasGrid()) {
@@ -90,7 +77,10 @@ const Map = ({
       const gridCellHeight =
         (mapRect.bottom - mapRect.top) / editedEncounter.map.gridHeight;
 
-      setGridCellSize({ x: gridCellWidth, y: gridCellHeight });
+      const newGridCellSize = { x: gridCellWidth, y: gridCellHeight };
+      setGridCellSize(newGridCellSize);
+    } else if (mapImageLoaded && editedEncounter && editedEncounter.map) {
+      setGridCellSize(null);
     }
   }, [editedEncounter, mapImageLoaded, hasGrid]);
 
@@ -131,10 +121,17 @@ const Map = ({
       const mapRect = participantsContainerRef.current.getBoundingClientRect();
       if (isOverMap(mouseEvent, mapRect)) {
         const avatarRect = mouseEvent.target.getBoundingClientRect();
-        const mapPos = getMapCoords(mapRect, avatarRect);
+        let mapPos = getMapCoords(mapRect, avatarRect);
 
         if (hasGrid()) {
           gridPos = getGridCoords(mapPos);
+
+          if (editedEncounter.map.snapToGrid) {
+            mapPos = {
+              x: gridPos.x * gridCellSize.x,
+              y: gridPos.y * gridCellSize.y
+            };
+          }
         }
 
         const newMapParticipant = {
@@ -157,12 +154,13 @@ const Map = ({
       hasGrid,
       isOverMap,
       getGridCoords,
-      getMapCoords
+      getMapCoords,
+      editedEncounter,
+      gridCellSize
     ]
   );
 
   const handleMapParticipantStartDrag = useCallback(participantCoordinate => {
-    console.log('started dragging', participantCoordinate);
     if (participantCoordinate.gridX && participantCoordinate.gridY) {
       setDragFromCell({
         x: participantCoordinate.gridX,
@@ -170,19 +168,6 @@ const Map = ({
       });
     }
   }, []);
-
-  const handleMapParticipantDrag = useCallback(
-    (participantCoordinate, mouseEvent, position) => {
-      setMapParticipantPositions(prevPositions => ({
-        ...prevPositions,
-        [participantCoordinate.participantId]: {
-          x: position.x,
-          y: position.y
-        }
-      }));
-    },
-    []
-  );
 
   const handleMapMarticipantDropped = useCallback(
     (participantCoordinate, mouseEvent, position) => {
@@ -192,27 +177,18 @@ const Map = ({
       if (isOverMap(mouseEvent, mapRect)) {
         let gridPos = null;
 
-        const avatarRect = mouseEvent.target.getBoundingClientRect();
-        let mapPos = getMapCoords(mapRect, avatarRect);
+        let mapPos = {x: position.x, y: position.y}
 
         if (hasGrid()) {
           gridPos = getGridCoords(mapPos);
 
-          if (mapSettings.snapToGrid) {
+          if (editedEncounter.map.snapToGrid) {
             mapPos = {
               x: gridPos.x * gridCellSize.x,
               y: gridPos.y * gridCellSize.y
             };
           }
         }
-
-        setMapParticipantPositions(prevPositions => ({
-          ...prevPositions,
-          [participantCoordinate.participantId]: {
-            x: mapPos.x,
-            y: mapPos.y
-          }
-        }));
 
         const newCoordinates = {
           ...participantCoordinate,
@@ -221,27 +197,22 @@ const Map = ({
           gridX: gridPos ? horizontalIndices[gridPos.x] : null,
           gridY: gridPos ? verticalIndices[gridPos.y] : null
         };
+        console.log('new coordinates calculated on drop', mapPos);
         onMapParticipantChanged(newCoordinates);
       } else {
         onMapParticipantDeleted(participantCoordinate.participantId);
-        setMapParticipantPositions(prevPositions => {
-          let newPositions = { ...prevPositions };
-          delete newPositions[participantCoordinate.participantId];
-          return newPositions;
-        });
       }
     },
     [
       isOverMap,
       getGridCoords,
-      getMapCoords,
       hasGrid,
       horizontalIndices,
       verticalIndices,
       onMapParticipantChanged,
       onMapParticipantDeleted,
       gridCellSize,
-      mapSettings
+      editedEncounter
     ]
   );
 
@@ -254,47 +225,58 @@ const Map = ({
       };
       onMapParticipantChanged(newCoordinates);
     },
-    [onMapParticipantChanged],
-  )
+    [onMapParticipantChanged]
+  );
 
   return (
     <>
-    
       {editedEncounter && editedEncounter.map ? (
-        <div className={classes.Container}>
-          <ItemsRow className={classes.Controls}>
-            {mapImageLoaded
-              ? editedEncounter.participants.map(participant => (
-                  <AddMapParticipant
-                    key={participant._id}
-                    participant={participant}
-                    isOnMap={editedEncounter.map.participantCoordinates.some(
-                      coordinate =>
-                        coordinate.participantId.toString() ===
-                        participant._id.toString()
-                    )}
-                    dropContainerRef={participantsContainerRef}
-                    onDropped={(mouseEvent, position) =>
-                      handleNewParticipantDropped(
-                        participant,
-                        mouseEvent,
-                        position
-                      )
-                    }
-                  />
-                ))
-              : null}
-          </ItemsRow>
+        <div className={classes.Container} style={{width: mapImageWidth + 'px'}}>
+          <details className={classes.ControlsContailer}>
+            <summary>Participants</summary>
+            <div className={classes.ControlsInsides}>
+              <ItemsRow className={classes.Controls}>
+                {mapImageLoaded
+                  ? editedEncounter.participants.map(participant => (
+                      <AddMapParticipant
+                        key={participant._id}
+                        participant={participant}
+                        isOnMap={editedEncounter.map.participantCoordinates.some(
+                          coordinate =>
+                            coordinate.participantId.toString() ===
+                            participant._id.toString()
+                        )}
+                        dropContainerRef={participantsContainerRef}
+                        onDropped={(mouseEvent, position) =>
+                          handleNewParticipantDropped(
+                            participant,
+                            mouseEvent,
+                            position
+                          )
+                        }
+                      />
+                    ))
+                  : null}
+              </ItemsRow>
+            </div>
+          </details>
 
+          <MapSettings onSettingsChanged={onMapSettingsChanged} showSettings={showSettings} />
 
           <div className={classes.MapContainer}>
             <img
               src={editedEncounter.map.mapUrl}
               alt="Map"
               className={classes.MapImage}
-              onLoad={() => setMapImageLoaded(true)}
+              onLoad={handleMapImageLoaded}
               onError={() => setMapImageLoaded(false)}
             />
+
+            {mapImageLoaded ? (
+              <div className={classes.MapSettingsIcon}>
+                <IconButton icon={faCog} onClick={() => setShowSettings(prev => !prev)} />
+              </div>
+            ) : null}
 
             {mapImageLoaded && hasGrid() ? (
               <Grid
@@ -321,22 +303,22 @@ const Map = ({
                             participant._id.toString() ===
                             participantCoordinate.participantId.toString()
                         )}
-                        position={
-                          mapParticipantPositions[
-                            participantCoordinate.participantId
-                          ]
-                        }
+                        // position={
+                        //   mapParticipantPositions[
+                        //     participantCoordinate.participantId
+                        //   ]
+                        // }
                         gridCellSize={gridCellSize}
                         onStartDrag={() =>
                           handleMapParticipantStartDrag(participantCoordinate)
                         }
-                        onDrag={(mouseEvent, position) =>
-                          handleMapParticipantDrag(
-                            participantCoordinate,
-                            mouseEvent,
-                            position
-                          )
-                        }
+                        // onDrag={(mouseEvent, position) =>
+                        //   handleMapParticipantDrag(
+                        //     participantCoordinate,
+                        //     mouseEvent,
+                        //     position
+                        //   )
+                        // }
                         onDrop={(mouseEvent, position) =>
                           handleMapMarticipantDropped(
                             participantCoordinate,
@@ -344,31 +326,20 @@ const Map = ({
                             position
                           )
                         }
-                        onInfoPosChanged={(newInfoPos) =>
+                        onInfoPosChanged={newInfoPos =>
                           handleMapParticipantInfoDropped(
                             participantCoordinate,
                             newInfoPos
                           )
                         }
-                        showDead={mapSettings.showDead}
-                        showInfo={mapSettings.showInfo}
+                        showDead={editedEncounter.map.showDead}
+                        showInfo={editedEncounter.map.showInfo}
                       />
                     )
                   )
                 : null}
             </div>
-
-            {mapImageLoaded && mapSettings ? (
-              <div className={classes.MapSettings}>
-                <MapSettings
-                  mapSettings={mapSettings}
-                  onSettingsChanged={handleMapSettingsChanged}
-                />
-              </div>
-            ) : null}
           </div>
-
-          
         </div>
       ) : null}
     </>

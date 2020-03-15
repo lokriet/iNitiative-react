@@ -11,42 +11,51 @@ const MapParticipant = ({
   participantCoordinates,
   gridCellSize,
   onStartDrag,
-  onDrag,
   onDrop,
   onInfoPosChanged,
   showDead,
-  showInfo,
-  position
+  showInfo
 }) => {
-  const [width, setWidth] = useState(`${participant.mapSize}rem`);
-  const [height, setHeight] = useState(`${participant.mapSize}rem`);
+  const [width, setWidth] = useState(`${participant.mapSize * 2}rem`);
+  const [height, setHeight] = useState(`${participant.mapSize * 2}rem`);
+
+  const [isDragging, setIsDragging] = useState(false);
 
   const [combinedInfoPosition, setCombinedInfoPosition] = useState({
     x: participantCoordinates.infoX + participantCoordinates.mapX,
     y: participantCoordinates.infoY + participantCoordinates.mapY
   });
 
+  const [position, setPosition] = useState({
+    x: participantCoordinates.mapX,
+    y: participantCoordinates.mapY
+  });
+
   useEffect(() => {
-    setCombinedInfoPosition({
-      x:
-        participantCoordinates.infoX +
-        (position ? position.x : participantCoordinates.mapX),
-      y:
-        participantCoordinates.infoY +
-        (position ? position.y : participantCoordinates.mapY)
-    });
+    console.log('coords changed in map participant', participantCoordinates.mapX, participantCoordinates.mapY);
+    if (!isDragging) {
+      setPosition({
+        x: participantCoordinates.mapX,
+        y: participantCoordinates.mapY
+      });
+
+      setCombinedInfoPosition({
+        x: participantCoordinates.infoX + participantCoordinates.mapX,
+        y: participantCoordinates.infoY + participantCoordinates.mapY
+      });
+    }
   }, [
-    participantCoordinates.infoX,
-    participantCoordinates.infoY,
-    position,
-    participantCoordinates.mapX,
-    participantCoordinates.mapY
+    isDragging,
+    participantCoordinates
   ]);
 
   useEffect(() => {
     if (gridCellSize) {
       setWidth(`${gridCellSize.x * participant.mapSize}px`);
       setHeight(`${gridCellSize.y * participant.mapSize}px`);
+    } else {
+      setWidth(`${participant.mapSize * 2}rem`);
+      setHeight(`${participant.mapSize * 2}rem`);
     }
   }, [gridCellSize, participant.mapSize]);
 
@@ -57,7 +66,6 @@ const MapParticipant = ({
   const handleInfoDrop = useCallback(
     (mouseEvent, position) => {
       setCombinedInfoPosition({ x: position.x, y: position.y });
-      console.log('info pos changed in map participant');
       onInfoPosChanged({
         x: position.x - participantCoordinates.mapX,
         y: position.y - participantCoordinates.mapY
@@ -66,25 +74,44 @@ const MapParticipant = ({
     [participantCoordinates.mapX, participantCoordinates.mapY, onInfoPosChanged]
   );
 
+  const handleStartAvatarDrag = useCallback(
+    (mouseEvent, position) => {
+      setIsDragging(true);
+      onStartDrag(mouseEvent, position);
+    },
+    [onStartDrag]
+  );
+
+  const handleAvatarDrag = useCallback((mouseEvent, position) => {
+    setPosition(position.x, position.y);
+  }, []);
+
+  const handleDropAvatar = useCallback(
+    (mouseEvent, position) => {
+      setIsDragging(false);
+      setCombinedInfoPosition({
+        x: participantCoordinates.infoX + position.x,
+        y: participantCoordinates.infoY + position.y
+      });
+      onDrop(mouseEvent, position);
+    },
+    [onDrop, participantCoordinates.infoX, participantCoordinates.infoY]
+  );
+
   return !showDead && participant.currentHp <= 0 ? null : (
     <div className={classes.Container}>
       <Draggable
-        onStart={onStartDrag}
-        onStop={onDrop}
-        onDrag={onDrag}
-        position={
-          position || {
-            x: participantCoordinates.mapX,
-            y: participantCoordinates.mapY
-          }
-        }
+        onStart={handleStartAvatarDrag}
+        onStop={handleDropAvatar}
+        onDrag={handleAvatarDrag}
+        position={position}
       >
         <div className={classes.DraggableAvatar}>
           <MapAvatar participant={participant} width={width} height={height} />
         </div>
       </Draggable>
 
-      {showInfo ? (
+      {showInfo && !isDragging ? (
         <Draggable
           position={combinedInfoPosition}
           onDrag={handleInfoDrag}
@@ -113,7 +140,6 @@ MapParticipant.propTypes = {
   participantCoordinates: PropTypes.object.isRequired,
   gridCellSize: PropTypes.object,
   onStartDrag: PropTypes.func.isRequired,
-  onDrag: PropTypes.func.isRequired,
   onDrop: PropTypes.func.isRequired,
   onInfoPosChanged: PropTypes.func.isRequired,
   showDead: PropTypes.bool,

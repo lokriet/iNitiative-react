@@ -46,6 +46,8 @@ table {
   box-sizing: border-box;
 }
 
+summary:focus,
+summary:active,
 button:active,
 button:focus,
 input:focus,

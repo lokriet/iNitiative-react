@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import Button from '../../../UI/Form/Button/Button';
@@ -11,6 +11,9 @@ import * as actions from '../../../../store/actions';
 import { EditedEncounterAction } from '../../../../store/actions';
 import { isEmpty } from '../../../../util/helper-methods';
 import Map from './Map/Map';
+import classes from './MapDetails.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
 const MapDetails = props => {
   const dispatch = useDispatch();
@@ -54,6 +57,10 @@ const MapDetails = props => {
               ...mapInfo,
               gridColor: '#aaaaaa',
               showGrid:
+                !isEmpty(mapInfo.gridWidth) && !isEmpty(mapInfo.gridHeight),
+              showInfo: true,
+              showDead: false,
+              snapToGrid:
                 !isEmpty(mapInfo.gridWidth) && !isEmpty(mapInfo.gridHeight),
 
               participantCoordinates: []
@@ -149,17 +156,14 @@ const MapDetails = props => {
   );
 
   const handleMapSettingsChanged = useCallback(
-    (mapSettings) => {
+    mapSettings => {
       dispatch(
         actions.editEncounter(
           props.editedEncounter._id,
           {
             map: {
               ...props.editedEncounter.map,
-              gridColor: mapSettings.gridColor,
-              gridWidth: mapSettings.gridWidth,
-              gridHeight: mapSettings.gridHeight,
-              showGrid: mapSettings.showGrid
+              ...mapSettings
             }
           },
           {
@@ -170,8 +174,20 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter],
-  )
+    [dispatch, props.editedEncounter]
+  );
+
+  const handleAttemptErrorFix = useCallback(() => {
+    dispatch(
+      actions.editEncounter(
+        props.editedEncounter._id,
+        {
+          ...props.editedEncounter
+        },
+        { editedEncounterAction: EditedEncounterAction.Set }
+      )
+    );
+  }, [dispatch, props.editedEncounter]);
 
   let view;
   if (!props.editedEncounter && !props.fetchingEncounterError) {
@@ -180,8 +196,33 @@ const MapDetails = props => {
     view = <ServerError serverError={props.fetchingEncounterError} />;
   } else {
     view = (
-      <div>
-        <ItemsRow>
+      <div className={classes.Container}>
+        {props.saveError ? (
+          <div className={classes.SavingError}>
+            <div className={classes.SavingErrorText}>
+              <FontAwesomeIcon
+                icon={faExclamationTriangle}
+                className={classes.SavingErrorIcon}
+              />
+              {` An error occured while saving changes to database. 
+
+Check your Internet connection and try 'attempt fix' button below. If the problem persists contact our hardworking developers.
+
+Please note, you can continue working, but if you reload the page before the problem is fixed, all unsaved changes will be lost.`}
+            </div>
+            <br />
+            <div>
+              <Button onClick={handleAttemptErrorFix}>Attempt fix</Button>
+            </div>
+          </div>
+        ) : null}
+        <Map
+          onMapSettingsChanged={handleMapSettingsChanged}
+          onMapParticipantAdded={handleAddParticipantOnMap}
+          onMapParticipantChanged={handleMapParticipantChanged}
+          onMapParticipantDeleted={handleMapParticipantDeleted}
+        />
+        <ItemsRow className={classes.Buttons}>
           <LoadMap onNewMapLoaded={handleNewMapUploaded} />
           <Popup
             modal
@@ -201,12 +242,6 @@ const MapDetails = props => {
             )}
           </Popup>
         </ItemsRow>
-        <Map
-          onMapSettingsChanged={handleMapSettingsChanged}
-          onMapParticipantAdded={handleAddParticipantOnMap}
-          onMapParticipantChanged={handleMapParticipantChanged}
-          onMapParticipantDeleted={handleMapParticipantDeleted}
-        />
       </div>
     );
   }

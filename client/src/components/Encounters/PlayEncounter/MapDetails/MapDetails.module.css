@@ -1,0 +1,21 @@
+.Container {
+  margin: auto;
+  width: fit-content;
+}
+
+.Buttons {
+  margin: 2rem 0 0 2rem;
+}
+
+
+.SavingError {
+  margin: 1rem 0;
+}
+
+.SavingErrorText {
+  white-space: pre-wrap;
+}
+
+.SavingErrorIcon {
+  color: #791010;
+}

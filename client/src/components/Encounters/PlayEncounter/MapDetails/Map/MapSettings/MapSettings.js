@@ -1,131 +1,136 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
-import Popup from 'reactjs-popup';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import FormikInput from '../../../../../UI/Form/Input/FormikInput/FormikInput';
 
 import classes from './MapSettings.module.css';
-import Button from '../../../../../UI/Form/Button/Button';
 import ItemsRow from '../../../../../UI/ItemsRow/ItemsRow';
+import { connect } from 'react-redux';
+import { CSSTransition } from 'react-transition-group';
+import InlineInput from '../../../../../UI/Form/Input/InlineInput/InlineInput';
+import { isEmpty } from '../../../../../../util/helper-methods';
 
-const MapSettings = ({ mapSettings, onSettingsChanged }) => {
-  const handleSubmit = useCallback(
-    (formValues, close) => {
-      onSettingsChanged(formValues);
-      close();
+const MapSettings = ({ editedEncounter, onSettingsChanged, showSettings }) => {
+  const handleSettingsChanged = useCallback(
+    (settingName, settingValue) => {
+      onSettingsChanged({ [settingName]: settingValue });
     },
     [onSettingsChanged]
   );
 
+  const handleGridSizeChanged = useCallback(
+    (settingName, settingValue) => {
+      if (!isEmpty(settingValue) && (settingValue <= 0 || settingValue > 1000)) {
+        return;
+      }
+      onSettingsChanged({ [settingName]: settingValue })
+    },
+    [onSettingsChanged],
+  )
+
   return (
-    <Popup
-      on="click"
-      trigger={open => (
-        <div className={classes.SettingsButton}>
-          <FontAwesomeIcon icon={faCog} />
-        </div>
-      )}
-      position="bottom left"
-      offsetX={15}
-      arrow={false}
-      contentStyle={{ width: 'auto' }}
+    <CSSTransition
+      in={showSettings}
+      timeout={300}
+      classNames="MapSettings"
+      unmountOnExit
     >
-      {close => (
-        <Formik
-          initialValues={mapSettings}
-          validationSchema={Yup.object({
-            gridColor: Yup.string().nullable(true),
-            snapToGrid: Yup.bool(),
-            showGrid: Yup.bool(),
-            showInfo: Yup.bool(),
-            showDead: Yup.bool(),
-            girdWidth: Yup.number()
-              .min(1, 'Grid size should be positive')
-              .max(1000)
-              .nullable(true),
-            gridHeight: Yup.number()
-              .min(1, 'Grid size should be positive')
-              .max(1000)
-              .nullable(true)
-          })}
-          onSubmit={values => handleSubmit(values, close)}
-        >
-          {formProps => (
-            <Form className={classes.MapSettingsForm}>
-              <div className={classes.FormHeader}>Map settings</div>
+      <ItemsRow alignCentered className={classes.MapSettings}>
+        <label>Grid color: </label>
+        <input
+          type="color"
+          value={editedEncounter.map.gridColor}
+          onChange={event =>
+            handleSettingsChanged('gridColor', event.target.value)
+          }
+        />
 
-              <ItemsRow alignCentered className={classes.FullRow}>
-                <label htmlFor="gridColor">Grid color</label>
-                <Field type="color" name="gridColor" id="gridColor" />
-              </ItemsRow>
+        <span>
+          <input
+            type="checkbox"
+            id="showGrid"
+            checked={editedEncounter.map.showGrid}
+            onChange={event =>
+              handleSettingsChanged('showGrid', event.target.checked)
+            }
+          />
+          <label htmlFor="showGrid">Show grid</label>
+        </span>
 
-              <div>
-                <Field type="checkbox" name="snapToGrid" id="snapToGrid" />
-                <label htmlFor="snapToGrid">Snap to grid</label>
-              </div>
-              <div>
-                <Field type="checkbox" name="showGrid" id="showGrid" />
-                <label htmlFor="showGrid">Show grid</label>
-              </div>
-              <div>
-                <Field type="checkbox" name="showInfo" id="showInfo" />
-                <label htmlFor="showInfo">Show info</label>
-              </div>
-              <div>
-                <Field type="checkbox" name="showDead" id="showDead" />
-                <label htmlFor="showDead">Show dead</label>
-              </div>
+        <span>
+          <input
+            type="checkbox"
+            id="snapToGrid"
+            checked={editedEncounter.map.snapToGrid}
+            onChange={event =>
+              handleSettingsChanged('snapToGrid', event.target.checked)
+            }
+          />
+          <label htmlFor="snapToGrid">Snap to grid</label>
+        </span>
 
-              <ItemsRow className={classes.FullRow} alignCentered>
-                <label htmlFor="gridWidth">Grid size</label>
+        <span>
+          <input
+            type="checkbox"
+            id="showInfo"
+            checked={editedEncounter.map.showInfo}
+            onChange={event =>
+              handleSettingsChanged('showInfo', event.target.checked)
+            }
+          />
+          <label htmlFor="showInfo">Show info</label>
+        </span>
 
-                <ItemsRow alignCentered>
-                  <label htmlFor="gridWidth">W: </label>
-                  <Field
-                    type="number"
-                    min={1}
-                    max={1000}
-                    id="gridWidth"
-                    name="gridWidth"
-                    hidingBorder
-                    className={classes.ShortInput}
-                    component={FormikInput}
-                  />
-                </ItemsRow>
+        <span>
+          <input
+            type="checkbox"
+            id="showDead"
+            checked={editedEncounter.map.showDead}
+            onChange={event =>
+              handleSettingsChanged('showDead', event.target.checked)
+            }
+          />
+          <label htmlFor="showDead">Show dead</label>
+        </span>
 
-                <ItemsRow alignCentered>
-                  <label htmlFor="gridHeight">H: </label>
-                  <Field
-                    type="number"
-                    min={1}
-                    max={1000}
-                    id="gridHeight"
-                    name="gridHeight"
-                    hidingBorder
-                    className={classes.ShortInput}
-                    component={FormikInput}
-                  />
-                </ItemsRow>
-              </ItemsRow>
-
-              <ItemsRow className={classes.FormButtons}>
-                <Button type="submit">Ok</Button>
-                <Button onClick={close}>Cancel</Button>
-              </ItemsRow>
-            </Form>
-          )}
-        </Formik>
-      )}
-    </Popup>
+        <label>Grid size:</label>
+        <span>
+          <label htmlFor="gridWidth">W </label>
+          <InlineInput
+            hidingBorder
+            type="number"
+            id="gridWidth"
+            min={0}
+            max={1000}
+            className={classes.ShortInput}
+            value={editedEncounter.map.gridWidth || ''}
+            onChange={event => handleGridSizeChanged('gridWidth', event.target.value)}
+          />
+        </span>
+        <span>
+          <label htmlFor="gridHeight">H </label>
+          <InlineInput
+            hidingBorder
+            type="number"
+            id="gridHeight"
+            min={0}
+            max={1000}
+            className={classes.ShortInput}
+            value={editedEncounter.map.gridHeight || ''}
+            onChange={event => handleGridSizeChanged('gridHeight', event.target.value)}
+          />
+        </span>
+      </ItemsRow>
+    </CSSTransition>
   );
 };
 
 MapSettings.propTypes = {
-  onSettingsChanged: PropTypes.func.isRequired,
-  mapSettings: PropTypes.object.isRequired
+  onSettingsChanged: PropTypes.func.isRequired
 };
 
-export default MapSettings;
+const mapStateToProps = state => {
+  return {
+    editedEncounter: state.encounter.editedEncounter
+  };
+};
+
+export default connect(mapStateToProps)(MapSettings);

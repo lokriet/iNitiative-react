@@ -84,7 +84,22 @@ const mapSchema = new Schema({
   gridWidth: Number,
   gridHeight: Number,
   gridColor: String,
-  showGrid: Boolean,
+  showGrid: {
+    type: Boolean,
+    required: true
+  },
+  showInfo: {
+    type: Boolean,
+    required: true
+  },
+  showDead: {
+    type: Boolean,
+    required: true
+  },
+  snapToGrid: {
+    type: Boolean,
+    required: true
+  },
   participantCoordinates: [
     {
       participantId: {
