@@ -50,12 +50,11 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
 
           <Popup
             trigger={open => <IconButton icon={faTimes} />}
-            position="right center"
             modal
-            offsetX={20}
             arrow={false}
             closeOnDocumentClick={false}
             closeOnEscape={false}
+            contentStyle={{width: 'auto'}}
           >
             {close => (
               <>
@@ -67,8 +66,8 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
                   <Spinner />
                 ) : (
                   <ItemsRow centered>
-                    <Button onClick={() => handleCancelDelete(close)}>Cancel</Button>
                     <Button onClick={handleConfirmDelete}>Delete!</Button>
+                    <Button onClick={() => handleCancelDelete(close)}>NO!</Button>
                   </ItemsRow>
                 )}
               </>

@@ -2,7 +2,7 @@ import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 
 export const ParticipantTemplateActionTypes = {
-  START_PARTICIPANT_TEMPLATE_OPERATION: 'START_PARTICIPANT_TEMPLATE_OPERATION',
+  RESET_PARTICIPANT_TEMPLATE_OPERATION: 'RESET_PARTICIPANT_TEMPLATE_OPERATION',
   ADD_PARTICIPANT_TEMPLATE_SUCCESS: 'ADD_PARTICIPANT_TEMPLATE_SUCCESS',
   UPDATE_PARTICIPANT_TEMPLATE_SUCCESS: 'UPDATE_PARTICIPANT_TEMPLATE_SUCCESS',
   DELETE_PARTICIPANT_TEMPLATE_SUCCESS: 'DELETE_PARTICIPANT_TEMPLATE_SUCCESS',
@@ -247,9 +247,9 @@ export const getParticipantTemplateById = (templateId) => {
   };
 };
 
-export const startParticipantTemplateOperation = () => {
+export const resetParticipantTemplateOperation = () => {
   return {
-    type: ParticipantTemplateActionTypes.START_PARTICIPANT_TEMPLATE_OPERATION
+    type: ParticipantTemplateActionTypes.RESET_PARTICIPANT_TEMPLATE_OPERATION
   };
 };
 
@@ -274,10 +274,9 @@ export const deleteParticipantTemplateSuccess = participantTemplateId => {
   };
 };
 
-export const participantTemplateOperationFailed = (participantTemplateId, error) => {
+export const participantTemplateOperationFailed = (error) => {
   return {
     type: ParticipantTemplateActionTypes.PARTICIPANT_TEMPLATE_OPERATION_FAILED,
-    participantTemplateId,
     error
   };
 };

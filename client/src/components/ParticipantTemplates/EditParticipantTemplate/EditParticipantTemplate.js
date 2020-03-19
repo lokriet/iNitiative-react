@@ -31,7 +31,7 @@ const EditParticipantTemplate = props => {
   const [damageTypes, combined, features] = useDropdownValues();
 
   useEffect(() => {
-    dispatch(actions.startParticipantTemplateOperation());
+    dispatch(actions.resetParticipantTemplateOperation());
     if (editMode) {
       dispatch(actions.getParticipantTemplateById(templateId));
     }

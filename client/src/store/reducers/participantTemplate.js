@@ -11,8 +11,8 @@ const initialState = {
 
 const participantTemplatesReducer = (state = initialState, action) => {
   switch (action.type) {
-    case ActionTypes.participantTemplate.START_PARTICIPANT_TEMPLATE_OPERATION:
-      return startParticipantTemplateOperation(state, action);
+    case ActionTypes.participantTemplate.RESET_PARTICIPANT_TEMPLATE_OPERATION:
+      return resetParticipantTemplateOperation(state, action);
 
     case ActionTypes.participantTemplate.ADD_PARTICIPANT_TEMPLATE_SUCCESS:
       return addParticipantTemplateSuccess(state, action);
@@ -43,7 +43,7 @@ const participantTemplatesReducer = (state = initialState, action) => {
   }
 };
 
-const startParticipantTemplateOperation = (state, action) => {
+const resetParticipantTemplateOperation = (state, action) => {
    return {
     ...state,
     error: null,

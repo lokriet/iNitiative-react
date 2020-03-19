@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons';
 
@@ -7,8 +7,34 @@ import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 
 import classes from './ParticipantTemplateRow.module.css';
+import Popup from 'reactjs-popup';
+import Spinner from '../../../UI/Spinner/Spinner';
+import Button from '../../../UI/Form/Button/Button';
+import ServerError from '../../../UI/Errors/ServerError/ServerError';
+import { connect } from 'react-redux';
 
-const ParticipantTemplateRow = ({ template, onEdit, onDelete }) => {
+const ParticipantTemplateRow = ({ template, onEdit, onDelete, onDeleteCancelled, serverError }) => {
+  const [deleting, setDeleting] = useState(false);
+
+  const handleConfirmDelete = useCallback(() => {
+    setDeleting(true);
+    onDelete(template._id);
+  }, [template._id, onDelete]);
+
+  const handleCancelDelete = useCallback(
+    (close) => {
+      onDeleteCancelled();
+      close();
+    },
+    [onDeleteCancelled],
+  )
+
+  useEffect(() => {
+    if (serverError) {
+      setDeleting(false);
+    }
+  }, [serverError])
+  
   return (
     <tr className={classes.ParticipantTemplateRow}>
       <td className={classes.AvatarCell}>
@@ -52,7 +78,33 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete }) => {
       <td>
         <ItemsRow>
           <IconButton icon={faCog} onClick={() => onEdit(template._id)} />
-          <IconButton icon={faTimes} onClick={() => onDelete(template._id)} />
+          {/* <IconButton icon={faTimes} onClick={() => onDelete(template._id)} /> */}
+          <Popup
+            trigger={open => <IconButton icon={faTimes} />}
+            modal
+            arrow={false}
+            closeOnDocumentClick={false}
+            closeOnEscape={false}
+            contentStyle={{width: 'auto'}}
+          >
+            {close => (
+              <>
+                <div className={classes.ModalQuestion}>
+                  Delete participant template ({template.name})?
+                </div>
+                <ServerError serverError={serverError} />
+                <br />
+                {deleting ? (
+                  <Spinner />
+                ) : (
+                  <ItemsRow centered>
+                    <Button onClick={handleConfirmDelete}>Delete!</Button>
+                    <Button onClick={() => handleCancelDelete(close)}>NO!</Button>
+                  </ItemsRow>
+                )}
+              </>
+            )}
+          </Popup>
         </ItemsRow>
       </td>
     </tr>
@@ -62,7 +114,14 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete }) => {
 ParticipantTemplateRow.propTypes = {
   template: PropTypes.object.isRequired,
   onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired
+  onDelete: PropTypes.func.isRequired,
+  onDeleteCancelled: PropTypes.func.isRequired
 };
 
-export default ParticipantTemplateRow;
+const mapStateToProps = state => {
+  return {
+    serverError: state.participantTemplate.error
+  };
+};
+
+export default connect(mapStateToProps)(ParticipantTemplateRow);

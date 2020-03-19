@@ -23,25 +23,37 @@ const ParticipantTemplatesList = props => {
   }, [dispatch]);
 
   useEffect(() => {
-    const allTemplates = props.participantTemplates ? props.participantTemplates.filter(item => item.type === props.type) : [];
+    const allTemplates = props.participantTemplates
+      ? props.participantTemplates.filter(item => item.type === props.type)
+      : [];
     setAllTemplates(allTemplates);
-    setFilteredTemplates(allTemplates)
+    setFilteredTemplates(allTemplates);
   }, [props.type, props.participantTemplates]);
 
   const handleItemsFiltered = useCallback(filteredItems => {
     setFilteredTemplates(filteredItems);
   }, []);
 
-  const handleEditTemplate = useCallback(templateId => {
-    console.log('going to edit template', templateId);
-    history.push(`/templates/edit/${templateId}`)
-  }, [history]);
+  const handleEditTemplate = useCallback(
+    templateId => {
+      console.log('going to edit template', templateId);
+      history.push(`/templates/edit/${templateId}`);
+    },
+    [history]
+  );
 
-  const handleDeleteTemplate = useCallback(templateId => {
-    console.log('going to delete template', templateId);
-    dispatch(actions.deleteParticipantTemplate(templateId));
+  const handleDeleteTemplate = useCallback(
+    templateId => {
+      console.log('going to delete template', templateId);
+      dispatch(actions.deleteParticipantTemplate(templateId));
+    },
+    [dispatch]
+  );
+
+  const handleCancelDeleteTemplate = useCallback(() => {
+    dispatch(actions.resetParticipantTemplateOperation());
   }, [dispatch]);
-  
+
   return (
     <div>
       <div className={classes.SearchRow}>
@@ -77,7 +89,13 @@ const ParticipantTemplatesList = props => {
         </thead>
         <tbody>
           {filteredTemplates.map(item => (
-            <ParticipantTemplateRow key={item._id} template={item} onDelete={handleDeleteTemplate} onEdit={handleEditTemplate} />
+            <ParticipantTemplateRow
+              key={item._id}
+              template={item}
+              onDelete={handleDeleteTemplate}
+              onDeleteCancelled={handleCancelDeleteTemplate}
+              onEdit={handleEditTemplate}
+            />
           ))}
         </tbody>
       </table>
