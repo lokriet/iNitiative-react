@@ -6,41 +6,69 @@ import classes from './AreaEffectEdit.module.css';
 import rotateCursor from '../../../../../../../assets/images/rotate.png';
 import * as aoe from '../aoe-utils';
 import AreaEffect from '../AreaEffect/AreaEffect';
+import { connect } from 'react-redux';
 
 const AreaEffectEdit = ({
   areaEffect,
   gridCellSize,
   mapImageSize,
-  onChange
+  onChange,
+  editedEncounter
 }) => {
   const getShapeWidth = useCallback(() => {
     return (
       areaEffect.gridWidth *
       (gridCellSize ? gridCellSize.x : aoe.defaultSquareSize)
     );
-  }, [areaEffect, gridCellSize]);
+  }, [areaEffect.gridWidth, gridCellSize]);
 
   const getShapeHeight = useCallback(() => {
     return (
       areaEffect.gridHeight *
       (gridCellSize ? gridCellSize.y : aoe.defaultSquareSize)
     );
-  }, [areaEffect, gridCellSize]);
+  }, [areaEffect.gridHeight, gridCellSize]);
 
-  const [position, setPosition] = useState(() => {
+  const snapPosToGrid = useCallback(
+    (pos) => {
+      if (editedEncounter.map.snapToGrid) {
+        const newPos = {
+          x: pos.x - (pos.x % (gridCellSize ? gridCellSize.x : aoe.defaultSquareSize)),
+          y: pos.y - (pos.y % (gridCellSize ? gridCellSize.y : aoe.defaultSquareSize))
+        };
+        return newPos;
+      } else {
+        return pos;
+      }
+    },
+    [editedEncounter, gridCellSize],
+  );
+
+  const getPos = useCallback(() => {
     if (areaEffect.position) {
       return areaEffect.position;
     } else {
+      let newPos;
       if (areaEffect.type === AreaEffectType.Rectangle) {
-        return {
+        newPos = {
           x: (mapImageSize.x - getShapeWidth()) / 2,
           y: (mapImageSize.y - getShapeHeight()) / 2
         };
       } else {
-        return { x: mapImageSize.x / 2, y: mapImageSize.y / 2 };
+        newPos = { x: mapImageSize.x / 2, y: mapImageSize.y / 2 };
       }
+      return snapPosToGrid(newPos);
     }
-  });
+  }, [
+    areaEffect.position,
+    areaEffect.type,
+    mapImageSize,
+    getShapeHeight,
+    getShapeWidth,
+    snapPosToGrid
+  ]);
+
+  const [position, setPosition] = useState(getPos());
 
   const [angle, setAngle] = useState(areaEffect.angle);
 
@@ -56,18 +84,8 @@ const AreaEffectEdit = ({
   );
 
   useEffect(() => {
-    let newPosition;
-    if (areaEffect.position) {
-      newPosition = areaEffect.position;
-    } else {
-      if (areaEffect.type === AreaEffectType.Rectangle) {
-        newPosition = {
-          x: (mapImageSize.x - getShapeWidth()) / 2,
-          y: (mapImageSize.y - getShapeHeight()) / 2
-        };
-      } else {
-        newPosition = { x: mapImageSize.x / 2, y: mapImageSize.y / 2 };
-      }
+    let newPosition = getPos();
+    if (!areaEffect.position) {
       onChange({ ...areaEffect, position: newPosition });
     }
 
@@ -85,7 +103,7 @@ const AreaEffectEdit = ({
         )
       );
     }
-  }, [areaEffect, getShapeWidth, getShapeHeight, mapImageSize, onChange]);
+  }, [areaEffect, getShapeWidth, getShapeHeight, mapImageSize, onChange, getPos]);
 
   const handleShapeDrag = useCallback((mouseEvent, position) => {
     setPosition({ x: position.x, y: position.y });
@@ -129,12 +147,17 @@ const AreaEffectEdit = ({
   );
 
   const handleAreaEffectChanged = useCallback(() => {
+    let newPos = position;
+    if (areaEffect.position.x !== position.x || areaEffect.position.y !== position.y) {
+      newPos = snapPosToGrid(position);
+    }
+
     onChange({
       ...areaEffect,
       angle,
-      position
+      position: newPos
     });
-  }, [angle, areaEffect, onChange, position]);
+  }, [angle, areaEffect, onChange, position, snapPosToGrid]);
 
   let rotator = null;
   if (areaEffect.type === AreaEffectType.Segment) {
@@ -201,4 +224,11 @@ AreaEffectEdit.propTypes = {
   onChange: PropTypes.func.isRequired
 };
 
-export default AreaEffectEdit;
+const mapStateToProps = state => {
+  return {
+    editedEncounter: state.encounter.editedEncounter
+  };
+};
+
+export default connect(mapStateToProps)(AreaEffectEdit);
+
