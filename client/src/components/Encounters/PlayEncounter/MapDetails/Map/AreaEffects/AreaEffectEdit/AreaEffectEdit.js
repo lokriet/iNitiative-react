@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { AreaEffectType } from '../AreaEffectsSetup/AreaEffectsSetup';
+import { AreaEffectType } from '../aoe-utils';
 import Draggable from 'react-draggable';
 import classes from './AreaEffectEdit.module.css';
 import rotateCursor from '../../../../../../../assets/images/rotate.png';
@@ -42,7 +42,7 @@ const AreaEffectEdit = ({
     }
   });
 
-  const [angle, setAngle] = useState(areaEffect.angle * (Math.PI / 180));
+  const [angle, setAngle] = useState(areaEffect.angle);
 
   const [rotatorPosition, setRotatorPosition] = useState(
     aoe.sum(
@@ -54,6 +54,38 @@ const AreaEffectEdit = ({
       { x: mapImageSize.x / 2, y: mapImageSize.y / 2 }
     )
   );
+
+  useEffect(() => {
+    let newPosition;
+    if (areaEffect.position) {
+      newPosition = areaEffect.position;
+    } else {
+      if (areaEffect.type === AreaEffectType.Rectangle) {
+        newPosition = {
+          x: (mapImageSize.x - getShapeWidth()) / 2,
+          y: (mapImageSize.y - getShapeHeight()) / 2
+        };
+      } else {
+        newPosition = { x: mapImageSize.x / 2, y: mapImageSize.y / 2 };
+      }
+      onChange({ ...areaEffect, position: newPosition });
+    }
+
+    setPosition(newPosition);
+
+    if (areaEffect.type === AreaEffectType.Segment) {
+      setRotatorPosition(
+        aoe.sum(
+          aoe.getEllipsePointCoords(
+            getShapeWidth() * aoe.arcRadius,
+            getShapeHeight() * aoe.arcRadius,
+            areaEffect.angle
+          ),
+          newPosition
+        )
+      );
+    }
+  }, [areaEffect, getShapeWidth, getShapeHeight, mapImageSize, onChange]);
 
   const handleShapeDrag = useCallback((mouseEvent, position) => {
     setPosition({ x: position.x, y: position.y });
@@ -67,7 +99,6 @@ const AreaEffectEdit = ({
     (mouseEvent, newPosition) => {
       const x = newPosition.x - position.x;
       const y = newPosition.y - position.y;
-      console.log('x, y', x, y);
 
       let positionAngle;
       if (x === 0) {
@@ -105,7 +136,6 @@ const AreaEffectEdit = ({
     });
   }, [angle, areaEffect, onChange, position]);
 
-  const style = { fill: areaEffect.color, stroke: areaEffect.color };
   let rotator = null;
   if (areaEffect.type === AreaEffectType.Segment) {
     rotator = (
@@ -113,7 +143,7 @@ const AreaEffectEdit = ({
         cx={0}
         cy={0}
         r={3}
-        style={{ ...style, cursor: `url('${rotateCursor}'),grab` }}
+        style={{ cursor: `url('${rotateCursor}'),grab` }}
         className={classes.Rotator}
       />
     );
@@ -125,6 +155,13 @@ const AreaEffectEdit = ({
       className={classes.Container}
     >
       <svg width={mapImageSize.x} height={mapImageSize.y}>
+        <rect
+          x={0}
+          y={0}
+          width={mapImageSize.x}
+          height={mapImageSize.y}
+          className={classes.Background}
+        />
         <Draggable
           position={position}
           onDrag={(mouseEvent, position) =>
@@ -136,6 +173,7 @@ const AreaEffectEdit = ({
             <AreaEffect
               areaEffect={areaEffect}
               angle={angle}
+              highlight
               gridCellSize={gridCellSize}
             />
           </g>

@@ -53,6 +53,7 @@
   white-space: normal;
   position: unset;
   transform: unset;
+  overflow: visible;
 }
 
 :global .InlineSelect__single-value+div .InlineSelect__input {

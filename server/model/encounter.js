@@ -127,6 +127,37 @@ const mapSchema = new Schema({
       gridX: String,
       gridY: String
     }
+  ],
+
+  areaEffects: [
+    {
+      name: String,
+      type: {
+        type: String,
+        required: true
+      },
+      color: {
+        type: String,
+        required: true
+      },
+      gridWidth: {
+        type: Number,
+        required: true
+      },
+      gridHeight: {
+        type: Number,
+        required: true
+      },
+      angle: Number,
+      position: {
+        x: Number,
+        y: Number
+      },
+      followingParticipantId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Encounter.participants'
+      }
+    }
   ]
 });
 

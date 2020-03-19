@@ -18,9 +18,11 @@ const MapControls = ({
   editedEncounter,
   onNewParticipantDropped,
   onMapSettingsChanged,
-  onEditAreaEffect,
-  onSaveAreaEffect,
-  onCancelEditAreaEffect
+
+  editedAreaEffect,
+  onAreaEffectSaved,
+  onAreaEffectChanged,
+  onAreaEffectDeleted
 }) => {
   const [selectedView, setSelectedView] = useState(null);
 
@@ -83,7 +85,12 @@ const MapControls = ({
         ) : null}
 
         {selectedView === ControlsView.AoE ? (
-          <AreaEffectsSetup onApply={onEditAreaEffect} onSave={onSaveAreaEffect} />
+          <AreaEffectsSetup
+            editedAreaEffect={editedAreaEffect}
+            onAreaEffectSaved={onAreaEffectSaved}
+            onAreaEffectChanged={onAreaEffectChanged}
+            onAreaEffectDeleted={onAreaEffectDeleted}
+          />
         ) : null}
       </div>
     </div>
@@ -93,8 +100,11 @@ const MapControls = ({
 MapControls.propTypes = {
   onNewParticipantDropped: PropTypes.func.isRequired,
   onMapSettingsChanged: PropTypes.func.isRequired,
-  onEditAreaEffect: PropTypes.func.isRequired,
-  onSaveAreaEffect: PropTypes.func.isRequired
+
+  editedAreaEffect: PropTypes.object,
+  onAreaEffectChanged: PropTypes.func.isRequired,
+  onAreaEffectSaved: PropTypes.func.isRequired,
+  onAreaEffectDeleted: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {

@@ -63,7 +63,8 @@ const MapDetails = props => {
               snapToGrid:
                 !isEmpty(mapInfo.gridWidth) && !isEmpty(mapInfo.gridHeight),
 
-              participantCoordinates: []
+              participantCoordinates: [],
+              areaEffects: []
             }
           },
           {
@@ -192,9 +193,9 @@ const MapDetails = props => {
             }
           },
           {
-            editedEncounterAction: EditedEncounterAction.Update,
-            applyChangesOnError: true,
-            overwriteError: false
+            editedEncounterAction: EditedEncounterAction.Set,
+            applyChangesOnError: false,
+            overwriteError: true
           }
         )
       );
@@ -237,7 +238,7 @@ const MapDetails = props => {
             map: {
               ...props.editedEncounter.map,
               areaEffects: props.editedEncounter.map.areaEffects.filter(
-                item => item._id.toString() !== areaEffectId
+                item => item._id.toString() !== areaEffectId.toString()
               )
             }
           },
@@ -296,7 +297,6 @@ Please note, you can continue working, but if you reload the page before the pro
           onMapParticipantAdded={handleAddParticipantOnMap}
           onMapParticipantChanged={handleMapParticipantChanged}
           onMapParticipantDeleted={handleMapParticipantDeleted}
-
           onAreaEffectAdded={handleAreaEffectAdded}
           onAreaEffectChanged={handleAreaEffectChanged}
           onAreaEffectDeleted={handleAreaEffectDeleted}

@@ -1,3 +1,10 @@
+export const AreaEffectType = {
+  Rectangle: 'rectangle',
+  Circle: 'circle',
+  Segment: 'segment'
+};
+
+
 export const defaultSquareSize = 32;
 export const arcRadius = Math.sqrt(1.25);
 export const vertexAngle = Math.atan(0.5);

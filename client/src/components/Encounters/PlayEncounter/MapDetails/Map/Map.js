@@ -11,6 +11,7 @@ import MapParticipant from './MapParticipant/MapParticipant';
 import classes from './Map.module.css';
 import AreaEffectEdit from './AreaEffects/AreaEffectEdit/AreaEffectEdit';
 import MapControls from './MapControls/MapControls';
+import AreaEffects from './AreaEffects/AreaEffects';
 
 const isOverMap = (mouseEvent, mapRect) => {
   return (
@@ -234,11 +235,11 @@ const Map = ({
   // AoE start
   const [editedAreaEffect, setEditedAreaEffect] = useState(null);
 
-  const handleSaveAreaEffect = useCallback(() => {
+  const handleAreaEffectSave = useCallback(() => {
     if ('_id' in editedAreaEffect) {
-      onAreaEffectAdded(editedAreaEffect);
-    } else {
       onAreaEffectChanged(editedAreaEffect);
+    } else {
+      onAreaEffectAdded(editedAreaEffect);
     }
     setEditedAreaEffect(null);
   }, [onAreaEffectChanged, onAreaEffectAdded, editedAreaEffect]);
@@ -256,8 +257,10 @@ const Map = ({
               <MapControls
                 onNewParticipantDropped={handleNewParticipantDropped}
                 onMapSettingsChanged={onMapSettingsChanged}
-                onEditAreaEffect={setEditedAreaEffect}
-                onSaveAreaEffect={handleSaveAreaEffect}
+                editedAreaEffect={editedAreaEffect}
+                onAreaEffectChanged={setEditedAreaEffect}
+                onAreaEffectSaved={handleAreaEffectSave}
+                onAreaEffectDeleted={onAreaEffectDeleted}
               />
             </div>
           ) : null}
@@ -327,6 +330,20 @@ const Map = ({
                     onChange={setEditedAreaEffect}
                   />
                 ) : null}
+
+                <AreaEffects
+                  mapImageSize={mapImageSize}
+                  gridCellSize={gridCellSize}
+                  areaEffects={editedEncounter.map.areaEffects.filter(
+                    item => {
+                      if (!editedAreaEffect || !editedAreaEffect._id) {
+                        return true;
+                      } else {
+                        return item._id.toString() !== editedAreaEffect._id.toString();
+                      }
+                    }
+                  )}
+                />
               </>
             ) : null}
           </div>

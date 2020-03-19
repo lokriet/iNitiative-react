@@ -1,10 +1,35 @@
-.SetupForm {
-  display: grid;
-  grid-template-columns: 8rem 12rem;
-  gap: 1rem;
-  align-items: center;
+.Container {
+  width: 100%;
+  display: flex;
 }
 
-.FullRow {
-  grid-column: 1 / span 2;
+.AreaEffectList {
+  width: 12rem;
+  padding: 1rem;
+  background-color: #f8f6f6;
+}
+
+.EditForm {
+  width: 40%;
+  margin-left: 10%;
+}
+
+.AreaEffectItem {
+  cursor: pointer;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin-left: -0.5rem;
+}
+
+.AreaEffectItem:hover .AreaEffectItemName,
+.Selected .AreaEffectItemName {
+   font-weight: 500;
+}
+
+.AreaEffectItemColor {
+  flex-shrink: 0;
+}
+
+.AddButton {
+  margin: 0 0 0.5rem 0.25rem;
 }

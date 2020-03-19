@@ -3,24 +3,26 @@ import PropTypes from 'prop-types';
 import classes from './ItemsRow.module.css';
 
 const ItemsRow = props => {
+  const {centered, alignCentered, className, ...htmlProps} = props;
 
   const classList = [classes.ItemsRow];
-  if (props.centered) {
+  if (centered) {
     classList.push(classes.Centered);
   }
-  if (props.alignCentered) {
+  if (alignCentered) {
     classList.push(classes.AlignCentered)
   }
-  if (props.className) {
+  if (className) {
     classList.push(props.className);
   }
 
-  return <div className={classList.join(' ')}>{props.children}</div>;
+  return <div className={classList.join(' ')} {...htmlProps}>{props.children}</div>;
 };
 
 ItemsRow.propTypes = {
   centered: PropTypes.bool,
-  alignCentered: PropTypes.bool
+  alignCentered: PropTypes.bool,
+  className: PropTypes.string
 };
 
 export default ItemsRow;

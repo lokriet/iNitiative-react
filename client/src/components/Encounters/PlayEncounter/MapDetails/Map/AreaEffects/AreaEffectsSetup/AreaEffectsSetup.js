@@ -1,160 +1,165 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import InlineSelect from '../../../../../../UI/Form/Select/InlineSelect/InlineSelect';
-import InlineInput from '../../../../../../UI/Form/Input/InlineInput/InlineInput';
-import Button from '../../../../../../UI/Form/Button/Button';
+import EditAreaEffectForm from './EditAreaEffectForm/EditAreaEffectForm';
+import { connect } from 'react-redux';
+import { isEmpty } from '../../../../../../../util/helper-methods';
+import Color from '../../../../../../UI/Color/Color';
 import classes from './AreaEffectsSetup.module.css';
+import AddButton from '../../../../../../UI/Form/Button/AddButton/AddButton';
+import ItemsRow from '../../../../../../UI/ItemsRow/ItemsRow';
+import IconButton from '../../../../../../UI/Form/Button/IconButton/IconButton';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import Popup from 'reactjs-popup';
+import Button from '../../../../../../UI/Form/Button/Button';
 
-export const AreaEffectType = {
-  Rectangle: 'rectangle',
-  Circle: 'circle',
-  Segment: 'segment'
-};
+const AreaEffectsSetup = ({
+  editedEncounter,
+  editedAreaEffect,
+  onAreaEffectChanged,
+  onAreaEffectSaved,
+  onAreaEffectDeleted
+}) => {
+  const [showForm, setShowForm] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [idToDelete, setIdToDelete] = useState(null);
 
-const typeOptions = [
-  { value: AreaEffectType.Rectangle, label: 'Rectangle' },
-  { value: AreaEffectType.Circle, label: 'Circle' },
-  { value: AreaEffectType.Segment, label: 'Segment' }
-];
-
-const AreaEffectsSetup = ({ onApply, onSave, areaEffect }) => {
-  const [type, setType] = useState(areaEffect ? areaEffect.type : AreaEffectType.Rectangle);
-  const [name, setName] = useState(areaEffect ? areaEffect.name : '');
-  const [width, setWidth] = useState(areaEffect ? areaEffect.gridWidth : 2);
-  const [height, setHeight] = useState(areaEffect ? areaEffect.gridHeight : 2);
-  const [color, setColor] = useState(areaEffect ? areaEffect.color : '#ff0000');
-
-  const handleRadiusChanged = useCallback(radius => {
-    setWidth(radius);
-    setHeight(radius);
-  }, []);
-
-  const handleApply = useCallback(() => {
-    const editedAreaEffect = {
-      type,
-      name,
-      gridWidth: parseFloat(width),
-      gridHeight: parseFloat(height),
-      color,
-      angle: areaEffect ? areaEffect.angle : 0,
-      position: areaEffect ? areaEffect.position : null
-    };
-
-    onApply(editedAreaEffect);
-  }, [color, height, width, type, name, onApply, areaEffect]);
-
-  const handleTypeChanged = useCallback(
-    option => {
-      setType(option.value);
-
-      console.log(
-        'handle type changed',
-        type,
-        option.value,
-        type === AreaEffectsSetup.Rectangle,
-        option.value !== type
-      );
-      if (type === AreaEffectType.Rectangle && option.value !== type) {
-        console.log('set height', width);
-        setHeight(width);
-      }
+  const handleAreaEffectChanged = useCallback(
+    partialUpdate => {
+      const updatedAreaEffect = { ...editedAreaEffect, ...partialUpdate };
+      onAreaEffectChanged(updatedAreaEffect);
     },
-    [type, width]
+    [editedAreaEffect, onAreaEffectChanged]
   );
 
-  const handleHeightChanged = useCallback(event => {
-    console.log('handle height changed', event.target.value);
-    setHeight(event.target.value);
+  const handleListItemSelected = useCallback(
+    areaEffect => {
+      onAreaEffectChanged(areaEffect);
+      setShowForm(true);
+    },
+    [onAreaEffectChanged]
+  );
+
+  const handleAddButtonClicked = useCallback(() => {
+    if (!showForm || (editedAreaEffect && editedAreaEffect._id != null)) {
+      onAreaEffectChanged(null);
+      setShowForm(true);
+    }
+  }, [onAreaEffectChanged, editedAreaEffect, showForm]);
+
+  const handleCancelEdit = useCallback(() => {
+    onAreaEffectChanged(null);
+    setShowForm(false);
+  }, [onAreaEffectChanged]);
+
+  const handleSave = useCallback(() => {
+    onAreaEffectSaved();
+    setShowForm(false);
+  }, [onAreaEffectSaved]);
+
+  const handleDeleteConfirmed = useCallback(() => {
+    if (
+      editedAreaEffect &&
+      editedAreaEffect._id &&
+      editedAreaEffect._id.toString() === idToDelete.toString()
+    ) {
+      onAreaEffectChanged(null);
+      setShowForm(false);
+    }
+
+    onAreaEffectDeleted(idToDelete);
+    setIdToDelete(null);
+    setShowDeleteConfirmation(false);
+  }, [onAreaEffectDeleted, onAreaEffectChanged, editedAreaEffect, idToDelete]);
+
+  const handleDeleteButtonClicked = useCallback(areaEffectId => {
+    setIdToDelete(areaEffectId);
+    setShowDeleteConfirmation(true);
+  }, []);
+
+  const handleDeleteCancelled = useCallback(() => {
+    setIdToDelete(null);
+    setShowDeleteConfirmation(false);
   }, []);
 
   return (
-    <div>
-      <div className={classes.SetupForm}>
-        <label>Name</label>
-        <InlineInput
-          name="name"
-          hidingBorder
-          value={name}
-          onChange={event => setName(event.target.value)}
+    <div className={classes.Container}>
+      <div className={classes.AreaEffectList}>
+        <AddButton
+          className={classes.AddButton}
+          onClick={handleAddButtonClicked}
         />
 
-        <label>Type</label>
-        <InlineSelect
-          isObjectBased={false}
-          name="type"
-          options={typeOptions}
-          value={typeOptions.find(item => item.value === type)}
-          onChange={handleTypeChanged}
-        />
-
-        <label>Color</label>
-        <input
-          type="color"
-          value={color}
-          onChange={event => setColor(event.target.value)}
-        />
-
-        {type === AreaEffectType.Rectangle ? (
-          <>
-            <label>Width</label>
-            <InlineInput
-              type="number"
-              min={1}
-              name="width"
-              hidingBorder
-              value={width}
-              onChange={event => setWidth(event.target.value)}
+        {editedEncounter.map.areaEffects.map(areaEffect => (
+          <ItemsRow
+            key={areaEffect._id || areaEffect._tempId}
+            alignCentered
+            className={`${classes.AreaEffectItem} ${
+              editedAreaEffect &&
+              editedAreaEffect._id &&
+              areaEffect._id.toString() === editedAreaEffect._id.toString()
+                ? classes.Selected
+                : ''
+            }`}
+          >
+            <ItemsRow
+              alignCentered
+              onClick={() => handleListItemSelected(areaEffect)}
+            >
+              <Color
+                color={areaEffect.color}
+                className={classes.AreaEffectItemColor}
+              />
+              <div className={classes.AreaEffectItemName}>
+                {isEmpty(areaEffect.name) ? '<noname>' : areaEffect.name}
+              </div>
+            </ItemsRow>
+            <IconButton
+              icon={faTimes}
+              onClick={() => handleDeleteButtonClicked(areaEffect._id)}
             />
-
-            <label>Height</label>
-            <InlineInput
-              type="number"
-              min={1}
-              name="height"
-              hidingBorder
-              value={height}
-              onChange={event => handleHeightChanged(event)}
-            />
-          </>
-        ) : type === AreaEffectType.Circle ? (
-          <>
-            <label>Radius</label>
-            <InlineInput
-              type="number"
-              min={1}
-              name="radius"
-              hidingBorder
-              value={width}
-              onChange={event => handleRadiusChanged(event.target.value)}
-            />
-          </>
-        ) : (
-          <>
-            <label>Length</label>
-            <InlineInput
-              type="number"
-              min={1}
-              name="length"
-              hidingBorder
-              value={width}
-              onChange={event => handleRadiusChanged(event.target.value)}
-            />
-          </>
-        )}
-
-        <div className={classes.FullRow}>
-          <Button onClick={handleApply}>{areaEffect ? 'Apply' : 'Add'}</Button>
-          <Button onClick={() => onApply(null)}>Cancel</Button>
-          <Button onClick={onSave}>Save</Button>
-        </div>
+          </ItemsRow>
+        ))}
       </div>
+      {showForm ? (
+        <div className={classes.EditForm}>
+          <EditAreaEffectForm
+            onAdd={onAreaEffectChanged}
+            onEdit={handleAreaEffectChanged}
+            onCancel={handleCancelEdit}
+            onSave={handleSave}
+            areaEffect={editedAreaEffect}
+          />
+        </div>
+      ) : null}
+
+      <Popup
+        modal
+        open={showDeleteConfirmation}
+        closeOnDocumentClick={false}
+        closeOnEscape={false}
+        contentStyle={{ width: 'auto' }}
+      >
+        <div>Delete area effect?</div>
+        <ItemsRow>
+          <Button onClick={handleDeleteConfirmed}>Yes</Button>
+          <Button onClick={handleDeleteCancelled}>No</Button>
+        </ItemsRow>
+      </Popup>
     </div>
   );
 };
 
 AreaEffectsSetup.propTypes = {
-  onApply: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired
+  editedAreaEffect: PropTypes.object,
+  onAreaEffectChanged: PropTypes.func.isRequired,
+  onAreaEffectSaved: PropTypes.func.isRequired,
+  onAreaEffectDeleted: PropTypes.func.isRequired
 };
 
-export default AreaEffectsSetup;
+const mapStateToProps = state => {
+  return {
+    editedEncounter: state.encounter.editedEncounter
+  };
+};
+
+export default connect(mapStateToProps)(AreaEffectsSetup);
