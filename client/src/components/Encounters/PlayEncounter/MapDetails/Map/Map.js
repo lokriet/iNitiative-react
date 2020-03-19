@@ -12,6 +12,7 @@ import classes from './Map.module.css';
 import AreaEffectEdit from './AreaEffects/AreaEffectEdit/AreaEffectEdit';
 import MapControls from './MapControls/MapControls';
 import AreaEffects from './AreaEffects/AreaEffects';
+import { sum } from './AreaEffects/aoe-utils';
 
 const isOverMap = (mouseEvent, mapRect) => {
   return (
@@ -34,7 +35,7 @@ const Map = ({
   onMapParticipantAdded,
   onMapParticipantChanged,
   onMapParticipantDeleted,
-  onMapSettingsChanged,
+  onMapDetailsChanged,
 
   onAreaEffectAdded,
   onAreaEffectChanged,
@@ -202,6 +203,7 @@ const Map = ({
           gridX: gridPos ? horizontalIndices[gridPos.x] : null,
           gridY: gridPos ? verticalIndices[gridPos.y] : null
         };
+        
         onMapParticipantChanged(newCoordinates);
       } else {
         onMapParticipantDeleted(participantCoordinate.participantId);
@@ -256,7 +258,7 @@ const Map = ({
             <div className={classes.ControlsContainer}>
               <MapControls
                 onNewParticipantDropped={handleNewParticipantDropped}
-                onMapSettingsChanged={onMapSettingsChanged}
+                onMapSettingsChanged={onMapDetailsChanged}
                 editedAreaEffect={editedAreaEffect}
                 onAreaEffectChanged={setEditedAreaEffect}
                 onAreaEffectSaved={handleAreaEffectSave}
@@ -334,15 +336,15 @@ const Map = ({
                 <AreaEffects
                   mapImageSize={mapImageSize}
                   gridCellSize={gridCellSize}
-                  areaEffects={editedEncounter.map.areaEffects.filter(
-                    item => {
-                      if (!editedAreaEffect || !editedAreaEffect._id) {
-                        return true;
-                      } else {
-                        return item._id.toString() !== editedAreaEffect._id.toString();
-                      }
+                  areaEffects={editedEncounter.map.areaEffects.filter(item => {
+                    if (!editedAreaEffect || !editedAreaEffect._id) {
+                      return true;
+                    } else {
+                      return (
+                        item._id.toString() !== editedAreaEffect._id.toString()
+                      );
                     }
-                  )}
+                  })}
                 />
               </>
             ) : null}
@@ -358,7 +360,7 @@ Map.propTypes = {
   onMapParticipantChanged: PropTypes.func.isRequired,
   onMapParticipantDeleted: PropTypes.func.isRequired,
 
-  onMapSettingsChanged: PropTypes.func.isRequired,
+  onMapDetailsChanged: PropTypes.func.isRequired,
 
   onAreaEffectAdded: PropTypes.func.isRequired,
   onAreaEffectChanged: PropTypes.func.isRequired,

@@ -8,6 +8,7 @@ import useDebounce from '../../../../../../../../hooks/useDebounce';
 import ItemsRow from '../../../../../../../UI/ItemsRow/ItemsRow';
 
 import { AreaEffectType } from '../../aoe-utils';
+import { connect } from 'react-redux';
 
 const typeOptions = [
   { value: AreaEffectType.Rectangle, label: 'Rectangle' },
@@ -20,9 +21,12 @@ const EditAreaEffectForm = ({
   onEdit,
   onCancel,
   onSave,
-  areaEffect
+  areaEffect,
+  editedEncounter
 }) => {
-  const [editedId, setEditedId] = useState(areaEffect ? areaEffect._id || areaEffect._tempId : null);
+  const [editedId, setEditedId] = useState(
+    areaEffect ? areaEffect._id || areaEffect._tempId : null
+  );
 
   const [type, setType] = useState(
     areaEffect ? areaEffect.type : AreaEffectType.Rectangle
@@ -38,11 +42,21 @@ const EditAreaEffectForm = ({
 
   const [color, setColor] = useState(areaEffect ? areaEffect.color : '#ff0000');
 
+  const [followingParticipantId, setFollowingParticipantId] = useState(
+    areaEffect ? areaEffect.followingParticipantId : null
+  );
+  const participantsOptions = editedEncounter.participants.filter(participant =>
+    editedEncounter.map.participantCoordinates.some(
+      participantCoordinate =>
+        participantCoordinate.participantId.toString() ===
+        participant._id.toString()
+    )
+  );
+
   const [pauseUpdates, setPauseUpdates] = useState(false);
 
   useEffect(() => {
     if (!pauseUpdates && areaEffect && areaEffect._id === editedId) {
-
       let partialUpdate = {};
       if (debouncedName !== areaEffect.name) {
         partialUpdate.name = debouncedName;
@@ -76,6 +90,7 @@ const EditAreaEffectForm = ({
       setWidth(areaEffect.gridWidth);
       setHeight(areaEffect.gridHeight);
       setColor(areaEffect.color);
+      setFollowingParticipantId(areaEffect.followParticipantId);
       setEditedId(areaEffect._id);
     }
     if (!areaEffect && editedId !== null) {
@@ -84,6 +99,7 @@ const EditAreaEffectForm = ({
       setWidth(2);
       setHeight(2);
       setColor('#ff0000');
+      setFollowingParticipantId(null);
       setEditedId(null);
     }
     setPauseUpdates(true);
@@ -106,7 +122,8 @@ const EditAreaEffectForm = ({
       gridHeight: parseFloat(height),
       color,
       angle: areaEffect ? areaEffect.angle : 0,
-      position: areaEffect ? areaEffect.position : null
+      position: areaEffect ? areaEffect.position : null,
+      followingParticipantId: areaEffect ? areaEffect.followParticipantId : null
     };
     // console.log('add area effect', editedAreaEffect);
     onAdd(editedAreaEffect);
@@ -142,10 +159,21 @@ const EditAreaEffectForm = ({
     [onEdit, areaEffect]
   );
 
+  const handleFollowingParticipantIdChanged = useCallback(
+    selectedParticipant => {
+      const newValue = selectedParticipant ? selectedParticipant._id : null;
+      setFollowingParticipantId(newValue);
+      if (areaEffect) {
+        onEdit({ followingParticipantId: newValue });
+      }
+    },
+    [areaEffect, onEdit]
+  );
+
   return (
     <div>
       <div className={classes.SetupForm}>
-        <label>Name</label>
+        <label htmlFor="name">Name</label>
         <InlineInput
           name="name"
           hidingBorder
@@ -153,7 +181,7 @@ const EditAreaEffectForm = ({
           onChange={event => setName(event.target.value)}
         />
 
-        <label>Type</label>
+        <label htmlFor="type">Type</label>
         <InlineSelect
           isObjectBased={false}
           name="type"
@@ -162,12 +190,17 @@ const EditAreaEffectForm = ({
           onChange={handleTypeChanged}
         />
 
-        <label>Color</label>
-        <input type="color" value={color} onChange={handleColorChanged} />
+        <label htmlFor="color">Color</label>
+        <input
+          type="color"
+          name="color"
+          value={color}
+          onChange={handleColorChanged}
+        />
 
         {type === AreaEffectType.Rectangle ? (
           <>
-            <label>Width</label>
+            <label htmlFor="width">Width</label>
             <InlineInput
               type="number"
               min={1}
@@ -177,7 +210,7 @@ const EditAreaEffectForm = ({
               onChange={event => setWidth(event.target.value)}
             />
 
-            <label>Height</label>
+            <label htmlFor="height">Height</label>
             <InlineInput
               type="number"
               min={1}
@@ -189,7 +222,7 @@ const EditAreaEffectForm = ({
           </>
         ) : type === AreaEffectType.Circle ? (
           <>
-            <label>Radius</label>
+            <label htmlFor="radius">Radius</label>
             <InlineInput
               type="number"
               min={1}
@@ -201,7 +234,7 @@ const EditAreaEffectForm = ({
           </>
         ) : (
           <>
-            <label>Length</label>
+            <label htmlFor="length">Length</label>
             <InlineInput
               type="number"
               min={1}
@@ -212,6 +245,22 @@ const EditAreaEffectForm = ({
             />
           </>
         )}
+
+        <label htmlFor="followingParticipantId">Follow</label>
+        <InlineSelect
+          options={participantsOptions}
+          name="followingParticipantId"
+          value={
+            followingParticipantId
+              ? participantsOptions.find(
+                  option =>
+                    option._id.toString() === followingParticipantId.toString()
+                )
+              : null
+          }
+          onChange={handleFollowingParticipantIdChanged}
+          isClearable
+        />
 
         <ItemsRow className={classes.FullRow}>
           {areaEffect ? (
@@ -236,4 +285,10 @@ EditAreaEffectForm.propTypes = {
   onSave: PropTypes.func.isRequired
 };
 
-export default EditAreaEffectForm;
+const mapStateToProps = state => {
+  return {
+    editedEncounter: state.encounter.editedEncounter
+  };
+};
+
+export default connect(mapStateToProps)(EditAreaEffectForm);

@@ -14,6 +14,7 @@ import Map from './Map/Map';
 import classes from './MapDetails.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { sum } from './Map/AreaEffects/aoe-utils';
 
 const MapDetails = props => {
   const dispatch = useDispatch();
@@ -104,6 +105,38 @@ const MapDetails = props => {
 
   const handleMapParticipantChanged = useCallback(
     editedMapParticipant => {
+      const initialMapParticipant = props.editedEncounter.map.participantCoordinates.find(
+        item =>
+          item.participantId.toString() ===
+          editedMapParticipant.participantId.toString()
+      );
+
+      let newAreaEffects = props.editedEncounter.map.areaEffects;
+      if (
+        editedMapParticipant.mapX !== initialMapParticipant.mapX ||
+        editedMapParticipant.mapY !== initialMapParticipant.mapY
+      ) {
+        const moveVector = {
+          x: editedMapParticipant.mapX - initialMapParticipant.mapX,
+          y: editedMapParticipant.mapY - initialMapParticipant.mapY
+        };
+
+        newAreaEffects = props.editedEncounter.map.areaEffects.map(areaEffect => {
+          if (
+            areaEffect.followingParticipantId &&
+            areaEffect.followingParticipantId.toString() ===
+            editedMapParticipant.participantId.toString()
+          ) {
+            return {
+              ...areaEffect,
+              position: sum(areaEffect.position, moveVector)
+            };
+          } else {
+            return areaEffect;
+          }
+        });
+      }
+
       dispatch(
         actions.editEncounter(
           props.editedEncounter._id,
@@ -116,7 +149,8 @@ const MapDetails = props => {
                   editedMapParticipant.participantId.toString()
                     ? editedMapParticipant
                     : participantCoordinate
-              )
+              ),
+              areaEffects: newAreaEffects
             }
           },
           {
@@ -132,6 +166,13 @@ const MapDetails = props => {
 
   const handleMapParticipantDeleted = useCallback(
     participantId => {
+      const newAreaEffects = props.editedEncounter.map.areaEffects.filter(
+        areaEffect =>
+          !areaEffect.followingParticipantId ||
+          areaEffect.followingParticipantId.toString() !==
+            participantId.toString()
+      );
+
       dispatch(
         actions.editEncounter(
           props.editedEncounter._id,
@@ -142,7 +183,8 @@ const MapDetails = props => {
                 participantCoordinate =>
                   participantCoordinate.participantId.toString() !==
                   participantId.toString()
-              )
+              ),
+              areaEffects: newAreaEffects
             }
           },
           {
@@ -156,15 +198,15 @@ const MapDetails = props => {
     [dispatch, props.editedEncounter]
   );
 
-  const handleMapSettingsChanged = useCallback(
-    mapSettings => {
+  const handleMapDetailsChanged = useCallback(
+    mapDetails => {
       dispatch(
         actions.editEncounter(
           props.editedEncounter._id,
           {
             map: {
               ...props.editedEncounter.map,
-              ...mapSettings
+              ...mapDetails
             }
           },
           {
@@ -293,7 +335,7 @@ Please note, you can continue working, but if you reload the page before the pro
           </div>
         ) : null}
         <Map
-          onMapSettingsChanged={handleMapSettingsChanged}
+          onMapDetailsChanged={handleMapDetailsChanged}
           onMapParticipantAdded={handleAddParticipantOnMap}
           onMapParticipantChanged={handleMapParticipantChanged}
           onMapParticipantDeleted={handleMapParticipantDeleted}

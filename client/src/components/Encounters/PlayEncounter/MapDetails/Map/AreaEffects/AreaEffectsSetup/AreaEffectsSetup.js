@@ -139,11 +139,14 @@ const AreaEffectsSetup = ({
         closeOnEscape={false}
         contentStyle={{ width: 'auto' }}
       >
-        <div>Delete area effect?</div>
-        <ItemsRow>
-          <Button onClick={handleDeleteConfirmed}>Yes</Button>
-          <Button onClick={handleDeleteCancelled}>No</Button>
-        </ItemsRow>
+        <div>
+          <div>Delete area effect?</div>
+          <br />
+          <ItemsRow>
+            <Button onClick={handleDeleteConfirmed}>Yes</Button>
+            <Button onClick={handleDeleteCancelled}>No</Button>
+          </ItemsRow>
+        </div>
       </Popup>
     </div>
   );
