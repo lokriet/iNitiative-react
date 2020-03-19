@@ -177,6 +177,81 @@ const MapDetails = props => {
     [dispatch, props.editedEncounter]
   );
 
+  const handleAreaEffectAdded = useCallback(
+    areaEffect => {
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...props.editedEncounter.map,
+              areaEffects: [
+                ...props.editedEncounter.map.areaEffects,
+                areaEffect
+              ]
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
+    },
+    [dispatch, props.editedEncounter]
+  );
+
+  const handleAreaEffectChanged = useCallback(
+    areaEffect => {
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...props.editedEncounter.map,
+              areaEffects: props.editedEncounter.map.areaEffects.map(item =>
+                item._id.toString() === areaEffect._id.toString()
+                  ? areaEffect
+                  : item
+              )
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
+    },
+    [dispatch, props.editedEncounter]
+  );
+
+  const handleAreaEffectDeleted = useCallback(
+    areaEffectId => {
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...props.editedEncounter.map,
+              areaEffects: props.editedEncounter.map.areaEffects.filter(
+                item => item._id.toString() !== areaEffectId
+              )
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
+    },
+    [dispatch, props.editedEncounter]
+  );
+
   const handleAttemptErrorFix = useCallback(() => {
     dispatch(
       actions.editEncounter(
@@ -221,6 +296,10 @@ Please note, you can continue working, but if you reload the page before the pro
           onMapParticipantAdded={handleAddParticipantOnMap}
           onMapParticipantChanged={handleMapParticipantChanged}
           onMapParticipantDeleted={handleMapParticipantDeleted}
+
+          onAreaEffectAdded={handleAreaEffectAdded}
+          onAreaEffectChanged={handleAreaEffectChanged}
+          onAreaEffectDeleted={handleAreaEffectDeleted}
         />
         <ItemsRow className={classes.Buttons}>
           <LoadMap onNewMapLoaded={handleNewMapUploaded} />

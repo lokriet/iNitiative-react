@@ -32,7 +32,6 @@ const MapParticipant = ({
   });
 
   useEffect(() => {
-    console.log('coords changed in map participant', participantCoordinates.mapX, participantCoordinates.mapY);
     if (!isDragging) {
       setPosition({
         x: participantCoordinates.mapX,

@@ -5,35 +5,47 @@ import { connect } from 'react-redux';
 import { isEmpty } from '../../../../../util/helper-methods';
 import StringIdGenerator from '../../../../../util/string-id-generator';
 
-import AddMapParticipant from './AddMapParticipant/AddMapParticipant';
 import Grid from './Grid/Grid';
 import MapParticipant from './MapParticipant/MapParticipant';
 
 import classes from './Map.module.css';
-import MapSettings from './MapSettings/MapSettings';
-import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
-import IconButton from '../../../../UI/Form/Button/IconButton/IconButton';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
-import AreaEffectsSetup from './AreaEffects/AreaEffectsSetup/AreaEffectsSetup';
 import AreaEffectEdit from './AreaEffects/AreaEffectEdit/AreaEffectEdit';
+import MapControls from './MapControls/MapControls';
+
+const isOverMap = (mouseEvent, mapRect) => {
+  return (
+    mouseEvent.clientX >= mapRect.left &&
+    mouseEvent.clientX <= mapRect.right &&
+    mouseEvent.clientY >= mapRect.top &&
+    mouseEvent.clientY <= mapRect.bottom
+  );
+};
+
+const getMapCoords = (mapRect, avatarRect) => {
+  return {
+    x: Math.max(avatarRect.left - mapRect.left, 0),
+    y: Math.max(avatarRect.top - mapRect.top, 0)
+  };
+};
 
 const Map = ({
   editedEncounter,
   onMapParticipantAdded,
   onMapParticipantChanged,
   onMapParticipantDeleted,
-  onMapSettingsChanged
+  onMapSettingsChanged,
+
+  onAreaEffectAdded,
+  onAreaEffectChanged,
+  onAreaEffectDeleted
 }) => {
   const [horizontalIndices, setHorizontalIndices] = useState([]);
   const [verticalIndices, setVerticalIndices] = useState([]);
-
-  const [showSettings, setShowSettings] = useState(false);
 
   const [gridCellSize, setGridCellSize] = useState(null);
   const [mapImageSize, setMapImageSize] = useState({ x: 0, y: 0 });
   const [mapImageLoaded, setMapImageLoaded] = useState(false);
   const [dragFromCell, setDragFromCell] = useState(null);
-  // const [mapParticipantPositions, setMapParticipantPositions] = useState({});
   const participantsContainerRef = useRef();
 
   const hasGrid = useCallback(() => {
@@ -55,7 +67,11 @@ const Map = ({
   }, []);
 
   useEffect(() => {
-    if (hasGrid()) {
+    if (
+      hasGrid() &&
+      (editedEncounter.map.gridWidth !== horizontalIndices.length ||
+        editedEncounter.map.gridHeight !== verticalIndices.length)
+    ) {
       let stringIdGenerator = new StringIdGenerator();
       let horizontalIndices = [];
       for (let i = 0; i < editedEncounter.map.gridWidth; i++) {
@@ -69,10 +85,16 @@ const Map = ({
       }
       setVerticalIndices(verticalIndices);
     }
-  }, [editedEncounter, hasGrid]);
+  }, [
+    editedEncounter,
+    hasGrid,
+    horizontalIndices.length,
+    verticalIndices.length
+  ]);
 
   useEffect(() => {
     if (mapImageLoaded && hasGrid()) {
+      console.log('calculating grid cell size');
       const gridCellWidth = mapImageSize.x / editedEncounter.map.gridWidth;
       const gridCellHeight = mapImageSize.y / editedEncounter.map.gridHeight;
 
@@ -82,22 +104,6 @@ const Map = ({
       setGridCellSize(null);
     }
   }, [editedEncounter, mapImageLoaded, mapImageSize, hasGrid]);
-
-  const isOverMap = useCallback((mouseEvent, mapRect) => {
-    return (
-      mouseEvent.clientX >= mapRect.left &&
-      mouseEvent.clientX <= mapRect.right &&
-      mouseEvent.clientY >= mapRect.top &&
-      mouseEvent.clientY <= mapRect.bottom
-    );
-  }, []);
-
-  const getMapCoords = useCallback((mapRect, avatarRect) => {
-    return {
-      x: Math.max(avatarRect.left - mapRect.left, 0),
-      y: Math.max(avatarRect.top - mapRect.top, 0)
-    };
-  }, []);
 
   const getGridCoords = useCallback(
     mapPos => {
@@ -113,6 +119,7 @@ const Map = ({
     [gridCellSize]
   );
 
+  // Participants handling start
   const handleNewParticipantDropped = useCallback(
     (participant, mouseEvent, position) => {
       let gridPos;
@@ -151,9 +158,7 @@ const Map = ({
       horizontalIndices,
       verticalIndices,
       hasGrid,
-      isOverMap,
       getGridCoords,
-      getMapCoords,
       editedEncounter,
       gridCellSize
     ]
@@ -196,14 +201,12 @@ const Map = ({
           gridX: gridPos ? horizontalIndices[gridPos.x] : null,
           gridY: gridPos ? verticalIndices[gridPos.y] : null
         };
-        console.log('new coordinates calculated on drop', mapPos);
         onMapParticipantChanged(newCoordinates);
       } else {
         onMapParticipantDeleted(participantCoordinate.participantId);
       }
     },
     [
-      isOverMap,
       getGridCoords,
       hasGrid,
       horizontalIndices,
@@ -226,8 +229,20 @@ const Map = ({
     },
     [onMapParticipantChanged]
   );
+  // Participants handling end
 
-  const [areaEffect, setAreaEffect] = useState(null);
+  // AoE start
+  const [editedAreaEffect, setEditedAreaEffect] = useState(null);
+
+  const handleSaveAreaEffect = useCallback(() => {
+    if ('_id' in editedAreaEffect) {
+      onAreaEffectAdded(editedAreaEffect);
+    } else {
+      onAreaEffectChanged(editedAreaEffect);
+    }
+    setEditedAreaEffect(null);
+  }, [onAreaEffectChanged, onAreaEffectAdded, editedAreaEffect]);
+  // AoE end
 
   return (
     <>
@@ -236,41 +251,16 @@ const Map = ({
           className={classes.Container}
           style={{ width: mapImageSize.x + 'px' }}
         >
-          <AreaEffectsSetup onAreaEffectAdd={setAreaEffect} />
-
-          <details className={classes.ControlsContailer}>
-            <summary>Participants</summary>
-            <div className={classes.ControlsInsides}>
-              <ItemsRow className={classes.Controls}>
-                {mapImageLoaded
-                  ? editedEncounter.participants.map(participant => (
-                      <AddMapParticipant
-                        key={participant._id}
-                        participant={participant}
-                        isOnMap={editedEncounter.map.participantCoordinates.some(
-                          coordinate =>
-                            coordinate.participantId.toString() ===
-                            participant._id.toString()
-                        )}
-                        dropContainerRef={participantsContainerRef}
-                        onDropped={(mouseEvent, position) =>
-                          handleNewParticipantDropped(
-                            participant,
-                            mouseEvent,
-                            position
-                          )
-                        }
-                      />
-                    ))
-                  : null}
-              </ItemsRow>
+          {mapImageLoaded ? (
+            <div className={classes.ControlsContainer}>
+              <MapControls
+                onNewParticipantDropped={handleNewParticipantDropped}
+                onMapSettingsChanged={onMapSettingsChanged}
+                onEditAreaEffect={setEditedAreaEffect}
+                onSaveAreaEffect={handleSaveAreaEffect}
+              />
             </div>
-          </details>
-
-          <MapSettings
-            onSettingsChanged={onMapSettingsChanged}
-            showSettings={showSettings}
-          />
+          ) : null}
 
           <div className={classes.MapContainer}>
             <img
@@ -279,33 +269,23 @@ const Map = ({
               className={classes.MapImage}
               onLoad={handleMapImageLoaded}
               onError={() => setMapImageLoaded(false)}
+              ref={participantsContainerRef}
             />
 
             {mapImageLoaded ? (
-              <div className={classes.MapSettingsIcon}>
-                <IconButton
-                  icon={faCog}
-                  onClick={() => setShowSettings(prev => !prev)}
-                />
-              </div>
-            ) : null}
+              <>
+                {hasGrid() ? (
+                  <Grid
+                    showGrid={editedEncounter.map.showGrid}
+                    gridColor={editedEncounter.map.gridColor}
+                    horizontalIndices={horizontalIndices}
+                    verticalIndices={verticalIndices}
+                    dragFromCell={dragFromCell}
+                  />
+                ) : null}
 
-            {mapImageLoaded && hasGrid() ? (
-              <Grid
-                showGrid={editedEncounter.map.showGrid}
-                gridColor={editedEncounter.map.gridColor}
-                horizontalIndices={horizontalIndices}
-                verticalIndices={verticalIndices}
-                dragFromCell={dragFromCell}
-              />
-            ) : null}
-
-            <div
-              className={classes.ParticipantsContainer}
-              ref={participantsContainerRef}
-            >
-              {mapImageLoaded
-                ? editedEncounter.map.participantCoordinates.map(
+                <div className={classes.ParticipantsContainer}>
+                  {editedEncounter.map.participantCoordinates.map(
                     participantCoordinate => (
                       <MapParticipant
                         key={participantCoordinate.participantId.toString()}
@@ -336,16 +316,18 @@ const Map = ({
                         showInfo={editedEncounter.map.showInfo}
                       />
                     )
-                  )
-                : null}
-            </div>
+                  )}
+                </div>
 
-            {areaEffect ? (
-              <AreaEffectEdit
-                areaEffect={areaEffect}
-                gridCellSize={gridCellSize}
-                mapImageSize={mapImageSize}
-              />
+                {editedAreaEffect ? (
+                  <AreaEffectEdit
+                    areaEffect={editedAreaEffect}
+                    gridCellSize={gridCellSize}
+                    mapImageSize={mapImageSize}
+                    onChange={setEditedAreaEffect}
+                  />
+                ) : null}
+              </>
             ) : null}
           </div>
         </div>
@@ -358,7 +340,12 @@ Map.propTypes = {
   onMapParticipantAdded: PropTypes.func.isRequired,
   onMapParticipantChanged: PropTypes.func.isRequired,
   onMapParticipantDeleted: PropTypes.func.isRequired,
-  onMapSettingsChanged: PropTypes.func.isRequired
+
+  onMapSettingsChanged: PropTypes.func.isRequired,
+
+  onAreaEffectAdded: PropTypes.func.isRequired,
+  onAreaEffectChanged: PropTypes.func.isRequired,
+  onAreaEffectDeleted: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {

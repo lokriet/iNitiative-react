@@ -1,0 +1,12 @@
+.TabButton {
+  background-color: white;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.TabButton:hover,
+.Active {
+  border-color: #aaa;
+}

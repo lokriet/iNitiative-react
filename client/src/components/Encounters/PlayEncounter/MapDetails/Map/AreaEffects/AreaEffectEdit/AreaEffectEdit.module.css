@@ -5,13 +5,6 @@
   z-index: 20;
 }
 
-.Shape {
-  stroke-width:3;
-  fill-opacity: 0.3;
-  stroke-opacity: 1;
-  cursor: move;
-}
-
 .Rotator {
   stroke-width:3;
 }

@@ -1,0 +1,6 @@
+.Shape {
+  stroke-width:3;
+  fill-opacity: 0.3;
+  stroke-opacity: 1;
+  cursor: move;
+}

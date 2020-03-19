@@ -1,0 +1,10 @@
+.SetupForm {
+  display: grid;
+  grid-template-columns: 8rem 12rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+.FullRow {
+  grid-column: 1 / span 2;
+}

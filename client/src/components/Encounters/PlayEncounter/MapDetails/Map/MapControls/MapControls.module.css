@@ -1,0 +1,13 @@
+.MapControls {
+  width: 100%;
+}
+
+.ControlsContainer {
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.Participants {
+  flex-wrap: wrap;
+  width: 100%;
+}

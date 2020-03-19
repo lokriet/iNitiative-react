@@ -1,9 +1,27 @@
-// const { validationResult } = require('express-validator');
 const Joi = require('@hapi/joi');
 
 const Encounter = require('../model/encounter');
 const httpErrors = require('../util/httpErrors');
 const responseCodes = require('../util/responseCodes');
+
+const mapParticipantValidationSchema = Joi.object()
+  .keys({
+    _id: Joi.any().optional(),
+    participantId: Joi.any().required(),
+    mapX: Joi.number()
+      .min(0)
+      .max(Joi.ref('....mapWidth'))
+      .required(),
+    mapY: Joi.number()
+      .min(0)
+      .max(Joi.ref('....mapHeight'))
+      .required(),
+    infoX: Joi.number().required(),
+    infoY: Joi.number().required(),
+    gridX: Joi.string().allow(null, ''),
+    gridY: Joi.string().allow(null, '')
+  })
+  .unknown(true);
 
 const mapValidationSchema = Joi.object()
   .keys({
@@ -35,26 +53,7 @@ const mapValidationSchema = Joi.object()
     showDead: Joi.bool().required(),
     snapToGrid: Joi.bool().required(),
     participantCoordinates: Joi.array()
-      .items(
-        Joi.object()
-          .keys({
-            _id: Joi.any().optional(),
-            participantId: Joi.any().required(),
-            mapX: Joi.number()
-              .min(0)
-              .max(Joi.ref('....mapWidth'))
-              .required(),
-            mapY: Joi.number()
-              .min(0)
-              .max(Joi.ref('....mapHeight'))
-              .required(),
-            infoX: Joi.number().required(),
-            infoY: Joi.number().required(),
-            gridX: Joi.string().allow(null, ''),
-            gridY: Joi.string().allow(null, '')
-          })
-          .unknown(true)
-      )
+      .items(mapParticipantValidationSchema)
       .unique((a, b) => {
         let aId;
         if (typeof a.participantId === 'object' && '_id' in a.participantId) {
@@ -243,6 +242,10 @@ module.exports.createEncounter = async (req, res, next) => {
 module.exports.updateEncounter = async (req, res, next) => {
   try {
     let partialUpdate = req.body.partialUpdate;
+    let withDataResponse = req.body.withDataResponse;
+    if (withDataResponse == null) {
+      withDataResponse = true;
+    }
     const encounterId = req.params.encounterId;
 
     let encounter = await Encounter.findById(encounterId);
@@ -289,22 +292,28 @@ module.exports.updateEncounter = async (req, res, next) => {
     }
 
     await Encounter.findOneAndUpdate({ _id: encounterId }, encounterData);
-    let savedEncounter = await Encounter.findById(encounterId)
-      .populate({ path: 'participants.vulnerabilities', select: 'name' })
-      .populate({ path: 'participants.resistances', select: 'name' })
-      .populate({
-        path: 'participants.features',
-        select: 'name type description'
-      })
-      .populate({ path: 'participants.immunities.damageTypes', select: 'name' })
-      .populate({
-        path: 'participants.immunities.conditions',
-        select: 'name description'
-      })
-      .populate({
-        path: 'participants.conditions',
-        select: 'name description'
-      });
+    let savedEncounter = null;
+    if (withDataResponse) {
+      savedEncounter = await Encounter.findById(encounterId)
+        .populate({ path: 'participants.vulnerabilities', select: 'name' })
+        .populate({ path: 'participants.resistances', select: 'name' })
+        .populate({
+          path: 'participants.features',
+          select: 'name type description'
+        })
+        .populate({
+          path: 'participants.immunities.damageTypes',
+          select: 'name'
+        })
+        .populate({
+          path: 'participants.immunities.conditions',
+          select: 'name description'
+        })
+        .populate({
+          path: 'participants.conditions',
+          select: 'name description'
+        });
+    }
 
     res.status(200).json({
       statusCode: 200,
@@ -442,8 +451,10 @@ module.exports.updateEncounterParticipant = async (req, res, next) => {
       }
     );
 
-    await Encounter.findOneAndUpdate( {_id: encounterId }, {$set: {'updatedAt': new Date()}});
-
+    await Encounter.findOneAndUpdate(
+      { _id: encounterId },
+      { $set: { updatedAt: new Date() } }
+    );
 
     res.status(200).json('Update successful');
   } catch (error) {

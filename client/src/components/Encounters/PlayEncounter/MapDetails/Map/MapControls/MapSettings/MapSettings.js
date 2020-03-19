@@ -2,13 +2,13 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import classes from './MapSettings.module.css';
-import ItemsRow from '../../../../../UI/ItemsRow/ItemsRow';
+import ItemsRow from '../../../../../../UI/ItemsRow/ItemsRow';
 import { connect } from 'react-redux';
-import { CSSTransition } from 'react-transition-group';
-import InlineInput from '../../../../../UI/Form/Input/InlineInput/InlineInput';
-import { isEmpty } from '../../../../../../util/helper-methods';
+// import { CSSTransition } from 'react-transition-group';
+import InlineInput from '../../../../../../UI/Form/Input/InlineInput/InlineInput';
+import { isEmpty } from '../../../../../../../util/helper-methods';
 
-const MapSettings = ({ editedEncounter, onSettingsChanged, showSettings }) => {
+const MapSettings = ({ editedEncounter, onSettingsChanged }) => {
   const handleSettingsChanged = useCallback(
     (settingName, settingValue) => {
       onSettingsChanged({ [settingName]: settingValue });
@@ -27,12 +27,12 @@ const MapSettings = ({ editedEncounter, onSettingsChanged, showSettings }) => {
   )
 
   return (
-    <CSSTransition
-      in={showSettings}
-      timeout={300}
-      classNames="MapSettings"
-      unmountOnExit
-    >
+    // <CSSTransition
+    //   in={showSettings}
+    //   timeout={300}
+    //   classNames="MapSettings"
+    //   unmountOnExit
+    // >
       <ItemsRow alignCentered className={classes.MapSettings}>
         <label>Grid color: </label>
         <input
@@ -119,7 +119,7 @@ const MapSettings = ({ editedEncounter, onSettingsChanged, showSettings }) => {
           />
         </span>
       </ItemsRow>
-    </CSSTransition>
+    // </CSSTransition>
   );
 };
 

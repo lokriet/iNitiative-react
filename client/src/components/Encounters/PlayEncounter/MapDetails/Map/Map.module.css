@@ -24,45 +24,7 @@
   z-index: 3;
 }
 
-.ControlsContailer {
+.ControlsContainer {
+  width: 100%;
   margin-left: 2rem;
-  width: 100%;
-  transition: all 300ms;
-}
-
-.ControlsContailer[open] {
-  max-height: 40rem;
-  overflow: visible;
-}
-
-.ControlsContailer:not([open]) {
-  max-height: 1.5rem;
-}
-
-.ControlsContailer summary {
-  padding-left: 0.5rem;
-  transition: all 300ms;
-  cursor: pointer;
-}
-
-.ControlsContailer[open] summary {
-  background-color: #eee;
-}
-
-.Controls {
-  flex-wrap: wrap;
-  width: 100%;
-  background-color: #eee;
-}
-
-.MapSettingsIcon {
-  width: 2rem;
-  height: 2rem;
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  padding-top: 0.75rem;
-  padding-left: 0.75rem;
-  z-index: 4;
 }
