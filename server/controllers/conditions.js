@@ -176,9 +176,11 @@ module.exports.deleteCondition = async (req, res, next) => {
 
 module.exports.getSharedConditions = async (req, res, next) => {
   try {
-    const conditions = await Condition.find({ isHomebrew: false }).sort({
-      name: 1
-    });
+    const conditions = await Condition.find({ isHomebrew: false })
+      .collation({ locale: 'en' })
+      .sort({
+        name: 1
+      });
     res.status(200).json(conditions);
   } catch (error) {
     next(error);
@@ -190,7 +192,9 @@ module.exports.getHomebrewConditions = async (req, res, next) => {
     const conditions = await Condition.find({
       isHomebrew: true,
       creator: req.userId
-    }).sort({ name: 1 });
+    })
+      .collation({ locale: 'en' })
+      .sort({ name: 1 });
     res.status(200).json(conditions);
   } catch (error) {
     next(error);

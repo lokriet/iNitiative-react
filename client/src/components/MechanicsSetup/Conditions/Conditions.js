@@ -12,13 +12,18 @@ import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Spinner from '../../UI/Spinner/Spinner';
 import IconButton from '../../UI/Form/Button/IconButton/IconButton';
 import FilterInput from '../../UI/FilterInput/FilterInput';
+import ItemsRow from '../../UI/ItemsRow/ItemsRow';
+import Popup from 'reactjs-popup';
+import Button from '../../UI/Form/Button/Button';
 
 import classes from './Conditions.module.css';
-import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 
 const Conditions = props => {
   const [saveCallbacks, setSaveCallbacks] = useState({});
   const [changedConditions, setChangedConditions] = useState(new Set());
+
+  const [deleting, setDeleting] = useState(false);
+  const [deletingCondition, setDeletingCondition] = useState(null);
 
   const dispatch = useDispatch();
   const allConditions = props.isHomebrew
@@ -57,7 +62,7 @@ const Conditions = props => {
         } else {
           newChangedConditions.delete(conditionId);
         }
-        
+
         console.log('new changes count', newChangedConditions.size);
         return newChangedConditions;
       });
@@ -91,12 +96,25 @@ const Conditions = props => {
     [dispatch, props.isHomebrew]
   );
 
-  const handleDeleteCondition = useCallback(
-    conditionId => {
-      dispatch(actions.deleteCondition(conditionId));
+  const handleDeleteConditionClicked = useCallback(
+    condition => {
+      dispatch(actions.removeConditionError(condition._id));
+      setDeletingCondition(condition);
+      setDeleting(true);
     },
     [dispatch]
   );
+
+  const handleDeleteConditionCancelled = useCallback(() => {
+    setDeletingCondition(null);
+    setDeleting(false);
+  }, []);
+
+  const handleDeleteConditionConfirmed = useCallback(() => {
+    dispatch(actions.deleteCondition(deletingCondition._id));
+    setDeletingCondition(null);
+    setDeleting(false);
+  }, [dispatch, deletingCondition]);
 
   const handleCancelChangingCondition = useCallback(
     conditionId => {
@@ -158,7 +176,7 @@ const Conditions = props => {
             condition={condition}
             onSave={handleUpdateCondition}
             onValidateName={validateName}
-            onDelete={handleDeleteCondition}
+            onDelete={handleDeleteConditionClicked}
             onCancel={handleCancelChangingCondition}
             onRegisterSaveCallback={handleRegisterSaveCallback}
             onUnregisterSaveCallback={handleUnregisterSaveCallback}
@@ -171,6 +189,26 @@ const Conditions = props => {
             serverError={props.errors[condition._id]}
           />
         ))}
+
+        <Popup
+          open={deleting}
+          modal
+          closeOnDocumentClick={false}
+          closeOnEscape={false}
+          contentStyle={{ width: 'auto' }}
+        >
+          <div>
+            <div>
+              Delete condition {deletingCondition ? deletingCondition.name : ''}
+              ?
+            </div>
+            <br />
+            <ItemsRow centered>
+              <Button onClick={handleDeleteConditionConfirmed}>Yes</Button>
+              <Button onClick={handleDeleteConditionCancelled}>No</Button>
+            </ItemsRow>
+          </div>
+        </Popup>
       </>
     );
   }

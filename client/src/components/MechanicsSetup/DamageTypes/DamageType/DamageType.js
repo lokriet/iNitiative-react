@@ -95,7 +95,7 @@ const DamageType = ({
             onBlur={handleBlur}
             ref={nameRef}
           />
-          <IconButton onClick={() => onDelete(damageType._id)} icon={faTimes} />
+          <IconButton onClick={() => onDelete(damageType)} icon={faTimes} />
 
           <div className={classes.CancelButton}>
             {showCancelButton ? (

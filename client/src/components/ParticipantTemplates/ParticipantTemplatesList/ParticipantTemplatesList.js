@@ -11,6 +11,7 @@ import FilterInput from '../../UI/FilterInput/FilterInput';
 import AddButton from '../../UI/Form/Button/AddButton/AddButton';
 
 import classes from './ParticipantTemplatesList.module.css';
+import Spinner from '../../UI/Spinner/Spinner';
 
 const ParticipantTemplatesList = props => {
   const [allTemplates, setAllTemplates] = useState([]);
@@ -69,36 +70,41 @@ const ParticipantTemplatesList = props => {
           </Link>
         </ItemsRow>
       </div>
-      <table className={classes.Table}>
-        <thead>
-          <tr className={classes.TableHeader}>
-            <th>{/* avatar */}</th>
-            <th>Name</th>
-            <th>Ini</th>
-            <th>HP</th>
-            <th>AC</th>
-            <th>Spd</th>
-            <th>Immune</th>
-            <th>Resist</th>
-            <th>Vulnerable</th>
-            <th>Features</th>
-            <th>Size</th>
-            <th>Comment</th>
-            <th>{/* action buttons */}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredTemplates.map(item => (
-            <ParticipantTemplateRow
-              key={item._id}
-              template={item}
-              onDelete={handleDeleteTemplate}
-              onDeleteCancelled={handleCancelDeleteTemplate}
-              onEdit={handleEditTemplate}
-            />
-          ))}
-        </tbody>
-      </table>
+
+      {props.fetching ? (
+        <Spinner />
+      ) : (
+        <table className={classes.Table}>
+          <thead>
+            <tr className={classes.TableHeader}>
+              <th>{/* avatar */}</th>
+              <th>Name</th>
+              <th>Ini</th>
+              <th>HP</th>
+              <th>AC</th>
+              <th>Spd</th>
+              <th>Immune</th>
+              <th>Resist</th>
+              <th>Vulnerable</th>
+              <th>Features</th>
+              <th>Size</th>
+              <th>Comment</th>
+              <th>{/* action buttons */}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredTemplates.map(item => (
+              <ParticipantTemplateRow
+                key={item._id}
+                template={item}
+                onDelete={handleDeleteTemplate}
+                onDeleteCancelled={handleCancelDeleteTemplate}
+                onEdit={handleEditTemplate}
+              />
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

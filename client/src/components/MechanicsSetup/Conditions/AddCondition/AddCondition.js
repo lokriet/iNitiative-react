@@ -19,6 +19,8 @@ const AddCondition = ({ serverError, onValidateName, onSave, onCancel }) => {
   const [descriptionValue, setDescriptionValue] = useState('');
 
   const handleStartAdding = useCallback(() => {
+    setNameValue('');
+    setDescriptionValue('');
     setAdding(true);
   }, []);
 

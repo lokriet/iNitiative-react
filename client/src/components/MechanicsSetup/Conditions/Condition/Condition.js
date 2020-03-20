@@ -159,7 +159,7 @@ class Condition extends Component {
             />
             <IconButton
               icon={faTimes}
-              onClick={() => this.props.onDelete(this.props.condition._id)}
+              onClick={() => this.props.onDelete(this.props.condition)}
             />
 
             <ItemsRow className={classes.SaveButtons}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect, useDispatch } from 'react-redux';
 
@@ -7,8 +7,14 @@ import ServerError from '../../UI/Errors/ServerError/ServerError';
 import DamageType from './DamageType/DamageType';
 import AddDamageType from './AddDamageType/AddDamageType';
 import Spinner from '../../UI/Spinner/Spinner';
+import Popup from 'reactjs-popup';
+import ItemsRow from '../../UI/ItemsRow/ItemsRow';
+import Button from '../../UI/Form/Button/Button';
 
 const DamageTypes = props => {
+  const [deleting, setDeleting] = useState(false);
+  const [deletingDamageType, setDeletingDamageType] = useState(null);
+
   const dispatch = useDispatch();
   const allDamageTypes = props.isHomebrew
     ? props.homebrewDamageTypes
@@ -31,13 +37,7 @@ const DamageTypes = props => {
 
   const handleAddDamageType = useCallback(
     (name, setSubmitted) => {
-      dispatch(
-        actions.addDamageType(
-          { name },
-          props.isHomebrew,
-          setSubmitted
-        )
-      );
+      dispatch(actions.addDamageType({ name }, props.isHomebrew, setSubmitted));
     },
     [dispatch, props.isHomebrew]
   );
@@ -45,22 +45,31 @@ const DamageTypes = props => {
   const handleUpdateDamageType = useCallback(
     (_id, name, setSubmitted) => {
       dispatch(
-        actions.updateDamageType(
-          { _id, name },
-          props.isHomebrew,
-          setSubmitted
-        )
+        actions.updateDamageType({ _id, name }, props.isHomebrew, setSubmitted)
       );
     },
     [dispatch, props.isHomebrew]
   );
 
-  const handleDeleteDamageType = useCallback(
-    damageTypeId => {
-      dispatch(actions.deleteDamageType(damageTypeId));
+  const handleDeleteDamageTypeClicked = useCallback(
+    damageType => {
+      dispatch(actions.removeDamageTypeError(damageType._id));
+      setDeletingDamageType(damageType);
+      setDeleting(true);
     },
     [dispatch]
   );
+
+  const handleDeleteDamageTypeCancelled = useCallback(() => {
+    setDeletingDamageType(null);
+    setDeleting(false);
+  }, []);
+
+  const handleDeleteDamageTypeConfirmed = useCallback(() => {
+    dispatch(actions.deleteDamageType(deletingDamageType._id));
+    setDeletingDamageType(null);
+    setDeleting(false);
+  }, [dispatch, deletingDamageType]);
 
   const handleCancelChangingDamageType = useCallback(
     damageTypeId => {
@@ -69,8 +78,12 @@ const DamageTypes = props => {
     [dispatch]
   );
 
-  const fetching = props.isHomebrew ? props.fetchingHomebrew : props.fetchingShared;
-  const fetchingError = props.isHomebrew ? props.errorHomebrew : props.errorShared;
+  const fetching = props.isHomebrew
+    ? props.fetchingHomebrew
+    : props.fetchingShared;
+  const fetchingError = props.isHomebrew
+    ? props.errorHomebrew
+    : props.errorShared;
   let view;
   if (fetching) {
     view = <Spinner />;
@@ -92,12 +105,32 @@ const DamageTypes = props => {
             damageType={damageType}
             onSave={handleUpdateDamageType}
             onValidateName={validateName}
-            onDelete={handleDeleteDamageType}
+            onDelete={handleDeleteDamageTypeClicked}
             onCancel={handleCancelChangingDamageType}
             serverError={props.errors[damageType._id]}
           />
         ))}
-        </>
+
+        <Popup
+          open={deleting}
+          modal
+          closeOnDocumentClick={false}
+          closeOnEscape={false}
+          contentStyle={{ width: 'auto' }}
+        >
+          <div>
+            <div>
+              Delete damage type {deletingDamageType ? deletingDamageType.name : ''}
+              ?
+            </div>
+            <br />
+            <ItemsRow centered>
+              <Button onClick={handleDeleteDamageTypeConfirmed}>Yes</Button>
+              <Button onClick={handleDeleteDamageTypeCancelled}>No</Button>
+            </ItemsRow>
+          </div>
+        </Popup>
+      </>
     );
   }
 

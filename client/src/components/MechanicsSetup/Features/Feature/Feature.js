@@ -210,7 +210,7 @@ class Feature extends Component {
             />
             <IconButton
               icon={faTimes}
-              onClick={() => this.props.onDelete(this.props.feature._id)}
+              onClick={() => this.props.onDelete(this.props.feature)}
             />
             <ItemsRow className={classes.SaveButtons}>
               {this.state.showSaveButtons ? (

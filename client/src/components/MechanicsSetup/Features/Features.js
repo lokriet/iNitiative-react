@@ -15,10 +15,15 @@ import FilterInput from '../../UI/FilterInput/FilterInput';
 
 import classes from './Features.module.css';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
+import Popup from 'reactjs-popup';
+import Button from '../../UI/Form/Button/Button';
 
 const Features = props => {
   const [saveCallbacks, setSaveCallbacks] = useState({});
   const [changedFeatures, setChangedFeatures] = useState(new Set());
+
+  const [deleting, setDeleting] = useState(false);
+  const [deletingFeature, setDeletingFeature] = useState(null);
 
   const dispatch = useDispatch();
   const allFeatures = props.isHomebrew
@@ -72,12 +77,25 @@ const Features = props => {
     [dispatch, props.isHomebrew]
   );
 
-  const handleDeleteFeature = useCallback(
-    featureId => {
-      dispatch(actions.deleteFeature(featureId));
+  const handleDeleteFeatureClicked = useCallback(
+    feature => {
+      dispatch(actions.removeFeatureError(feature._id));
+      setDeletingFeature(feature);
+      setDeleting(true);
     },
     [dispatch]
   );
+
+  const handleDeleteFeatureCancelled = useCallback(() => {
+    setDeletingFeature(null);
+    setDeleting(false);
+  }, []);
+
+  const handleDeleteFeatureConfirmed = useCallback(() => {
+    dispatch(actions.deleteFeature(deletingFeature._id));
+    setDeletingFeature(null);
+    setDeleting(false);
+  }, [dispatch, deletingFeature]);
 
   const handleCancelChangingFeature = useCallback(
     featureId => {
@@ -96,20 +114,23 @@ const Features = props => {
     setFilteredFeatures(filteredItems);
   }, []);
 
-  const handleUnsavedChangesStateChange = useCallback((featureId, hasUnsavedChanges) => {
-    setChangedFeatures(previousChangedFeatures => {
-      const newChangedFeatures = new Set(previousChangedFeatures);
-      if (hasUnsavedChanges) {
-        newChangedFeatures.add(featureId);
-      } else {
-        newChangedFeatures.delete(featureId);
-      }
+  const handleUnsavedChangesStateChange = useCallback(
+    (featureId, hasUnsavedChanges) => {
+      setChangedFeatures(previousChangedFeatures => {
+        const newChangedFeatures = new Set(previousChangedFeatures);
+        if (hasUnsavedChanges) {
+          newChangedFeatures.add(featureId);
+        } else {
+          newChangedFeatures.delete(featureId);
+        }
 
-      console.log('new changes count', newChangedFeatures.size);
+        console.log('new changes count', newChangedFeatures.size);
 
-      return newChangedFeatures;
-    });
-  }, []);
+        return newChangedFeatures;
+      });
+    },
+    []
+  );
 
   const fetching = props.isHomebrew
     ? props.fetchingHomebrew
@@ -154,14 +175,39 @@ const Features = props => {
             feature={feature}
             onSave={handleUpdateFeature}
             onValidateName={validateName}
-            onDelete={handleDeleteFeature}
+            onDelete={handleDeleteFeatureClicked}
             onCancel={handleCancelChangingFeature}
             onRegisterSaveCallback={handleRegisterSaveCallback}
             onUnregisterSaveCallback={handleUnregisterSaveCallback}
-            onHaveUnsavedChangesStateChange={(hasUnsavedChanges) => handleUnsavedChangesStateChange(feature._id.toString(), hasUnsavedChanges)}
+            onHaveUnsavedChangesStateChange={hasUnsavedChanges =>
+              handleUnsavedChangesStateChange(
+                feature._id.toString(),
+                hasUnsavedChanges
+              )
+            }
             serverError={props.errors[feature._id]}
           />
         ))}
+
+        <Popup
+          open={deleting}
+          modal
+          closeOnDocumentClick={false}
+          closeOnEscape={false}
+          contentStyle={{ width: 'auto' }}
+        >
+          <div>
+            <div>
+              Delete feature {deletingFeature ? deletingFeature.name : ''}
+              ?
+            </div>
+            <br />
+            <ItemsRow centered>
+              <Button onClick={handleDeleteFeatureConfirmed}>Yes</Button>
+              <Button onClick={handleDeleteFeatureCancelled}>No</Button>
+            </ItemsRow>
+          </div>
+        </Popup>
       </>
     );
   }

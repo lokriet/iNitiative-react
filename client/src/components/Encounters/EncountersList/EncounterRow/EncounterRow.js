@@ -30,13 +30,13 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
       close();
     },
     [onDeleteCancelled],
-  )
+  );
 
   useEffect(() => {
     if (serverError) {
       setDeleting(false);
     }
-  }, [serverError])
+  }, [serverError]);
 
   return (
     <tr className={classes.EncounterRow}>

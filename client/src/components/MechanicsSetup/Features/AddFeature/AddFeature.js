@@ -28,6 +28,9 @@ const AddFeature = ({
   const [typeValue, setTypeValue] = useState(null);
 
   const handleStartAdding = useCallback(() => {
+    setNameValue('');
+    setDescriptionValue('');
+    setTypeValue(null);
     setAdding(true);
   }, []);
 

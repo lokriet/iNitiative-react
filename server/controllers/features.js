@@ -175,9 +175,11 @@ module.exports.deleteFeature = async (req, res, next) => {
 
 module.exports.getSharedFeatures = async (req, res, next) => {
   try {
-    const features = await Feature.find({ isHomebrew: false }).sort({
-      name: 1
-    });
+    const features = await Feature.find({ isHomebrew: false })
+      .collation({ locale: 'en' })
+      .sort({
+        name: 1
+      });
 
     res.status(200).json(features);
   } catch (error) {
@@ -190,20 +192,21 @@ module.exports.getHomebrewFeatures = async (req, res, next) => {
     const features = await Feature.find({
       isHomebrew: true,
       creator: req.userId
-    }).sort({ name: 1 });
+    })
+      .collation({ locale: 'en' })
+      .sort({ name: 1 });
 
     const featureTypes = await Feature.distinct('type', {
       $or: [
         {
           isHomebrew: true,
           creator: req.userId,
-          $and: [{ type: { $ne: null } }, { type: { $ne: "" } }]
+          $and: [{ type: { $ne: null } }, { type: { $ne: '' } }]
         },
         {
           isHomebrew: false,
-          $and: [{ type: { $ne: null } }, { type: { $ne: "" } }]
+          $and: [{ type: { $ne: null } }, { type: { $ne: '' } }]
         }
-        
       ]
     });
     res.status(200).json({ features, featureTypes });
