@@ -19,39 +19,48 @@ const mapParticipantValidationSchema = Joi.object()
   })
   .unknown(true);
 
-const areaEffectValidationSchema = Joi.object().keys({
-  _id: Joi.any().optional(),
-  name: Joi.string()
-    .optional()
-    .allow(null, ''),
-  type: Joi.string()
-    .equal('rectangle', 'circle', 'segment')
-    .required(),
-  color: Joi.string()
-    .regex(/^#[0-9a-f]{6}/i)
-    .required(),
-  gridWidth: Joi.number()
-    .min(0)
-    .max(1000)
-    .required(),
-  gridHeight: Joi.number()
-    .min(0)
-    .max(1000)
-    .required(),
-  angle: Joi.number()
-    .optional()
-    .allow(null, ''),
-  position: Joi.object()
-    .keys({
-      x: Joi.number().required(),
-      y: Joi.number().required()
-    })
-    .optional()
-    .allow(null),
-  followingParticipantId: Joi.any()
-    .optional()
-    .allow(null, '')
-});
+const positionSchema = Joi.object()
+  .keys({
+    posX: Joi.any().required(),
+    posY: Joi.any().required()
+  })
+  .unknown(true);
+
+const areaEffectValidationSchema = Joi.object()
+  .keys({
+    _id: Joi.any().optional(),
+    name: Joi.string()
+      .optional()
+      .allow(null, ''),
+    type: Joi.string()
+      .equal('rectangle', 'circle', 'segment')
+      .required(),
+    color: Joi.string()
+      .regex(/^#[0-9a-f]{6}/i)
+      .required(),
+    gridWidth: Joi.number()
+      .min(0)
+      .max(1000)
+      .required(),
+    gridHeight: Joi.number()
+      .min(0)
+      .max(1000)
+      .required(),
+    angle: Joi.number()
+      .optional()
+      .allow(null, ''),
+    position: Joi.object()
+      .keys({
+        x: Joi.any().required().strip(false),
+        y: Joi.any().required().strip(false)
+      })
+      .unknown(true)
+      .required(),
+    followingParticipantId: Joi.any()
+      .optional()
+      .allow(null, '')
+  })
+  .unknown(true);
 
 const mapValidationSchema = Joi.object()
   .keys({
@@ -102,8 +111,7 @@ const mapValidationSchema = Joi.object()
         console.log('comparator', aId, bId);
         return aId === bId;
       }),
-    areaEffects: Joi.array()
-      .items(areaEffectValidationSchema)
+    areaEffects: Joi.array().items(areaEffectValidationSchema)
   })
   .unknown(true);
 
@@ -225,6 +233,7 @@ module.exports = {
   encounterValidationSchema,
   participantValidationSchema,
   mapValidationSchema,
+  positionSchema,
   areaEffectValidationSchema,
   mapParticipantValidationSchema
 };

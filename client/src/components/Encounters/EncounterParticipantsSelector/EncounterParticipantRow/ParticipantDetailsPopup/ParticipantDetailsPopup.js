@@ -16,11 +16,17 @@ const ParticipantDetailsPopup = ({ participant }) => {
         {participant.avatarUrl != null && participant.avatarUrl !== '' ? (
           <img
             className={classes.Avatar}
-            style={participant.color == null ? {} : {borderColor: participant.color}}
+            style={
+              participant.color == null
+                ? {}
+                : { borderColor: participant.color }
+            }
             src={participant.avatarUrl}
             alt={participant.name}
           />
-        ) : participant.color == null ? null : <Color className={classes.ColorDot} color={participant.color} /> }
+        ) : participant.color == null ? null : (
+          <Color className={classes.ColorDot} color={participant.color} />
+        )}
         <div className={classes.Name}>{participant.name}</div>
       </ItemsRow>
       <ItemsRow>
@@ -30,8 +36,11 @@ const ParticipantDetailsPopup = ({ participant }) => {
             <div>
               {(participant.rolledInitiative || 0) +
                 participant.initiativeModifier}{' '}
-              ({participant.rolledInitiative == null ? '-' : participant.rolledInitiative} + {participant.initiativeModifier}
-              )
+              (
+              {participant.rolledInitiative == null
+                ? '-'
+                : participant.rolledInitiative}{' '}
+              + {participant.initiativeModifier})
             </div>
           </ItemsRow>
           <ItemsRow>
@@ -47,32 +56,65 @@ const ParticipantDetailsPopup = ({ participant }) => {
           </ItemsRow>
           <ItemsRow>
             <label className={classes.DetailsLabel}>Comment</label>
-            <div>{participant.comment == null || participant.comment === '' ? '-' : participant.comment}</div>
+            <div>
+              {participant.comment == null || participant.comment === ''
+                ? '-'
+                : participant.comment}
+            </div>
           </ItemsRow>
         </div>
         <div className={classes.DetailsColumn}>
           <ItemsRow>
             <label className={classes.DetailsLabel}>Armor Class:</label>
-              <div>{participant.armorClass} {participant.temporaryArmorClass == null ? '' : 'Tmp ' + participant.temporaryArmorClass}</div>
+            <div>
+              {participant.armorClass}{' '}
+              {participant.temporaryArmorClass == null
+                ? ''
+                : 'Tmp ' + participant.temporaryArmorClass}
+            </div>
           </ItemsRow>
           <ItemsRow>
             <label className={classes.DetailsLabel}>Speed:</label>
-            <div>{participant.speed} {participant.temporarySpeed == null ? '' : 'Tmp ' + participant.temporarySpeed}</div>
+            <div>
+              {participant.speed}{' '}
+              {participant.temporarySpeed == null
+                ? ''
+                : 'Tmp ' + participant.temporarySpeed}
+            </div>
           </ItemsRow>
           <ItemsRow className={classes.ExtraSpeeds}>
             {participant.swimSpeed == null ? null : (
-              <div>Swim: {participant.swimSpeed} {participant.temporarySwimSpeed == null ? '' : 'Tmp ' + participant.temporarySwimSpeed}</div>
+              <div>
+                Swim: {participant.swimSpeed}{' '}
+                {participant.temporarySwimSpeed == null
+                  ? ''
+                  : 'Tmp ' + participant.temporarySwimSpeed}
+              </div>
             )}
             {participant.climbSpeed == null ? null : (
-              <div>Climb: {participant.climbSpeed} {participant.temporaryClimbSpeed == null ? '' : 'Tmp ' + participant.temporaryClimbSpeed}</div>
+              <div>
+                Climb: {participant.climbSpeed}{' '}
+                {participant.temporaryClimbSpeed == null
+                  ? ''
+                  : 'Tmp ' + participant.temporaryClimbSpeed}
+              </div>
             )}
             {participant.flySpeed == null ? null : (
-              <div>Fly: {participant.flySpeed} {participant.temporaryFlySpeed == null ? '' : 'Tmp ' + participant.temporaryFlySpeed}</div>
+              <div>
+                Fly: {participant.flySpeed}{' '}
+                {participant.temporaryFlySpeed == null
+                  ? ''
+                  : 'Tmp ' + participant.temporaryFlySpeed}
+              </div>
             )}
           </ItemsRow>
           <ItemsRow>
             <label className={classes.DetailsLabel}>Advantages:</label>
-            <div>{participant.advantages == null || participant.advantages === '' ? '-' : participant.advantages}</div>
+            <div>
+              {participant.advantages == null || participant.advantages === ''
+                ? '-'
+                : participant.advantages}
+            </div>
           </ItemsRow>
         </div>
       </ItemsRow>
@@ -82,6 +124,13 @@ const ParticipantDetailsPopup = ({ participant }) => {
       </ItemsRow>
       <ItemsRow>
         <div className={classes.DetailsColumn}>
+          <div className={classes.DetailsList}>
+            <label className={classes.DetailsLabel}>Conditions:</label>
+            <div>
+              <List items={participant.conditions} />
+              {participant.conditions.length === 0 ? '—' : null}
+            </div>
+          </div>
           <div className={classes.DetailsList}>
             <label className={classes.DetailsLabel}>Immunities:</label>
             <div>

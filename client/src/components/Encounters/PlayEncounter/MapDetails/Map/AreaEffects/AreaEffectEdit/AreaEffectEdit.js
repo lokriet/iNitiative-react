@@ -30,18 +30,22 @@ const AreaEffectEdit = ({
   }, [areaEffect.gridHeight, gridCellSize]);
 
   const snapPosToGrid = useCallback(
-    (pos) => {
+    pos => {
       if (editedEncounter.map.snapToGrid) {
         const newPos = {
-          x: pos.x - (pos.x % (gridCellSize ? gridCellSize.x : aoe.defaultSquareSize)),
-          y: pos.y - (pos.y % (gridCellSize ? gridCellSize.y : aoe.defaultSquareSize))
+          x:
+            pos.x -
+            (pos.x % (gridCellSize ? gridCellSize.x : aoe.defaultSquareSize)),
+          y:
+            pos.y -
+            (pos.y % (gridCellSize ? gridCellSize.y : aoe.defaultSquareSize))
         };
         return newPos;
       } else {
         return pos;
       }
     },
-    [editedEncounter, gridCellSize],
+    [editedEncounter, gridCellSize]
   );
 
   const getPos = useCallback(() => {
@@ -103,7 +107,14 @@ const AreaEffectEdit = ({
         )
       );
     }
-  }, [areaEffect, getShapeWidth, getShapeHeight, mapImageSize, onChange, getPos]);
+  }, [
+    areaEffect,
+    getShapeWidth,
+    getShapeHeight,
+    mapImageSize,
+    onChange,
+    getPos
+  ]);
 
   const handleShapeDrag = useCallback((mouseEvent, position) => {
     setPosition({ x: position.x, y: position.y });
@@ -231,4 +242,3 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps)(AreaEffectEdit);
-

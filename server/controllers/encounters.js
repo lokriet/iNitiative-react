@@ -4,7 +4,8 @@ const responseCodes = require('../util/responseCodes');
 
 const {
   encounterValidationSchema,
-  participantValidationSchema
+  participantValidationSchema,
+  positionSchema
 } = require('../validators/encounter');
 
 module.exports.createEncounter = async (req, res, next) => {
@@ -66,7 +67,7 @@ module.exports.updateEncounter = async (req, res, next) => {
     }
     const encounterId = req.params.encounterId;
 
-    let encounter = await Encounter.findById(encounterId);
+    let encounter = await Encounter.findById(encounterId).lean();
     if (!encounter) {
       next(httpErrors.pageNotFoundError());
       return;
@@ -77,11 +78,9 @@ module.exports.updateEncounter = async (req, res, next) => {
       return;
     }
 
-    let encounterData = { ...encounter._doc, ...partialUpdate };
+    let encounterData = { ...encounter, ...partialUpdate };
 
-    const { error, value } = encounterValidationSchema.validate(encounterData, {
-      abortEarly: false
-    });
+    const { error, value } = encounterValidationSchema.validate(encounterData);
 
     if (error) {
       next(httpErrors.joiValidationError(error));
@@ -236,7 +235,7 @@ module.exports.updateEncounterParticipant = async (req, res, next) => {
 
     let participant = encounter.participants.find(
       item => item._id.toString() === participantId
-    );
+    ).lean();
     if (!participant) {
       next(httpErrors.pageNotFoundError());
       return;
@@ -244,7 +243,7 @@ module.exports.updateEncounterParticipant = async (req, res, next) => {
 
     const participantEditedFields = req.body.partialUpdate;
     let newParticipantData = {
-      ...participant._doc,
+      ...participant,
       ...participantEditedFields
     };
 

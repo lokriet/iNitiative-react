@@ -121,20 +121,22 @@ const MapDetails = props => {
           y: editedMapParticipant.mapY - initialMapParticipant.mapY
         };
 
-        newAreaEffects = props.editedEncounter.map.areaEffects.map(areaEffect => {
-          if (
-            areaEffect.followingParticipantId &&
-            areaEffect.followingParticipantId.toString() ===
-            editedMapParticipant.participantId.toString()
-          ) {
-            return {
-              ...areaEffect,
-              position: sum(areaEffect.position, moveVector)
-            };
-          } else {
-            return areaEffect;
+        newAreaEffects = props.editedEncounter.map.areaEffects.map(
+          areaEffect => {
+            if (
+              areaEffect.followingParticipantId &&
+              areaEffect.followingParticipantId.toString() ===
+                editedMapParticipant.participantId.toString()
+            ) {
+              return {
+                ...areaEffect,
+                position: sum(areaEffect.position, moveVector)
+              };
+            } else {
+              return areaEffect;
+            }
           }
-        });
+        );
       }
 
       dispatch(
