@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 
 import { connect, useDispatch } from 'react-redux';
@@ -12,7 +12,6 @@ const withAuthCheck = WrappedComponent => {
     const history = useHistory();
 
     const handleLogin = useCallback(() => {
-      console.log('auth check', history);
       dispatch(actions.setAuthRedirectPath(history.location.pathname + history.location.search));
       history.push('/login');
     }, [dispatch, history]);

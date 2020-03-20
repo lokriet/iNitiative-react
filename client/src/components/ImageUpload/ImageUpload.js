@@ -56,7 +56,6 @@ const ImageUpload = ({
           },
           (blob, didItResize, newSize) => {
             const uploadTask = firebase.doUploadImage(blob, file.name);
-            console.log('blob!', blob);
             setIsUploading(true);
             setStatusMessage('Uploading...');
             setErrorMessage(null);

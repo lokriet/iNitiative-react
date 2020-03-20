@@ -34,7 +34,6 @@ const EncountersList = props => {
   }, [history]);
   
   const handleDeleteEncounter = useCallback((encounterId) => {
-    console.log('deleting');
     dispatch(actions.deleteEncounter(encounterId))
   }, [dispatch]);
 

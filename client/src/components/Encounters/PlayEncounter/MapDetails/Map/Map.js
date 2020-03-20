@@ -12,7 +12,6 @@ import classes from './Map.module.css';
 import AreaEffectEdit from './AreaEffects/AreaEffectEdit/AreaEffectEdit';
 import MapControls from './MapControls/MapControls';
 import AreaEffects from './AreaEffects/AreaEffects';
-import { sum } from './AreaEffects/aoe-utils';
 
 const isOverMap = (mouseEvent, mapRect) => {
   return (
@@ -96,7 +95,6 @@ const Map = ({
 
   useEffect(() => {
     if (mapImageLoaded && hasGrid()) {
-      console.log('calculating grid cell size');
       const gridCellWidth = mapImageSize.x / editedEncounter.map.gridWidth;
       const gridCellHeight = mapImageSize.y / editedEncounter.map.gridHeight;
 

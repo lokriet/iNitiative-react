@@ -68,7 +68,6 @@ module.exports.createDamageType = async (req, res, next) => {
 
 module.exports.updateDamageType = async (req, res, next) => {
   try {
-    console.log('updating damage type');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       next(httpErrors.validationError(errors.array()));

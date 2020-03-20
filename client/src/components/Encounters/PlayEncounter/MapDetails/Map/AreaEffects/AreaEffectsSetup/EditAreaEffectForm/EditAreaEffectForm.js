@@ -125,7 +125,6 @@ const EditAreaEffectForm = ({
       position: areaEffect ? areaEffect.position : null,
       followingParticipantId: areaEffect ? areaEffect.followParticipantId : null
     };
-    // console.log('add area effect', editedAreaEffect);
     onAdd(editedAreaEffect);
   }, [color, height, width, type, name, onAdd, areaEffect]);
 

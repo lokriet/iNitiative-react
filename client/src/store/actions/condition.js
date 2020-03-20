@@ -36,7 +36,6 @@ export const addCondition = (condition, isHomebrew, setSubmitted) => {
       );
 
       const responseData = await response.json();
-      console.log('got response for condition creation', responseData);
 
       if (
         response.status === 500 ||
@@ -59,11 +58,9 @@ export const addCondition = (condition, isHomebrew, setSubmitted) => {
         );
         setSubmitted(false);
       } else if (response.status === 201) {
-        console.log(responseData.data);
         dispatch(addConditionSuccess(responseData.data));
         setSubmitted(true);
       } else {
-        console.log('Unexpected response status');
         dispatch(
           conditionOperationFailed(null, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
@@ -122,12 +119,10 @@ export const updateCondition = (condition, isHomebrew, setSubmitted) => {
         );
         setSubmitted(false);
       } else if (response.status === 200) {
-        console.log(responseData);
         dispatch(updateConditionSuccess(responseData.data));
         dispatch(actions.resetParticipantTemplateStore());
         setSubmitted(true);
       } else {
-        console.log('Unexpected response status');
         dispatch(
           conditionOperationFailed(condition._id, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
@@ -179,7 +174,6 @@ export const deleteCondition = conditionId => {
         dispatch(deleteConditionSuccess(conditionId));
         dispatch(actions.resetParticipantTemplateStore());
       } else {
-        console.log('Unexpected response status');
         dispatch(
           conditionOperationFailed(conditionId, {
             type: ErrorType.INTERNAL_CLIENT_ERROR,

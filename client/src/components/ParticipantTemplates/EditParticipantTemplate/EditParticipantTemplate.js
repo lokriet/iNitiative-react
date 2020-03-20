@@ -45,7 +45,6 @@ const EditParticipantTemplate = props => {
 
   const submitHandler = useCallback(
     (values, setSubmitting) => {
-      console.log('submit!', values);
       dispatch(
         actions.editParticipantTemplate(
           editMode ? templateId : null,
@@ -118,7 +117,6 @@ const EditParticipantTemplate = props => {
         }
       >
         {formProps => {
-          // console.log(formProps);
           return formProps.submitCount > 0 &&
             !formProps.isSubmitting &&
             formProps.isValid &&

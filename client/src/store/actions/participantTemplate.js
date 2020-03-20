@@ -53,7 +53,6 @@ export const editParticipantTemplate = (templateId, template, setSubmitting) => 
       }
 
       const responseData = await response.json();
-      console.log('got response for participant template edit', responseData);
 
       if (
         response.status === 500 ||
@@ -74,14 +73,12 @@ export const editParticipantTemplate = (templateId, template, setSubmitting) => 
           })
         );
       } else if (response.status === 201 || response.status === 200) {
-        console.log(responseData.data);
         if (templateId == null) {
           dispatch(addParticipantTemplateSuccess(responseData.data));
         } else {
           dispatch(updateParticipantTemplateSuccess(responseData.data));
         }
       } else {
-        console.log('Unexpected response status');
         dispatch(
           participantTemplateOperationFailed(null, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
@@ -132,7 +129,6 @@ export const deleteParticipantTemplate = (templateId) => {
       } else if (response.status === 200) {
         dispatch(deleteParticipantTemplateSuccess(templateId));
       } else {
-        console.log('Unexpected response status');
         dispatch(
           participantTemplateOperationFailed({
             type: ErrorType.INTERNAL_CLIENT_ERROR,
@@ -193,7 +189,6 @@ export const getParticipantTemplates = () => {
         );
       }
     } catch (error) {
-      console.log(error);
       dispatch(
         fetchParticipantTemplatesFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
@@ -238,7 +233,6 @@ export const getParticipantTemplateById = (templateId) => {
         );
       }
     } catch (error) {
-      console.log(error);
       dispatch(
         fetchParticipantTemplatesFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,

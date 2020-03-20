@@ -124,8 +124,6 @@ const Features = props => {
           newChangedFeatures.delete(featureId);
         }
 
-        console.log('new changes count', newChangedFeatures.size);
-
         return newChangedFeatures;
       });
     },

@@ -108,7 +108,6 @@ const mapValidationSchema = Joi.object()
           bId = b.participantId.toString();
         }
 
-        console.log('comparator', aId, bId);
         return aId === bId;
       }),
     areaEffects: Joi.array().items(areaEffectValidationSchema)

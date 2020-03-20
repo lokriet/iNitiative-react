@@ -89,7 +89,6 @@ const PlayDetails = props => {
             participant._id !== participantId &&
             participant.name === newName.trim()
         );
-        console.log('validating name', newName, result);
         return result;
       } else {
         return false;

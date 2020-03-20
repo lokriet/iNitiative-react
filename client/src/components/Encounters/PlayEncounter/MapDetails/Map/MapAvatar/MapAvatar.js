@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classes from './MapAvatar.module.css';
 import { isEmpty } from '../../../../../../util/helper-methods';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faSkull} from '@fortawesome/free-solid-svg-icons';
+import { faSkull } from '@fortawesome/free-solid-svg-icons';
 
 const MapAvatar = ({ participant, width, height, className }) => {
   return (
@@ -45,6 +45,11 @@ const MapAvatar = ({ participant, width, height, className }) => {
   );
 };
 
-MapAvatar.propTypes = {};
+MapAvatar.propTypes = {
+  participant: PropTypes.object.isRequired,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  className: PropTypes.string
+};
 
 export default MapAvatar;

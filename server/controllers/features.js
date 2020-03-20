@@ -70,7 +70,6 @@ module.exports.createFeature = async (req, res, next) => {
 
 module.exports.updateFeature = async (req, res, next) => {
   try {
-    console.log('updating feature');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       next(httpErrors.validationError(errors.array()));

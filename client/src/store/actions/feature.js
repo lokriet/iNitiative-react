@@ -31,7 +31,6 @@ export const addFeature = (feature, isHomebrew, setSubmitted) => {
       });
 
       const responseData = await response.json();
-      console.log('got response for feature creation', responseData);
 
       if (
         response.status === 500 ||
@@ -54,11 +53,9 @@ export const addFeature = (feature, isHomebrew, setSubmitted) => {
         );
         setSubmitted(false);
       } else if (response.status === 201) {
-        console.log(responseData.data);
         dispatch(addFeatureSuccess(responseData.data));
         setSubmitted(true);
       } else {
-        console.log('Unexpected response status');
         dispatch(
           featureOperationFailed(null, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
@@ -117,12 +114,10 @@ export const updateFeature = (feature, isHomebrew, setSubmitted) => {
         );
         setSubmitted(false);
       } else if (response.status === 200) {
-        console.log(responseData);
         dispatch(updateFeatureSuccess(responseData.data));
         dispatch(actions.resetParticipantTemplateStore());
         setSubmitted(true);
       } else {
-        console.log('Unexpected response status');
         dispatch(
           featureOperationFailed(feature._id, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
@@ -174,7 +169,6 @@ export const deleteFeature = featureId => {
         dispatch(deleteFeatureSuccess(featureId));
         dispatch(actions.resetParticipantTemplateStore());
       } else {
-        console.log('Unexpected response status');
         dispatch(
           featureOperationFailed(featureId, {
             type: ErrorType.INTERNAL_CLIENT_ERROR,

@@ -37,7 +37,6 @@ const ParticipantTemplatesList = props => {
 
   const handleEditTemplate = useCallback(
     templateId => {
-      console.log('going to edit template', templateId);
       history.push(`/templates/edit/${templateId}`);
     },
     [history]
@@ -45,7 +44,6 @@ const ParticipantTemplatesList = props => {
 
   const handleDeleteTemplate = useCallback(
     templateId => {
-      console.log('going to delete template', templateId);
       dispatch(actions.deleteParticipantTemplate(templateId));
     },
     [dispatch]

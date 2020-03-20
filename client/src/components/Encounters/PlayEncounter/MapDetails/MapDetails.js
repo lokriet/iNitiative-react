@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import Button from '../../../UI/Form/Button/Button';

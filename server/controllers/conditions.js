@@ -69,7 +69,6 @@ module.exports.createCondition = async (req, res, next) => {
 
 module.exports.updateCondition = async (req, res, next) => {
   try {
-    console.log('updating condition');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       next(httpErrors.validationError(errors.array()));

@@ -107,7 +107,6 @@ const updateFeatureSuccess = (state, action) => {
     const newFeatures = state.homebrewFeatures
       .map(item => (item._id === action.feature._id ? action.feature : item))
       .sort((a, b) => a.name.localeCompare(b.name));
-    console.log('new features', newFeatures);
     return {
       ...state,
       homebrewFeatures: newFeatures,
@@ -118,7 +117,6 @@ const updateFeatureSuccess = (state, action) => {
     const newFeatures = state.sharedFeatures
       .map(item => (item._id === action.feature._id ? action.feature : item))
       .sort((a, b) => a.name.localeCompare(b.name));
-    console.log('new features', newFeatures, action.feature);
     return {
       ...state,
       sharedFeatures: newFeatures,

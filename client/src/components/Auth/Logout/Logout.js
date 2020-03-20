@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux';
 
 const Logout = () => {
   const dispatch = useDispatch();
-  console.log('logouting?');
   dispatch(actions.logout());
   
   return (

@@ -11,7 +11,6 @@ const getAdminAuth = require('../util/firebaseAuthAdmin');
 module.exports.createUser = async (req, res, next) => {
   try {
     const errors = validationResult(req);
-    console.log('in create user');
     if (!errors.isEmpty()) {
       console.log(errors);
       next(httpErrors.validationError(errors.array()));
@@ -37,7 +36,6 @@ module.exports.createUser = async (req, res, next) => {
       isAdmin: savedUser.isAdmin
     };
 
-    // console.log('created user', userId);
     let token;
     try {
       token = await getAdminAuth().createCustomToken(userId, additionalClaims);
@@ -46,7 +44,6 @@ module.exports.createUser = async (req, res, next) => {
       next(error);
       return;
     }
-    // const token = jwtUtils.generateJWT(claims);
 
     return res.status(201).json({
       message: 'User created',
@@ -71,7 +68,6 @@ module.exports.login = async (req, res, next) => {
   try {
     const errors = validationResult(req);
 
-    console.log('in login');
     if (!errors.isEmpty()) {
       console.log(errors);
       next(httpErrors.validationError(errors.array()));
@@ -92,14 +88,7 @@ module.exports.login = async (req, res, next) => {
       return;
     }
 
-    // const claims = {
-    //   userId: user._id,
-    //   isAdmin: user.isAdmin
-    // };
-
-    // const token = jwtUtils.generateJWT(claims);
     const userId = user._id;
-    console.log('userId: ', userId);
     const additionalClaims = {
       isAdmin: user.isAdmin
     };

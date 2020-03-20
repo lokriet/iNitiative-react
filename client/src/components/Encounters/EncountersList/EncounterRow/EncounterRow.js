@@ -19,7 +19,6 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
   const [deleting, setDeleting] = useState(false);
 
   const handleConfirmDelete = useCallback(() => {
-    console.log('deleting', encounter._id);
     setDeleting(true);
     onDelete(encounter._id);
   }, [encounter._id, onDelete]);

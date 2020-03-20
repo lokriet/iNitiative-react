@@ -109,7 +109,6 @@ class Feature extends Component {
   };
 
   handleTypeChanged = (newValue, action) => {
-    console.log(newValue)
     this.setState({ typeValue: newValue });
 
     if (

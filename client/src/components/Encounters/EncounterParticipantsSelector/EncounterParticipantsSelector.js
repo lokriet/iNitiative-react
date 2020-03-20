@@ -77,7 +77,6 @@ const EncounterParticipantsSelector = ({
         }
         newParticipants[index] = newParticipant;
         onParticipantsChanged(newParticipants);
-        console.log('participants updated', newParticipants);
         return newParticipants;
       });
     },

@@ -71,7 +71,6 @@ export const editEncounter = (encounterId, encounterData, actionOptions) => {
       }
 
       const responseData = await response.json();
-      console.log('got response for encounter edit', responseData);
 
       if (
         response.status === 500 ||
@@ -95,7 +94,6 @@ export const editEncounter = (encounterId, encounterData, actionOptions) => {
           })
         );
       } else if (response.status === 201 || response.status === 200) {
-        console.log(responseData.data);
         if (encounterId == null) {
           dispatch(addEncounterSuccess(responseData.data));
         } else {
@@ -114,7 +112,6 @@ export const editEncounter = (encounterId, encounterData, actionOptions) => {
           }
         }
       } else {
-        console.log('Unexpected response status');
         dispatch(
           encounterOperationFailed(
             {
@@ -169,7 +166,6 @@ export const deleteEncounter = encounterId => {
       } else if (response.status === 200) {
         dispatch(deleteEncounterSuccess(encounterId));
       } else {
-        console.log('Unexpected response status');
         dispatch(
           encounterOperationFailed({
             type: ErrorType.INTERNAL_CLIENT_ERROR,
@@ -225,7 +221,6 @@ export const getEncounterById = encounterId => {
         );
       }
     } catch (error) {
-      console.log(error);
       dispatch(
         fetchEncountersFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
@@ -278,7 +273,6 @@ export const getEncounters = () => {
         );
       }
     } catch (error) {
-      console.log(error);
       dispatch(
         fetchEncountersFailed({
           type: ErrorType.INTERNAL_CLIENT_ERROR,
@@ -312,7 +306,6 @@ export const updateEncounterParticipantDetails = (
       );
 
       const responseData = await response.json();
-      console.log('got response for encounter participant edit', responseData);
 
       if (
         response.status === 500 ||
@@ -348,7 +341,6 @@ export const updateEncounterParticipantDetails = (
           encounterParticipantUpdateSuccess(participantId, partialUpdate)
         );
       } else {
-        console.log('Unexpected response status');
         dispatch(
           encounterParticipantOperationFailed(
             {
@@ -362,7 +354,6 @@ export const updateEncounterParticipantDetails = (
         );
       }
     } catch (error) {
-      console.log(error);
       dispatch(
         encounterParticipantOperationFailed(
           {

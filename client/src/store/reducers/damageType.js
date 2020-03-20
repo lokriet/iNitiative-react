@@ -88,7 +88,6 @@ const updateDamageTypeSuccess = (state, action) => {
         item._id === action.damageType._id ? action.damageType : item
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-    console.log('new damage types', newDamageTypes);
     return {
       ...state,
       homebrewDamageTypes: newDamageTypes,
@@ -100,7 +99,6 @@ const updateDamageTypeSuccess = (state, action) => {
         item._id === action.damageType._id ? action.damageType : item
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-    console.log('new damage types', newDamageTypes, action.damageType);
     return {
       ...state,
       sharedDamageTypes: newDamageTypes,

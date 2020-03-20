@@ -23,7 +23,6 @@ const Login = props => {
 
   const handleSubmit = useCallback(
     formValues => {
-      console.log('submitting form', formValues);
       dispatch(
         actions.authenticate(false, {
           email: formValues.email,
@@ -45,15 +44,15 @@ const Login = props => {
 
     form = (
       <Formik
-        // initialValues={{
-        //   email: '',
-        //   password: ''
-        // }}
         initialValues={{
-          email: '1@1.com',
-          password: '1111111',
-          rememberMe: true
+          email: '',
+          password: ''
         }}
+        // initialValues={{
+        //   email: '1@1.com',
+        //   password: '1111111',
+        //   rememberMe: true
+        // }}
         validationSchema={Yup.object({
           email: Yup.string()
             .required('Required')

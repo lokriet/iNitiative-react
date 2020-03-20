@@ -17,7 +17,6 @@ const LoadMap = ({ onNewMapLoaded, firebase }) => {
   const [gridSizeError, setGridSizeError] = useState(false);
 
   const handleMapUploaded = useCallback((mapUrl, mapSize) => {
-    console.log('Map uploaded', mapUrl, mapSize);
     if (loadedMapInfo) {
       firebase.doDeleteImage(loadedMapInfo.mapUrl);
     }

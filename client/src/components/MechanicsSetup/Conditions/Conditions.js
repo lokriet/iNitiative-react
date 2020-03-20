@@ -63,7 +63,6 @@ const Conditions = props => {
           newChangedConditions.delete(conditionId);
         }
 
-        console.log('new changes count', newChangedConditions.size);
         return newChangedConditions;
       });
     },

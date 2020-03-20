@@ -28,7 +28,6 @@ const EncounterParticipantRow = ({ participant, onInfoChanged, onDelete }) => {
 
   useEffect(() => {
     if (debouncedName !== participant.name) {
-      console.log('changing info on debounced name change');
       onInfoChanged({ name: debouncedName });
     }
   }, [debouncedName, onInfoChanged, participant.name]);

@@ -88,7 +88,6 @@ const updateConditionSuccess = (state, action) => {
         item._id === action.condition._id ? action.condition : item
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-    console.log('new conditions', newConditions);
     return {
       ...state,
       homebrewConditions: newConditions,
@@ -100,7 +99,6 @@ const updateConditionSuccess = (state, action) => {
         item._id === action.condition._id ? action.condition : item
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-    console.log('new conditions', newConditions, action.condition);
     return {
       ...state,
       sharedConditions: newConditions,

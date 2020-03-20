@@ -57,8 +57,8 @@ router.post(
       .exists()
       .notEmpty()
       .withMessage('Password is required')
-      .isLength({ min: 7 })
-      .withMessage('Password should be at least 7 characters long'),
+      .isLength({ min: 6 })
+      .withMessage('Password should be at least 6 characters long'),
 
     body('email')
       .exists()

@@ -84,8 +84,6 @@ const Summon = props => {
             );
           }
         }
-
-        console.log('validated summon', validationErrors);
       }
 
       setValidationErrors(validationErrors);

@@ -9,7 +9,6 @@ const INTERNAL_ERROR_MESSAGE =
 export const getFirebase = state => state.auth.firebase;
 
 export function* authSaga(action) {
-  console.log("I'm in saga!");
   yield put(actions.authStart());
 
   try {
@@ -33,10 +32,7 @@ export function* authSaga(action) {
       body: JSON.stringify(body)
     });
 
-    console.log(response);
-
     const responseData = yield response.json();
-    console.log(responseData);
 
     if (response.status === 500 || response.status === 401) {
       yield put(
@@ -59,14 +55,12 @@ export function* authSaga(action) {
         yield localStorage.removeItem('token');
       }
       const firebase = yield select(getFirebase);
-      const firebaseLoginResult = yield firebase.doSignInWithCustomToken(
+      yield firebase.doSignInWithCustomToken(
         responseData.data.token
       );
-      console.log('firebase login result: ', firebaseLoginResult);
       yield put(actions.authSuccess(responseData.data));
     }
   } catch (error) {
-    console.log(error);
     yield put(
       actions.authFailed({
         type: ErrorType.INTERNAL_CLIENT_ERROR,
@@ -100,8 +94,7 @@ export function* checkAuthStateSaga(action) {
 
   try {
     const firebase = yield select(getFirebase);
-    const firebaseLoginResult = yield firebase.doSignInWithCustomToken(token);
-    console.log('firebase login result: ', firebaseLoginResult);
+    yield firebase.doSignInWithCustomToken(token);
     const idToken = yield firebase.doGetIdToken();
     const response = yield fetch('http://localhost:3001/users/userinfo', {
       headers: {
@@ -117,8 +110,7 @@ export function* checkAuthStateSaga(action) {
       })
     );
   } catch (error) {
-    // yield put(actions.authFailed(error));
-    console.log(error);
+    // console.log(error);
   } finally {
     yield put(actions.authCheckInitialStateDone());
   }

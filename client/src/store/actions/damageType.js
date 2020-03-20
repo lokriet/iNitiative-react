@@ -36,7 +36,6 @@ export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
       );
 
       const responseData = await response.json();
-      console.log('got response for damage type creation', responseData);
 
       if (
         response.status === 500 ||
@@ -59,11 +58,9 @@ export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
         );
         setSubmitted(false);
       } else if (response.status === 201) {
-        console.log(responseData.data);
         dispatch(addDamageTypeSuccess(responseData.data));
         setSubmitted(true);
       } else {
-        console.log('Unexpected response status');
         dispatch(
           damageTypeOperationFailed(null, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
@@ -122,12 +119,10 @@ export const updateDamageType = (damageType, isHomebrew, setSubmitted) => {
         );
         setSubmitted(false);
       } else if (response.status === 200) {
-        console.log(responseData);
         dispatch(updateDamageTypeSuccess(responseData.data));
         dispatch(actions.resetParticipantTemplateStore());
         setSubmitted(true);
       } else {
-        console.log('Unexpected response status');
         dispatch(
           damageTypeOperationFailed(damageType._id, {
             type: ErrorType.INTERNAL_SERVER_ERROR,
@@ -179,7 +174,6 @@ export const deleteDamageType = damageTypeId => {
         dispatch(deleteDamageTypeSuccess(damageTypeId));
         dispatch(actions.resetParticipantTemplateStore());
       } else {
-        console.log('Unexpected response status');
         dispatch(
           damageTypeOperationFailed(damageTypeId, {
             type: ErrorType.INTERNAL_CLIENT_ERROR,

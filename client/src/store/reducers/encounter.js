@@ -175,7 +175,6 @@ const encounterParticipantUpdateSuccess = (state, action) => {
       participant => participant._id.toString() === action.participantId
     )
   ) {
-    console.log("I'm confused :(");
     return state;
   }
 
