@@ -38,6 +38,9 @@ const participantTemplatesReducer = (state = initialState, action) => {
     case ActionTypes.participantTemplate.SET_EDITED_PARTICIPANT_TEMPLATE: 
       return setEditedParticipantTemplate(state, action);
 
+    case ActionTypes.participantTemplate.RESET_PARTICIPANT_TEMPLATE_STORE: 
+      return resetParticipantTemplateStore(state, action);
+
     default:
       return state;
   }
@@ -132,5 +135,9 @@ const fetchParticipantTemplatesFailed = (state, action) => {
     error: action.error
   };
 };
+
+const resetParticipantTemplateStore = (state, action) => {
+  return initialState;
+}
 
 export default participantTemplatesReducer;

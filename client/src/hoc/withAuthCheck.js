@@ -22,12 +22,12 @@ const withAuthCheck = WrappedComponent => {
       return <Spinner />;
     } else if (!props.isAuthenticated && props.initialAuthCheckDone) {
       return (
-        <Fragment>
+        <div style={{width: 'fit-content', margin: 'auto'}}>
           <div>You are not logged in</div>
           <button type="button" onClick={handleLogin}>
             Login
           </button>
-        </Fragment>
+        </div>
       );
     } else {
       return <WrappedComponent {...props} />;

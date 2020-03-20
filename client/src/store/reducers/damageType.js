@@ -45,36 +45,49 @@ const damageTypesReducer = (state = initialState, action) => {
 
     case ActionTypes.damageType.FETCH_HOMEBREW_DAMAGE_TYPES_FAILED:
       return fetchHomebrewDamageTypesFailed(state, action);
+
+    case ActionTypes.damageType.RESET_DAMAGE_TYPE_STORE:
+      return resetDamageTypeStore();
+
     default:
       return state;
   }
 };
 
 const addDamageTypeSuccess = (state, action) => {
-  const newErrors = removeErrorFromStateErrors(state.errors, null)
+  const newErrors = removeErrorFromStateErrors(state.errors, null);
 
   if (action.damageType.isHomebrew) {
     return {
       ...state,
-      homebrewDamageTypes: state.homebrewDamageTypes.concat(action.damageType).sort((a, b) => a.name.localeCompare(b.name)),
+      homebrewDamageTypes: state.homebrewDamageTypes
+        .concat(action.damageType)
+        .sort((a, b) => a.name.localeCompare(b.name)),
       errors: newErrors
     };
   } else {
     return {
       ...state,
-      sharedDamageTypes: state.sharedDamageTypes.concat(action.damageType).sort((a, b) => a.name.localeCompare(b.name)),
+      sharedDamageTypes: state.sharedDamageTypes
+        .concat(action.damageType)
+        .sort((a, b) => a.name.localeCompare(b.name)),
       errors: newErrors
     };
   }
 };
 
 const updateDamageTypeSuccess = (state, action) => {
-  const newErrors = removeErrorFromStateErrors(state.errors, action.damageType._id)
+  const newErrors = removeErrorFromStateErrors(
+    state.errors,
+    action.damageType._id
+  );
 
   if (action.damageType.isHomebrew) {
-    const newDamageTypes = state.homebrewDamageTypes.map(item =>
-      item._id === action.damageType._id ? action.damageType : item
-    ).sort((a, b) => a.name.localeCompare(b.name));
+    const newDamageTypes = state.homebrewDamageTypes
+      .map(item =>
+        item._id === action.damageType._id ? action.damageType : item
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
     console.log('new damage types', newDamageTypes);
     return {
       ...state,
@@ -82,9 +95,11 @@ const updateDamageTypeSuccess = (state, action) => {
       errors: newErrors
     };
   } else {
-    const newDamageTypes = state.sharedDamageTypes.map(item =>
-      item._id === action.damageType._id ? action.damageType : item
-    ).sort((a, b) => a.name.localeCompare(b.name));
+    const newDamageTypes = state.sharedDamageTypes
+      .map(item =>
+        item._id === action.damageType._id ? action.damageType : item
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
     console.log('new damage types', newDamageTypes, action.damageType);
     return {
       ...state,
@@ -95,15 +110,22 @@ const updateDamageTypeSuccess = (state, action) => {
 };
 
 const deleteDamageTypeSuccess = (state, action) => {
-  const newErrors = removeErrorFromStateErrors(state.errors, action.damageTypeId);
+  const newErrors = removeErrorFromStateErrors(
+    state.errors,
+    action.damageTypeId
+  );
 
   return {
     ...state,
     errors: newErrors,
-    sharedDamageTypes: state.sharedDamageTypes.filter(item => item._id !== action.damageTypeId),
-    homebrewDamageTypes: state.homebrewDamageTypes.filter(item => item._id !== action.damageTypeId)
-  }
-}
+    sharedDamageTypes: state.sharedDamageTypes.filter(
+      item => item._id !== action.damageTypeId
+    ),
+    homebrewDamageTypes: state.homebrewDamageTypes.filter(
+      item => item._id !== action.damageTypeId
+    )
+  };
+};
 
 const damageTypeOperationFailed = (state, action) => {
   const damageTypeId = action.damageTypeId || 'ADD';
@@ -170,7 +192,6 @@ const fetchHomebrewDamageTypesFailed = (state, action) => {
   };
 };
 
-
 const removeErrorFromStateErrors = (errors, damageTypeId) => {
   let newErrors;
   const errorId = damageTypeId || 'ADD';
@@ -184,6 +205,10 @@ const removeErrorFromStateErrors = (errors, damageTypeId) => {
     newErrors = errors;
   }
   return newErrors;
-}
+};
+
+const resetDamageTypeStore = (state, action) => {
+  return initialState;
+};
 
 export default damageTypesReducer;

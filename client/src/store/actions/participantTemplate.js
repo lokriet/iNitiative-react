@@ -2,6 +2,8 @@ import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 
 export const ParticipantTemplateActionTypes = {
+  RESET_PARTICIPANT_TEMPLATE_STORE: 'RESET_PARTICIPANT_TEMPLATE_STORE',
+
   RESET_PARTICIPANT_TEMPLATE_OPERATION: 'RESET_PARTICIPANT_TEMPLATE_OPERATION',
   ADD_PARTICIPANT_TEMPLATE_SUCCESS: 'ADD_PARTICIPANT_TEMPLATE_SUCCESS',
   UPDATE_PARTICIPANT_TEMPLATE_SUCCESS: 'UPDATE_PARTICIPANT_TEMPLATE_SUCCESS',
@@ -319,5 +321,11 @@ export const fetchParticipantTemplatesFailed = error => {
   return {
     type: ParticipantTemplateActionTypes.FETCH_PARTICIPANT_TEMPLATES_FAILED,
     error
+  };
+};
+
+export const resetParticipantTemplateStore = () => {
+  return {
+    type: ParticipantTemplateActionTypes.RESET_PARTICIPANT_TEMPLATE_STORE
   };
 };

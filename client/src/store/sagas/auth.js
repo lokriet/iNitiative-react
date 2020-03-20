@@ -1,4 +1,3 @@
-// import { push } from 'react-router-redux';
 import { put, select } from 'redux-saga/effects';
 import ErrorType from '../../util/error';
 
@@ -6,8 +5,6 @@ import * as actions from '../actions/index';
 
 const INTERNAL_ERROR_MESSAGE =
   'Internal server error occured while authenticating. Please try again.';
-// import createHistory from 'history/createBrowserHistory';
-// const history = createHistory();
 
 export const getFirebase = state => state.auth.firebase;
 
@@ -83,6 +80,13 @@ export function* logoutSaga(action) {
   yield localStorage.removeItem('token');
   const firebase = yield select(getFirebase);
   yield firebase.doSignOut();
+
+  yield put(actions.resetConditionStore());
+  yield put(actions.resetDamageTypeStore());
+  yield put(actions.resetFeatureStore());
+  yield put(actions.resetParticipantTemplateStore());
+  yield put(actions.resetEncounterStore());
+
   yield put(actions.logoutSuccess());
 }
 

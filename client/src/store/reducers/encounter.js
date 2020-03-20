@@ -43,10 +43,13 @@ const encounterReducer = (state = initialState, action) => {
       return setEditedEncounter(state, action);
 
     case ActionTypes.encounter.UPDATE_EDITED_ENCOUNTER:
-      return updateEditedEncounter(state, action);   
+      return updateEditedEncounter(state, action);
 
     case ActionTypes.encounter.FETCH_ENCOUNTERS_FAILED:
       return fetchEncountersFailed(state, action);
+
+    case ActionTypes.encounter.RESET_ENCOUNTER_STORE:
+      return resetEncounterStore(state, action);
 
     default:
       return state;
@@ -159,7 +162,7 @@ const setEditedEncounter = (state, action) => {
 const updateEditedEncounter = (state, action) => {
   return {
     ...state,
-    editedEncounter: {...state.editedEncounter, ...action.partialUpdate},
+    editedEncounter: { ...state.editedEncounter, ...action.partialUpdate },
     fetching: false,
     fetchingError: null
   };
@@ -193,7 +196,7 @@ const encounterParticipantUpdateSuccess = (state, action) => {
       ...state.encounters.filter(
         item => item._id.toString() !== state.editedEncounter._id.toString()
       )
-    ],
+    ]
   };
 };
 
@@ -229,6 +232,10 @@ const applyParticipantUpdate = (
     updatedAt: new Date()
   };
   return newEncounter;
+};
+
+const resetEncounterStore = () => {
+  return initialState;
 };
 
 export default encounterReducer;

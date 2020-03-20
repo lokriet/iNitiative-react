@@ -1,7 +1,10 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
+import * as actions from '../actions';
 
 export const DamageTypeActionTypes = {
+  RESET_DAMAGE_TYPE_STORE: 'RESET_DAMAGE_TYPE_STORE',
+
   ADD_DAMAGE_TYPE_SUCCESS: 'ADD_DAMAGE_TYPE_SUCCESS',
   UPDATE_DAMAGE_TYPE_SUCCESS: 'UPDATE_DAMAGE_TYPE_SUCCESS',
   DELETE_DAMAGE_TYPE_SUCCESS: 'DELETE_DAMAGE_TYPE_SUCCESS',
@@ -19,7 +22,7 @@ export const DamageTypeActionTypes = {
 export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         'http://localhost:3001/damageTypes/damageType',
         {
@@ -81,14 +84,10 @@ export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
   };
 };
 
-export const updateDamageType = (
-  damageType,
-  isHomebrew,
-  setSubmitted
-) => {
+export const updateDamageType = (damageType, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/damageTypes/damageType/${damageType._id}`,
         {
@@ -125,6 +124,7 @@ export const updateDamageType = (
       } else if (response.status === 200) {
         console.log(responseData);
         dispatch(updateDamageTypeSuccess(responseData.data));
+        dispatch(actions.resetParticipantTemplateStore());
         setSubmitted(true);
       } else {
         console.log('Unexpected response status');
@@ -144,14 +144,14 @@ export const updateDamageType = (
         })
       );
       setSubmitted(false);
-    } 
+    }
   };
 };
 
-export const deleteDamageType = (damageTypeId) => {
+export const deleteDamageType = damageTypeId => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/damageTypes/damageType/${damageTypeId}`,
         {
@@ -177,6 +177,7 @@ export const deleteDamageType = (damageTypeId) => {
         );
       } else if (response.status === 200) {
         dispatch(deleteDamageTypeSuccess(damageTypeId));
+        dispatch(actions.resetParticipantTemplateStore());
       } else {
         console.log('Unexpected response status');
         dispatch(
@@ -201,8 +202,9 @@ export const getSharedDamageTypes = () => {
   return async (dispatch, getState) => {
     if (
       getState().damageType.sharedDamageTypesInitialised &&
-      new Date().getTime() - getState().damageType.sharedDamageTypesInitialised <
-      constants.refreshDataTimeout
+      new Date().getTime() -
+        getState().damageType.sharedDamageTypesInitialised <
+        constants.refreshDataTimeout
     ) {
       return;
     }
@@ -236,25 +238,26 @@ export const getHomebrewDamageTypes = () => {
   return async (dispatch, getState) => {
     if (
       getState().damageType.homebrewDamageTypesInitialised &&
-      new Date().getTime() - getState().damageType.homebrewDamageTypesInitialised <
-      constants.refreshDataTimeout
+      new Date().getTime() -
+        getState().damageType.homebrewDamageTypesInitialised <
+        constants.refreshDataTimeout
     ) {
       return;
     }
 
     try {
       dispatch(startFetchingHomebrewDamageTypes());
-      const idToken =  await getState().auth.firebase.doGetIdToken();
-      const response = await fetch('http://localhost:3001/damageTypes/homebrew', {
-        headers: {
-          Authorization: `Bearer ${idToken}`
+      const idToken = await getState().auth.firebase.doGetIdToken();
+      const response = await fetch(
+        'http://localhost:3001/damageTypes/homebrew',
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
         }
-      });
+      );
 
-      if (
-        response.status === 500 ||
-        response.status === 401
-      ) {
+      if (response.status === 500 || response.status === 401) {
         const responseData = await response.json();
         dispatch(
           fetchHomebrewDamageTypesFailed({
@@ -282,7 +285,7 @@ export const getHomebrewDamageTypes = () => {
       );
     }
   };
-}
+};
 
 export const addDamageTypeSuccess = damageType => {
   return {
@@ -357,5 +360,11 @@ export const fetchHomebrewDamageTypesFailed = error => {
   return {
     type: DamageTypeActionTypes.FETCH_HOMEBREW_DAMAGE_TYPES_FAILED,
     error
+  };
+};
+
+export const resetDamageTypeStore = () => {
+  return {
+    type: DamageTypeActionTypes.RESET_DAMAGE_TYPE_STORE
   };
 };

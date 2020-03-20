@@ -2,6 +2,8 @@ import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 
 export const EncounterActionTypes = {
+  RESET_ENCOUNTER_STORE: 'RESET_ENCOUNTER_STORE',
+
   RESET_ENCOUNTER_OPERATION: 'RESET_ENCOUNTER_OPERATION',
   ADD_ENCOUNTER_SUCCESS: 'ADD_ENCOUNTER_SUCCESS',
   UPDATE_ENCOUNTER_SUCCESS: 'UPDATE_ENCOUNTER_SUCCESS',
@@ -26,12 +28,7 @@ export const EditedEncounterAction = {
   Update: 'update'
 };
 
-
-export const editEncounter = (
-  encounterId,
-  encounterData,
-  actionOptions
-) => {
+export const editEncounter = (encounterId, encounterData, actionOptions) => {
   return async (dispatch, getState) => {
     let options = {
       editedEncounterAction: EditedEncounterAction.None,
@@ -39,7 +36,7 @@ export const editEncounter = (
       overwriteError: true
     };
     if (actionOptions) {
-      options = {...options, ...actionOptions};
+      options = { ...options, ...actionOptions };
     }
 
     try {
@@ -102,21 +99,30 @@ export const editEncounter = (
         if (encounterId == null) {
           dispatch(addEncounterSuccess(responseData.data));
         } else {
-          dispatch(updateEncounterSuccess(responseData.data, options.overwriteError));
-          if (options.editedEncounterAction === EditedEncounterAction.Update && !options.applyChangesOnError) {
+          dispatch(
+            updateEncounterSuccess(responseData.data, options.overwriteError)
+          );
+          if (
+            options.editedEncounterAction === EditedEncounterAction.Update &&
+            !options.applyChangesOnError
+          ) {
             dispatch(updateEditedEncounter(encounterData));
-          } else if (options.editedEncounterAction === EditedEncounterAction.Set) {
+          } else if (
+            options.editedEncounterAction === EditedEncounterAction.Set
+          ) {
             dispatch(setEditedEncounter(responseData.data));
           }
         }
       } else {
         console.log('Unexpected response status');
         dispatch(
-          encounterOperationFailed({
-            type: ErrorType.INTERNAL_SERVER_ERROR,
-            message: INTERNAL_ERROR_MESSAGE
-          },
-          options.overwriteError)
+          encounterOperationFailed(
+            {
+              type: ErrorType.INTERNAL_SERVER_ERROR,
+              message: INTERNAL_ERROR_MESSAGE
+            },
+            options.overwriteError
+          )
         );
       }
     } catch (error) {
@@ -327,13 +333,15 @@ export const updateEncounterParticipantDetails = (
         );
       } else if (response.status === 422) {
         dispatch(
-          encounterParticipantOperationFailed({
-            type: ErrorType.VALIDATION_ERROR,
-            data: responseData.data
-          },
-          applyChangesOnError,
-          participantId,
-          partialUpdate)
+          encounterParticipantOperationFailed(
+            {
+              type: ErrorType.VALIDATION_ERROR,
+              data: responseData.data
+            },
+            applyChangesOnError,
+            participantId,
+            partialUpdate
+          )
         );
       } else if (response.status === 201 || response.status === 200) {
         dispatch(
@@ -342,25 +350,29 @@ export const updateEncounterParticipantDetails = (
       } else {
         console.log('Unexpected response status');
         dispatch(
-          encounterParticipantOperationFailed({
-            type: ErrorType.INTERNAL_SERVER_ERROR,
-            message: INTERNAL_ERROR_MESSAGE
-          },
-          applyChangesOnError,
-          participantId,
-          partialUpdate)
+          encounterParticipantOperationFailed(
+            {
+              type: ErrorType.INTERNAL_SERVER_ERROR,
+              message: INTERNAL_ERROR_MESSAGE
+            },
+            applyChangesOnError,
+            participantId,
+            partialUpdate
+          )
         );
       }
     } catch (error) {
       console.log(error);
       dispatch(
-        encounterParticipantOperationFailed({
-          type: ErrorType.INTERNAL_CLIENT_ERROR,
-          message: INTERNAL_ERROR_MESSAGE
-        },
-        applyChangesOnError,
-        participantId,
-        partialUpdate)
+        encounterParticipantOperationFailed(
+          {
+            type: ErrorType.INTERNAL_CLIENT_ERROR,
+            message: INTERNAL_ERROR_MESSAGE
+          },
+          applyChangesOnError,
+          participantId,
+          partialUpdate
+        )
       );
     }
   };
@@ -455,8 +467,8 @@ export const updateEditedEncounter = partialUpdate => {
   return {
     type: EncounterActionTypes.UPDATE_EDITED_ENCOUNTER,
     partialUpdate
-  }
-}
+  };
+};
 
 export const resetEditedEncounter = () => {
   return {
@@ -473,5 +485,11 @@ export const encounterParticipantUpdateSuccess = (
     type: EncounterActionTypes.ENCOUNTER_PARTICIPANT_UPDATE_SUCCESS,
     participantId,
     partialUpdate
+  };
+};
+
+export const resetEncounterStore = () => {
+  return {
+    type: EncounterActionTypes.RESET_ENCOUNTER_STORE
   };
 };

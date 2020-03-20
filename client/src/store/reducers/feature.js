@@ -47,6 +47,9 @@ const featuresReducer = (state = initialState, action) => {
     case ActionTypes.feature.FETCH_HOMEBREW_FEATURES_FAILED:
       return fetchHomebrewFeaturesFailed(state, action);
 
+    case ActionTypes.feature.RESET_FEATURE_STORE:
+      return resetFeatureStore(state, action);
+
     default:
       return state;
   }
@@ -250,6 +253,10 @@ const getDistinctFeatureTypes = (sharedFeatures, homebrewFeatures) => {
       featureTypesSet.add(feature.type);
   });
   return [...featureTypesSet];
+};
+
+const resetFeatureStore = (state, action) => {
+  return initialState;
 };
 
 export default featuresReducer;

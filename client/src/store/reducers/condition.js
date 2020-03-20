@@ -46,6 +46,9 @@ const conditionsReducer = (state = initialState, action) => {
     case ActionTypes.condition.FETCH_HOMEBREW_CONDITIONS_FAILED:
       return fetchHomebrewConditionsFailed(state, action);
 
+    case ActionTypes.condition.RESET_CONDITION_STORE:
+      return resetConditionStore(state, action);
+
     default:
       return state;
   }
@@ -202,6 +205,10 @@ const removeErrorFromStateErrors = (errors, conditionId) => {
     newErrors = errors;
   }
   return newErrors;
+};
+
+const resetConditionStore = (state, action) => {
+  return initialState;
 };
 
 export default conditionsReducer;

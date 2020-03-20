@@ -1,7 +1,10 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
+import * as actions from '../actions';
 
 export const ConditionActionTypes = {
+  RESET_CONDITION_STORE: 'RESET_CONDITION_STORE',
+
   ADD_CONDITION_SUCCESS: 'ADD_CONDITION_SUCCESS',
   UPDATE_CONDITION_SUCCESS: 'UPDATE_CONDITION_SUCCESS',
   DELETE_CONDITION_SUCCESS: 'DELETE_CONDITION_SUCCESS',
@@ -19,7 +22,6 @@ export const ConditionActionTypes = {
 export const addCondition = (condition, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         'http://localhost:3001/conditions/condition',
@@ -85,7 +87,7 @@ export const addCondition = (condition, isHomebrew, setSubmitted) => {
 export const updateCondition = (condition, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/conditions/condition/${condition._id}`,
         {
@@ -122,6 +124,7 @@ export const updateCondition = (condition, isHomebrew, setSubmitted) => {
       } else if (response.status === 200) {
         console.log(responseData);
         dispatch(updateConditionSuccess(responseData.data));
+        dispatch(actions.resetParticipantTemplateStore());
         setSubmitted(true);
       } else {
         console.log('Unexpected response status');
@@ -145,10 +148,10 @@ export const updateCondition = (condition, isHomebrew, setSubmitted) => {
   };
 };
 
-export const deleteCondition = (conditionId) => {
+export const deleteCondition = conditionId => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/conditions/condition/${conditionId}`,
         {
@@ -174,6 +177,7 @@ export const deleteCondition = (conditionId) => {
         );
       } else if (response.status === 200) {
         dispatch(deleteConditionSuccess(conditionId));
+        dispatch(actions.resetParticipantTemplateStore());
       } else {
         console.log('Unexpected response status');
         dispatch(
@@ -233,15 +237,16 @@ export const getHomebrewConditions = () => {
   return async (dispatch, getState) => {
     if (
       getState().condition.homebrewConditionsInitialised &&
-      new Date().getTime() - getState().condition.homebrewConditionsInitialised <
-      constants.refreshDataTimeout
+      new Date().getTime() -
+        getState().condition.homebrewConditionsInitialised <
+        constants.refreshDataTimeout
     ) {
       return;
     }
 
     try {
       dispatch(startFetchingHomebrewConditions());
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         'http://localhost:3001/conditions/homebrew',
         {
@@ -354,5 +359,11 @@ export const fetchHomebrewConditionsFailed = error => {
   return {
     type: ConditionActionTypes.FETCH_HOMEBREW_CONDITIONS_FAILED,
     error
+  };
+};
+
+export const resetConditionStore = () => {
+  return {
+    type: ConditionActionTypes.RESET_CONDITION_STORE
   };
 };

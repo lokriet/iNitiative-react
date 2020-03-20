@@ -1,7 +1,10 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
+import * as actions from '../actions';
 
 export const FeatureActionTypes = {
+  RESET_FEATURE_STORE: 'RESET_FEATURE_STORE',
+
   ADD_FEATURE_SUCCESS: 'ADD_FEATURE_SUCCESS',
   UPDATE_FEATURE_SUCCESS: 'UPDATE_FEATURE_SUCCESS',
   DELETE_FEATURE_SUCCESS: 'DELETE_FEATURE_SUCCESS',
@@ -17,7 +20,7 @@ export const FeatureActionTypes = {
 export const addFeature = (feature, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch('http://localhost:3001/features/feature', {
         method: 'POST',
         headers: {
@@ -79,7 +82,7 @@ export const addFeature = (feature, isHomebrew, setSubmitted) => {
 export const updateFeature = (feature, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/features/feature/${feature._id}`,
         {
@@ -116,6 +119,7 @@ export const updateFeature = (feature, isHomebrew, setSubmitted) => {
       } else if (response.status === 200) {
         console.log(responseData);
         dispatch(updateFeatureSuccess(responseData.data));
+        dispatch(actions.resetParticipantTemplateStore());
         setSubmitted(true);
       } else {
         console.log('Unexpected response status');
@@ -139,10 +143,10 @@ export const updateFeature = (feature, isHomebrew, setSubmitted) => {
   };
 };
 
-export const deleteFeature = (featureId) => {
+export const deleteFeature = featureId => {
   return async (dispatch, getState) => {
     try {
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
         `http://localhost:3001/features/feature/${featureId}`,
         {
@@ -168,6 +172,7 @@ export const deleteFeature = (featureId) => {
         );
       } else if (response.status === 200) {
         dispatch(deleteFeatureSuccess(featureId));
+        dispatch(actions.resetParticipantTemplateStore());
       } else {
         console.log('Unexpected response status');
         dispatch(
@@ -235,7 +240,7 @@ export const getHomebrewFeatures = () => {
 
     try {
       dispatch(startFetchingFeatures());
-      const idToken =  await getState().auth.firebase.doGetIdToken();
+      const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch('http://localhost:3001/features/homebrew', {
         headers: {
           Authorization: `Bearer ${idToken}`
@@ -335,5 +340,11 @@ export const fetchFeaturesFailed = error => {
   return {
     type: FeatureActionTypes.FETCH_FEATURES_FAILED,
     error
+  };
+};
+
+export const resetFeatureStore = () => {
+  return {
+    type: FeatureActionTypes.RESET_FEATURE_STORE
   };
 };
