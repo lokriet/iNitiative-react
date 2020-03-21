@@ -55,31 +55,18 @@ const App = props => {
             <Route path="/" exact component={Home} />
             <Route path="/register" component={Register} />
             <Route path="/login" component={Login} />
-            <Route path="/admin">
-              <MechanicsSetup isHomebrew={false} />
-            </Route>
+            <Route path="/admin" render={() => <MechanicsSetup isHomebrew={false} />} />
 
-            <Route path="/homebrew">
-              <MechanicsSetup isHomebrew={true} />
-            </Route>
+            <Route path="/homebrew" render={() => <MechanicsSetup isHomebrew={true} />} />
 
-            <Route path="/templates/new">
-              <EditParticipantTemplate isNew />
-            </Route>
-            <Route path="/templates/edit/:templateId">
-              <EditParticipantTemplate />
-            </Route>
+            <Route path="/templates/new" render={() => <EditParticipantTemplate isNew />} />
+            <Route path="/templates/edit/:templateId" component={EditParticipantTemplate} />
             <Route path="/templates" component={ParticipantTemplates} />
             
-            <Route path="/encounters/new">
-              <EditEncounter isNew />
-            </Route>
-            <Route path="/encounters/edit/:encounterId">
-              <EditEncounter />
-            </Route>
-            <Route path="/encounters/play/:encounterId">
-              <PlayEncounter />
-            </Route>
+            <Route path="/encounters/new" render={() => <EditEncounter isNew />} />
+            
+            <Route path="/encounters/edit/:encounterId" component={EditEncounter} />
+            <Route path="/encounters/play/:encounterId" component={PlayEncounter} />
             <Route path="/encounters" exact component={EncountersList} />
             <Route path="/logout" component={Logout} />
             <Route path="/404" component={PageNotFound} />

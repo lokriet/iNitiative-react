@@ -65,22 +65,22 @@ const EncounterParticipantsSelector = ({
 
   const handleParticipantUpdate = useCallback(
     (partialUpdate, participant) => {
-      setAddedParticipants(previousAddedParticipants => {
-        const newParticipants = [...previousAddedParticipants];
-        const index = newParticipants.indexOf(participant);
-        const newParticipant = {
-          ...newParticipants[index],
-          ...partialUpdate
-        };
-        if ("_tempId" in newParticipant && newParticipant.maxHp !== newParticipant.currentHp)  {
-          newParticipant.currentHp = newParticipant.maxHp;
-        }
-        newParticipants[index] = newParticipant;
-        onParticipantsChanged(newParticipants);
-        return newParticipants;
-      });
+      const newParticipants = [...addedParticipants];
+      const index = newParticipants.indexOf(participant);
+      const newParticipant = {
+        ...newParticipants[index],
+        ...partialUpdate
+      };
+
+      if ("_tempId" in newParticipant && newParticipant.maxHp !== newParticipant.currentHp)  {
+        newParticipant.currentHp = newParticipant.maxHp;
+      }
+      newParticipants[index] = newParticipant;
+
+      setAddedParticipants(newParticipants);
+      onParticipantsChanged(newParticipants);
     },
-    [onParticipantsChanged]
+    [onParticipantsChanged, addedParticipants]
   );
 
   const handleParticipantDelete = useCallback(
@@ -155,7 +155,6 @@ const EncounterParticipantsSelector = ({
   );
 
   return (
-    // <>
     <div className={classes.Container}>
       <div className={classes.TemplatesPicker}>
         <TemplatesPicker onAdd={handleAddParticipant} />
@@ -185,7 +184,6 @@ const EncounterParticipantsSelector = ({
         )}
       </div>
     </div>
-    // </>
   );
 };
 

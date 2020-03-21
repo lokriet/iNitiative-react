@@ -7,6 +7,7 @@ import IconButton from '../../../../UI/Form/Button/IconButton/IconButton';
 import { faPlus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Popup from 'reactjs-popup';
 import TemplateDetailsPopup from './TemplateDetailsPopup/TemplateDetailsPopup';
+import { Link } from 'react-router-dom';
 
 const TemplatesPickList = props => {
   const [filteredTemplates, setFilteredTemplates] = useState(props.templates);
@@ -63,7 +64,11 @@ const TemplatesPickList = props => {
           </ItemsRow>
         ))
       ) : (
-        <div>No templates found</div>
+        <div className={classes.EmptyTemplates}>
+          <p>No characters found</p>
+          <br />
+          <p><Link to="/templates">Add some!</Link></p>
+        </div>
       )}
     </>
   );

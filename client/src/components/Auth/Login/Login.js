@@ -46,7 +46,8 @@ const Login = props => {
       <Formik
         initialValues={{
           email: '',
-          password: ''
+          password: '',
+          rememberMe: true
         }}
         // initialValues={{
         //   email: '1@1.com',

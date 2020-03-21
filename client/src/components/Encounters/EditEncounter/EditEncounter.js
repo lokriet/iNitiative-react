@@ -1,10 +1,8 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 
 import * as actions from '../../../store/actions';
-import withAuthCheck from '../../../hoc/withAuthCheck';
-import { useDispatch, connect } from 'react-redux';
-import { Redirect, useHistory, useParams, Prompt } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { Redirect, Prompt } from 'react-router-dom';
 
 import Button from '../../UI/Form/Button/Button';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
@@ -15,60 +13,91 @@ import EncounterParticipantsSelector from '../EncounterParticipantsSelector/Enco
 import Error from '../../UI/Errors/Error/Error';
 
 import classes from './EditEncounter.module.css';
+import { isEmpty } from '../../../util/helper-methods';
+import withAuthCheck from '../../../hoc/withAuthCheck';
 
-const EditEncounter = props => {
-  const [encounterName, setEncounterName] = useState('');
-  const [addedParticipants, setAddedParticipants] = useState([]);
-  const [submitAttempted, setSubmitAttempted] = useState(false);
-  const [validationErrors, setValidationErrors] = useState([]);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const { encounterId } = useParams();
-  const editMode = !props.isNew;
+class EditEncounter extends Component {
+  state = {
+    encounterName: '',
+    addedParticipants: [],
+    submitAttempted: false,
+    validationErrors: [],
+    hasUnsavedChanges: false,
+    avatarUrlsToCheck: new Set(),
+    initialized: false
+  };
 
-  useEffect(() => {
-    dispatch(actions.resetEncounterOperation());
-    dispatch(actions.getParticipantTemplates());
+  componentDidMount = () => {
+    this.props.resetEncounterOperation();
+    this.props.getParticipantTemplates();
 
-    if (editMode) {
-      dispatch(actions.getEncounterById(encounterId));
+    if (!this.props.isNew) {
+      this.props.getEncounterById(this.props.match.params.encounterId);
     }
+  };
 
-    return () => {
-      if (editMode) {
-        dispatch(actions.resetEditedEncounter());
-      }
-    };
-  }, [dispatch, editMode, encounterId]);
+  componentDidUpdate = () => {
+    if (this.props.editedEncounter && !this.state.initialized) {
+      this.setState(prevState => {
+        const newSet = new Set(prevState.avatarUrlsToCheck);
+        this.props.editedEncounter.participants.forEach(item => {
+          if (!isEmpty(item.avatarUrl)) {
+            newSet.add(item.avatarUrl);
+          }
+        });
 
-  useEffect(() => {
-    if (props.editedEncounter) {
-      setEncounterName(props.editedEncounter.name);
-      setAddedParticipants(props.editedEncounter.participants);
+        return {
+          encounterName: this.props.editedEncounter.name,
+          addedParticipants: this.props.editedEncounter.participants,
+          avatarUrlsToCheck: newSet,
+          initialized: true
+        };
+      });
     }
-  }, [props.editedEncounter]);
+  };
 
-  const handleParticipantsChanged = useCallback(participants => {
-    setAddedParticipants(participants);
-    setHasUnsavedChanges(true);
-  }, []);
+  componentWillUnmount = () => {
+    console.log('closing edit encounter', this.state.avatarUrlsToCheck);
+    if (!this.props.isNew) {
+      this.props.resetEditedEncounter();
+      this.props.cleanUpAvatarUrls(Array.from(this.state.avatarUrlsToCheck));
+    }
+  };
 
-  const handleSaveEncounter = useCallback(() => {
-    let newEncounterName = encounterName.trim();
-    setEncounterName(newEncounterName);
+  handleParticipantsChanged = participants => {
+    this.setState(prevState => {
+      const newSet = new Set(prevState.avatarUrlsToCheck);
+      participants.forEach(item => {
+        if (!isEmpty(item.avatarUrl)) {
+          newSet.add(item.avatarUrl);
+        }
+      });
+      return {
+        addedParticipants: participants,
+        hasUnsavedChanges: true,
+        avatarUrlsToCheck: newSet
+      };
+    });
+  };
+
+  handleNameChanged = event => {
+    this.setState({ encounterName: event.target.value });
+  };
+
+  handleSaveEncounter = () => {
+    let newEncounterName = this.state.encounterName.trim();
+    this.setState({ encounterName: newEncounterName });
 
     let validationErrors = [];
-
     if (newEncounterName === '') {
       validationErrors.push('Encounter name should not be empty');
     }
-    for (let i = 0; i < addedParticipants.length; i++) {
-      const checkedParticipant = addedParticipants[i];
+    for (let i = 0; i < this.state.addedParticipants.length; i++) {
+      const checkedParticipant = this.state.addedParticipants[i];
       if (checkedParticipant.name.trim() === '') {
         validationErrors.push(`#${i}: participant name should not be empty`);
       } else if (
-        addedParticipants.some(participant => {
+        this.state.addedParticipants.some(participant => {
           return (
             ((participant._id && participant._id !== checkedParticipant._id) ||
               (participant._tempId &&
@@ -77,105 +106,117 @@ const EditEncounter = props => {
           );
         })
       ) {
-        validationErrors.push(`${checkedParticipant.name}: participant with this name already exists in the encounter`);
+        validationErrors.push(
+          `${checkedParticipant.name}: participant with this name already exists in the encounter`
+        );
       }
 
-      if (checkedParticipant.rolledInitiative != null && checkedParticipant.rolledInitiative !== '') {
+      if (
+        checkedParticipant.rolledInitiative != null &&
+        checkedParticipant.rolledInitiative !== ''
+      ) {
         let ini = parseFloat(checkedParticipant.rolledInitiative);
         if (ini < 1 || ini > 20) {
-          const name = (checkedParticipant.name != null && checkedParticipant.name.trim() !== '') ? checkedParticipant.name : `#${i}`;
-          validationErrors.push(`${name}: rolled initiative should be between 1 and 20`);
+          const name =
+            checkedParticipant.name != null &&
+            checkedParticipant.name.trim() !== ''
+              ? checkedParticipant.name
+              : `#${i}`;
+          validationErrors.push(
+            `${name}: rolled initiative should be between 1 and 20`
+          );
         }
       }
     }
 
-    setValidationErrors(validationErrors);
+    this.setState({ validationErrors });
     if (validationErrors.length > 0) {
       return;
     }
 
-    setSubmitAttempted(true);
-    const participantsToSave = addedParticipants.map(participant => {
+    this.setState({ submitAttempted: true });
+    const participantsToSave = this.state.addedParticipants.map(participant => {
       let newParticipant = { ...participant };
       delete newParticipant._tempId;
       return newParticipant;
     });
 
-    if (editMode) {
-      dispatch(
-        actions.editEncounter(encounterId, {
-          _id: encounterId,
-          name: encounterName,
-          participants: participantsToSave
-        })
-      );
+    if (!this.props.isNew) {
+      this.props.editEncounter(this.props.match.params.encounterId, {
+        _id: this.props.match.params.encounterId,
+        name: this.state.encounterName,
+        participants: participantsToSave
+      });
     } else {
-      dispatch(
-        actions.editEncounter(null, {
-          name: encounterName,
-          participants: participantsToSave
-        })
+      this.props.editEncounter(null, {
+        name: this.state.encounterName,
+        participants: participantsToSave
+      });
+    }
+  };
+
+  render() {
+    let view;
+    if (this.state.submitAttempted && this.props.saveSuccess) {
+      view = <Redirect to="/encounters" />;
+    } else if (!this.props.isNew && this.props.fetchingEncounterError) {
+      view = <ServerError serverError={this.props.fetchingEncounterError} />;
+    } else if (!this.props.isNew && !this.props.editedEncounter) {
+      view = <Spinner />;
+    } else {
+      view = (
+        <div className={classes.Container}>
+          <Prompt
+            when={
+              !this.props.isNew &&
+              (this.state.hasUnsavedChanges ||
+                this.state.encounterName !== this.props.editedEncounter.name)
+            }
+            message="Confirm leaving the page? All unsaved changes will be lost. "
+          />
+          <input
+            placeholder="Give it a name!"
+            className={classes.EncounterName}
+            value={this.state.encounterName}
+            onChange={this.handleNameChanged}
+          />
+          <ItemsRow>
+            <Button type="button" onClick={this.props.history.goBack}>
+              Cancel
+            </Button>
+            <Button onClick={this.handleSaveEncounter}>Save</Button>
+          </ItemsRow>
+
+          <div className={classes.Errors}>
+            {this.state.validationErrors.map((error, index) => (
+              <Error key={index}>{error}</Error>
+            ))}
+            {this.props.saveError ? (
+              <div>
+                <ServerValidationError
+                  serverError={this.props.saveError}
+                  for="name"
+                />
+                <ServerError serverError={this.props.saveError} />
+              </div>
+            ) : null}
+          </div>
+
+          <div className={classes.ParticipantsSelector}>
+            <EncounterParticipantsSelector
+              participants={
+                !this.props.isNew ? this.props.editedEncounter.participants : []
+              }
+              onParticipantsChanged={this.handleParticipantsChanged}
+            />
+          </div>
+        </div>
       );
     }
-  }, [dispatch, encounterName, editMode, encounterId, addedParticipants]);
 
-  let view;
-  if (submitAttempted && props.saveSuccess) {
-    view = <Redirect to="/encounters" />;
-  } else if (editMode && props.fetchingEncounterError) {
-    view = <ServerError serverError={props.fetchingEncounterError} />;
-  } else if (editMode && !props.editedEncounter) {
-    view = <Spinner />;
-  } else {
-    view = (
-      <div className={classes.Container}>
-        <Prompt
-          when={
-            editMode &&
-            (hasUnsavedChanges || encounterName !== props.editedEncounter.name)
-          }
-          message="Confirm leaving the page? All unsaved changes will be lost. "
-        />
-        <input
-          placeholder="Give it a name!"
-          className={classes.EncounterName}
-          value={encounterName}
-          onChange={event => setEncounterName(event.target.value)}
-        />
-        <ItemsRow>
-          <Button type="button" onClick={history.goBack}>
-            Cancel
-          </Button>
-          <Button onClick={handleSaveEncounter}>Save</Button>
-        </ItemsRow>
-
-        <div className={classes.Errors}>
-          {validationErrors.map((error, index) => (
-            <Error key={index}>{error}</Error>
-          ))}
-          {props.saveError ? (
-            <div>
-              <ServerValidationError serverError={props.saveError} for="name" />
-              <ServerError serverError={props.saveError} />
-            </div>
-          ) : null}
-        </div>
-
-        <div className={classes.ParticipantsSelector}>
-          <EncounterParticipantsSelector
-            participants={editMode ? props.editedEncounter.participants : []}
-            onParticipantsChanged={handleParticipantsChanged}
-          />
-        </div>
-      </div>
-    );
+    return view;
   }
-  return view;
-};
-
-EditEncounter.propTypes = {
-  isNew: PropTypes.bool
-};
+}
 
 const mapStateToProps = state => {
   return {
@@ -186,4 +227,21 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(withAuthCheck(EditEncounter));
+const mapActionsToProps = dispatch => {
+  return {
+    resetEditedEncounter: () => dispatch(actions.resetEditedEncounter()),
+    resetEncounterOperation: () => dispatch(actions.resetEncounterOperation()),
+    getParticipantTemplates: () => dispatch(actions.getParticipantTemplates()),
+    getEncounterById: encounterId =>
+      dispatch(actions.getEncounterById(encounterId)),
+    editEncounter: (encounterId, partialUpdate) =>
+      dispatch(actions.editEncounter(encounterId, partialUpdate)),
+    cleanUpAvatarUrls: avatarUrls =>
+      dispatch(actions.cleanUpAvatarUrls(avatarUrls))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(withAuthCheck(EditEncounter));
