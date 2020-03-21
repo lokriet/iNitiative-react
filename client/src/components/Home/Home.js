@@ -1,29 +1,156 @@
-import React, { Fragment } from 'react';
+import React, { useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import * as actions from '../../store/actions/index';
 import { Link } from 'react-router-dom';
+import classes from './Home.module.css';
+import { isEmpty } from '../../util/helper-methods';
+import Spinner from '../UI/Spinner/Spinner';
 
 const Home = props => {
   const dispatch = useDispatch();
-  return (
-    <Fragment>
-      <div>
-        {props.isAuthenticated
-          ? `You are logged in as ${props.user.username} (${props.user.email})`
-          : 'You are not logged in'}
+
+  useEffect(() => {
+    dispatch(actions.getLatestEncounter());
+    dispatch(actions.getNews());
+
+    return () => {
+      dispatch(actions.setLatestEncounter(null));
+    };
+  }, [dispatch]);
+
+  let jumpRightInContent;
+  if (props.fetching) {
+    jumpRightInContent = <Spinner />;
+  } else if (props.latestEncounter) {
+    jumpRightInContent = (
+      <>
+        <div>
+          Continue where you left off:{' '}
+          <Link to={`/encounters/play/${props.latestEncounter._id}`}>
+            {props.latestEncounter.name}
+          </Link>
+        </div>
+        <br />
+        <div className={classes.SideNote}>
+          Last activity at: {props.latestEncounter.updatedAt.getHours()}:
+          {props.latestEncounter.updatedAt.getMinutes()}{' '}
+          {props.latestEncounter.updatedAt.getDate()}.
+          {props.latestEncounter.updatedAt.getMonth() + 1}.
+          {props.latestEncounter.updatedAt.getFullYear()}
+        </div>
+      </>
+    );
+  } else {
+    jumpRightInContent = (
+      <>
+        <div>Create an encounter and have fun playing!</div>
+        <br />
+        <div>
+          <Link to="/encounters/new">Right-o</Link>
+        </div>
+      </>
+    );
+  }
+
+  let news;
+  if (props.fetchingNews) {
+    news = <Spinner />;
+  } else if (props.fetchingNewsError) {
+    news = <div>Oops, something went wrong</div>;
+  } else {
+    news = (
+      <div className={classes.NewsContainer}>
+        {props.news.map(item => (
+          <div key={item._id} className={classes.News}>
+            <div className={classes.NewsHeader}>{item.title}</div>
+            <div className={classes.NewsDate}>
+              {item.createdAt.getDate()}.{item.createdAt.getMonth() + 1}.
+              {item.createdAt.getFullYear()}
+            </div>
+            <div className={classes.NewsContent}>{item.text}</div>
+          </div>
+        ))}
       </div>
-      {props.isAuthenticated ? 
-        <button onClick={() => dispatch(actions.logout())}>Logout</button>
-      : <div><Link to='/register'>Register</Link> <Link to='/login'>Login</Link></div>}
-      <Link to='/admin'>Admin console</Link>
-    </Fragment>
+    );
+  }
+
+  return (
+    <div className={classes.Container}>
+      <h1 className={classes.Greeting}>
+        Hi
+        {!props.user
+          ? ' stranger'
+          : isEmpty(props.user.username)
+          ? ''
+          : ` ${props.user.username}`}
+        !
+      </h1>
+
+      <div className={classes.Columns}>
+        <div className={classes.CardsContainer}>
+          {props.isAuthenticated ? (
+            props.fetchingEncounterError == null ? (
+              <div className={classes.Card}>
+                <div className={classes.CardHeader}>Jump right in!</div>
+                <div className={classes.CardContent}>{jumpRightInContent}</div>
+              </div>
+            ) : null
+          ) : (
+            <div className={classes.Card}>
+              <div className={classes.CardHeader}>You are not logged in</div>
+              <div className={classes.CardContent}>
+                <div>You'll have a lot of fun once you are logged in. Give it a try!</div>
+                <br />
+                <Link to="/login">Log in</Link> or{' '}
+                <Link to="/register">Create a new account</Link>
+              </div>
+            </div>
+          )}
+
+          <div className={classes.Card}>
+            <div className={classes.CardHeader}>Adore foxes</div>
+            <div className={classes.CardContent}>
+              <div>Because foxes are the cutest animals ever</div>
+              <br />
+              <a href="https://www.youtube.com/results?search_query=adorable+fox">
+                I want one!
+              </a>
+            </div>
+          </div>
+
+          {props.isAuthenticated ? (
+            <div className={classes.Card}>
+              <div className={classes.CardHeader}>Tell us what you think</div>
+              <div className={classes.CardContent}>
+                <div>
+                  Let us know how we're doing, ask questions or share your fun
+                  with others
+                </div>
+                <br />
+                <Link to="/discuss">Go do it!</Link>
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        {news}
+      </div>
+    </div>
   );
 };
 
 const mapStateToProps = state => {
   return {
     isAuthenticated: state.auth.token != null,
-    user: state.auth.user
+    user: state.auth.user,
+
+    latestEncounter: state.encounter.latestEncounter,
+    fetchingLatestEncounter: state.encounter.fetching,
+    fetchingEncounterError: state.encounter.fetchingError,
+
+    news: state.news.news,
+    fetchingNews: state.news.fetching,
+    fetchingNewsError: state.news.error
   };
 };
 

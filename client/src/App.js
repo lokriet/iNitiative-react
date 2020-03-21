@@ -16,6 +16,7 @@ import EditParticipantTemplate from './components/ParticipantTemplates/EditParti
 import EncountersList from './components/Encounters/EncountersList/EncountersList';
 import EditEncounter from './components/Encounters/EditEncounter/EditEncounter';
 import PlayEncounter from './components/Encounters/PlayEncounter/PlayEncounter';
+import Discuss from './components/Discuss/Discuss';
 
 const App = props => {
   const dispatch = useDispatch();
@@ -68,6 +69,7 @@ const App = props => {
             <Route path="/encounters/edit/:encounterId" component={EditEncounter} />
             <Route path="/encounters/play/:encounterId" component={PlayEncounter} />
             <Route path="/encounters" exact component={EncountersList} />
+            <Route path="/discuss" component={Discuss} />
             <Route path="/logout" component={Logout} />
             <Route path="/404" component={PageNotFound} />
             <Route path="/" component={PageNotFound} />

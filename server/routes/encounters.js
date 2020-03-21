@@ -127,6 +127,24 @@ router.delete(
   encounterController.deleteEncounter
 );
 
+
+/**
+ * Get last updated encounter
+ * http://localhost:3001/encounters/latestEncounter GET
+ *
+ * ==Response==
+ * Success:
+ * status: 200
+ * data:
+ *  {
+ *    name
+ *    _id
+ *    updatedAt:  "2020-05-06T23:00:15.057Z"
+ *  }
+ */
+router.get('/latestEncounter', isAuth, encounterController.getLatestEncounter);
+
+
 /**
  * Get encounter by id
  * http://localhost:3001/encounters/:encounterId GET

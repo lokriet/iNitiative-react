@@ -17,3 +17,27 @@
   height: 100%;
 }
 
+.NarrowScreenNav {
+  display: none;
+}
+
+
+@media(max-width: 39rem) {
+  .WideScreenNav {
+    display: none;
+  }
+
+  .NarrowScreenNav {
+    display: flex;
+  }
+
+  .HamburgerIcon {
+    font-size: 1.5rem;
+  }
+
+  .SideNavigation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}

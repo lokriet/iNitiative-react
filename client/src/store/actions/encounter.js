@@ -17,6 +17,7 @@ export const EncounterActionTypes = {
   START_FETCHING_ENCOUNTERS: 'START_FETCHING_ENCOUNTERS',
   SET_ENCOUNTERS: 'SET_ENCOUNTERS',
   SET_EDITED_ENCOUNTER: 'SET_EDITED_ENCOUNTER',
+  SET_LATEST_ENCOUNTER: 'SET_LATEST_ENCOUNTER',
   UPDATE_EDITED_ENCOUNTER: 'UPDATE_EDITED_ENCOUNTER',
   FETCH_ENCOUNTERS_FAILED: 'FETCH_ENCOUNTERS_FAILED'
 };
@@ -189,7 +190,7 @@ export const deleteEncounter = encounterId => {
         );
       } else if (response.status === 200) {
         dispatch(deleteEncounterSuccess(encounterId));
-        dispatch(actions.cleanUpAvatarUrls(avatarUrlsToCheck));       
+        dispatch(actions.cleanUpAvatarUrls(avatarUrlsToCheck));
       } else {
         dispatch(
           encounterOperationFailed({
@@ -203,6 +204,51 @@ export const deleteEncounter = encounterId => {
         encounterOperationFailed({
           type: ErrorType.INTERNAL_SERVER_ERROR,
           message: INTERNAL_ERROR_MESSAGE
+        })
+      );
+    }
+  };
+};
+
+export const getLatestEncounter = () => {
+  return async (dispatch, getState) => {
+    try {
+      const idToken = await getState().auth.firebase.doGetIdToken();
+      const response = await fetch(
+        `http://localhost:3001/encounters/latestEncounter`,
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
+        }
+      );
+
+      const responseData = await response.json();
+      if (response.status === 200) {
+        dispatch(setLatestEncounter(responseData));
+      } else if (response.status === 500 || response.status === 401) {
+        dispatch(
+          fetchEncountersFailed({
+            type: ErrorType[response.status],
+            message:
+              response.status === 500
+                ? 'Fetching encounter failed'
+                : responseData.message
+          })
+        );
+      } else {
+        dispatch(
+          fetchEncountersFailed({
+            type: ErrorType.INTERNAL_SERVER_ERROR,
+            message: 'Fetching encounter failed'
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        fetchEncountersFailed({
+          type: ErrorType.INTERNAL_CLIENT_ERROR,
+          message: 'Fetching encounter failed'
         })
       );
     }
@@ -478,6 +524,13 @@ export const setEditedEncounter = encounter => {
     encounter
   };
 };
+
+export const setLatestEncounter = (latestEncounter) => {
+  return {
+    type: EncounterActionTypes.SET_LATEST_ENCOUNTER,
+    latestEncounter
+  }
+}
 
 export const updateEditedEncounter = partialUpdate => {
   return {

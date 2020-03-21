@@ -18,6 +18,7 @@ const featuresRouter = require('./routes/features');
 const templatesRouter = require('./routes/participantTemplates');
 const encountersRouter = require('./routes/encounters');
 const imagesRouter = require('./routes/images');
+const newsRouter = require('./routes/news');
 
 const responseCodes = require('./util/responseCodes');
 
@@ -59,6 +60,7 @@ app.use('/features', featuresRouter);
 app.use('/participantTemplates', templatesRouter);
 app.use('/encounters', encountersRouter);
 app.use('/images', imagesRouter);
+app.use('/news', newsRouter);
 
 
 app.use(function(req, res, next) {

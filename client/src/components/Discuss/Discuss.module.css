@@ -1,0 +1,11 @@
+.Container {
+  width: 80%;
+  max-width: 60rem;
+  margin: auto;
+}
+
+h1 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 2rem auto;
+}

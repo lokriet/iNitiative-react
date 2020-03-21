@@ -15,6 +15,8 @@ import conditionReducer from './store/reducers/condition';
 import featureReducer from './store/reducers/feature';
 import participantTemplateReducer from './store/reducers/participantTemplate';
 import encounterReducer from './store/reducers/encounter';
+import newsReducer from './store/reducers/news';
+import { ErrorBoundary } from './hoc/ErrorBoundary';
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
@@ -27,7 +29,8 @@ const rootReducer = combineReducers({
   condition: conditionReducer,
   feature: featureReducer,
   participantTemplate: participantTemplateReducer,
-  encounter: encounterReducer
+  encounter: encounterReducer,
+  news: newsReducer
 });
 
 const sagaMiddleware = createSagaMiddleware();
@@ -41,7 +44,9 @@ sagaMiddleware.run(watchAll);
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </Provider>,
   document.getElementById('root')
 );

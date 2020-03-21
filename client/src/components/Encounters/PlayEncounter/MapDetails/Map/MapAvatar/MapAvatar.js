@@ -47,8 +47,8 @@ const MapAvatar = ({ participant, width, height, className }) => {
 
 MapAvatar.propTypes = {
   participant: PropTypes.object.isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   className: PropTypes.string
 };
 

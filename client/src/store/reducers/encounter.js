@@ -7,7 +7,8 @@ const initialState = {
   operationSuccess: false,
   fetching: false,
   fetchingError: null,
-  encountersInitialised: null
+  encountersInitialised: null,
+  latestEncounter: null
 };
 
 const encounterReducer = (state = initialState, action) => {
@@ -41,6 +42,9 @@ const encounterReducer = (state = initialState, action) => {
 
     case ActionTypes.encounter.SET_EDITED_ENCOUNTER:
       return setEditedEncounter(state, action);
+
+    case ActionTypes.encounter.SET_LATEST_ENCOUNTER:
+      return setLatestEncounter(state, action);
 
     case ActionTypes.encounter.UPDATE_EDITED_ENCOUNTER:
       return updateEditedEncounter(state, action);
@@ -154,6 +158,15 @@ const setEditedEncounter = (state, action) => {
   return {
     ...state,
     editedEncounter: action.encounter,
+    fetching: false,
+    fetchingError: null
+  };
+};
+
+const setLatestEncounter = (state, action) => {
+  return {
+    ...state,
+    latestEncounter: action.latestEncounter ? {...action.latestEncounter, updatedAt: new Date(action.latestEncounter.updatedAt)} : null,
     fetching: false,
     fetchingError: null
   };

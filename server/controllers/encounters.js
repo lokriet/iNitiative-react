@@ -205,6 +205,16 @@ module.exports.getEncounter = async (req, res, next) => {
   }
 };
 
+module.exports.getLatestEncounter = async (req, res, next) => {
+  try {
+    const encounter = await Encounter.findOne({creator: req.userId}, 'name updatedAt', { sort: {'updatedAt': -1}});
+
+    res.status(200).json(encounter);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports.getEncounters = async (req, res, next) => {
   try {
     const encounters = await Encounter.find(
@@ -278,3 +288,5 @@ module.exports.updateEncounterParticipant = async (req, res, next) => {
     next(error);
   }
 };
+
+
