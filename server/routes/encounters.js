@@ -1,5 +1,4 @@
 const express = require('express');
-const { body } = require('express-validator');
 
 const encounterController = require('../controllers/encounters');
 const isAuth = require('../middleware/auth');

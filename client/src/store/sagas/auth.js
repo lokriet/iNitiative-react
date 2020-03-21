@@ -110,7 +110,7 @@ export function* checkAuthStateSaga(action) {
       })
     );
   } catch (error) {
-    // console.log(error);
+    // meow!
   } finally {
     yield put(actions.authCheckInitialStateDone());
   }

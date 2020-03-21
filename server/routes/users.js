@@ -30,7 +30,4 @@ const isAuth = require('../middleware/auth');
  */
 router.get('/userinfo', isAuth, userController.getUserInfo);
 
-
-router.get('/avatarUrls', isAuth, userController.getUserAvatarUrls);
-
 module.exports = router;

@@ -14,15 +14,18 @@ const Avatar = ({
 }) => {
   const [avatarUrl, setAvatarUrl] = useState(field.value);
   const isMonster = form.values.type === ParticipantType.Monster;
+  const onAvatarChanged = props.onAvatarChanged || (() => {});
 
   const avatarUploadedHandler = url => {
     setAvatarUrl(url);
-
+    
+    onAvatarChanged(url);
     form.setFieldValue(field.name, url);
   };
 
   const avatarDeletedHandler = () => {
     setAvatarUrl(null);
+    onAvatarChanged(null);
     form.setFieldValue(field.name, null);
   };
 

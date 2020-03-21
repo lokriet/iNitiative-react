@@ -1,5 +1,6 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
+import * as actions from './index';
 
 export const EncounterActionTypes = {
   RESET_ENCOUNTER_STORE: 'RESET_ENCOUNTER_STORE',
@@ -137,6 +138,29 @@ export const deleteEncounter = encounterId => {
   return async (dispatch, getState) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
+
+      let avatarUrlsToCheck = [];
+      try {
+        const avatarsResponse = await fetch(
+          `http://localhost:3001/images/encounterAvatarUrls/${encounterId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`
+            }
+          }
+        );
+
+        if (avatarsResponse.status === 200) {
+          avatarUrlsToCheck = await avatarsResponse.json();
+        } else {
+          console.log(
+            'failed to check encounter avatar urls - got unexpected response code'
+          );
+        }
+      } catch (error) {
+        console.log('failed to check encounter avatar urls', error);
+      }
+
       const response = await fetch(
         `http://localhost:3001/encounters/encounter/${encounterId}`,
         {
@@ -165,6 +189,7 @@ export const deleteEncounter = encounterId => {
         );
       } else if (response.status === 200) {
         dispatch(deleteEncounterSuccess(encounterId));
+        dispatch(actions.cleanUpAvatarUrls(avatarUrlsToCheck));       
       } else {
         dispatch(
           encounterOperationFailed({

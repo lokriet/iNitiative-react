@@ -63,7 +63,7 @@ const App = props => {
             <Route path="/templates/edit/:templateId" component={EditParticipantTemplate} />
             <Route path="/templates" component={ParticipantTemplates} />
             
-            <Route path="/encounters/new" render={() => <EditEncounter isNew />} />
+            <Route path="/encounters/new" render={(routeProps) => <EditEncounter isNew {...routeProps} />} />
             
             <Route path="/encounters/edit/:encounterId" component={EditEncounter} />
             <Route path="/encounters/play/:encounterId" component={PlayEncounter} />

@@ -57,7 +57,6 @@ class EditEncounter extends Component {
   };
 
   componentWillUnmount = () => {
-    console.log('closing edit encounter', this.state.avatarUrlsToCheck);
     if (!this.props.isNew) {
       this.props.resetEditedEncounter();
       this.props.cleanUpAvatarUrls(Array.from(this.state.avatarUrlsToCheck));

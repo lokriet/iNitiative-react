@@ -18,8 +18,8 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete, onDeleteCancelled,
 
   const handleConfirmDelete = useCallback(() => {
     setDeleting(true);
-    onDelete(template._id);
-  }, [template._id, onDelete]);
+    onDelete(template);
+  }, [template, onDelete]);
 
   const handleCancelDelete = useCallback(
     (close) => {

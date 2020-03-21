@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import * as Yup from 'yup';
 import useQueryParams from '../../../hooks/useQueryParams';
 import withAuthCheck from '../../../hoc/withAuthCheck';
@@ -30,6 +30,17 @@ const EditParticipantTemplate = props => {
   const history = useHistory();
   const [damageTypes, combined, features] = useDropdownValues();
 
+
+  const [avatarUrlsToCheck, setAvatarUrlsToCheck] = useState(new Set());
+  const avatarUrlsToCheckRef = useRef(avatarUrlsToCheck);
+  avatarUrlsToCheckRef.current = avatarUrlsToCheck;
+
+  useEffect(() => {
+    return () => {
+      dispatch(actions.cleanUpAvatarUrls(Array.from(avatarUrlsToCheckRef.current)));
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(actions.resetParticipantTemplateOperation());
     if (editMode) {
@@ -43,7 +54,7 @@ const EditParticipantTemplate = props => {
     };
   }, [dispatch, editMode, templateId]);
 
-  const submitHandler = useCallback(
+  const handleSubmit = useCallback(
     (values, setSubmitting) => {
       dispatch(
         actions.editParticipantTemplate(
@@ -56,8 +67,18 @@ const EditParticipantTemplate = props => {
     [dispatch, editMode, templateId]
   );
 
-  let form;
+  const handleAvatarChange = useCallback(
+    (newAvatarUrl) => {
+      if (newAvatarUrl !== null) {
+        const newAvatarUrlsToCheck = new Set(avatarUrlsToCheck);
+        newAvatarUrlsToCheck.add(newAvatarUrl);
+        setAvatarUrlsToCheck(newAvatarUrlsToCheck);
+      }
+    },
+    [avatarUrlsToCheck],
+  );
 
+  let form;
   if (
     !editMode ||
     (props.editedTemplate != null)
@@ -113,7 +134,7 @@ const EditParticipantTemplate = props => {
           features: Yup.array().of(Yup.object())
         })}
         onSubmit={(values, { setSubmitting }) =>
-          submitHandler(values, setSubmitting)
+          handleSubmit(values, setSubmitting)
         }
       >
         {formProps => {
@@ -149,7 +170,7 @@ const EditParticipantTemplate = props => {
               <label className={classes.Avatar}>Avatar</label>
 
               <div className={classes.Avatar}>
-                <Field id="avatarUrl" name="avatarUrl" component={Avatar} />
+                <Field id="avatarUrl" name="avatarUrl" component={Avatar} onAvatarChanged={handleAvatarChange} />
               </div>
 
               <label htmlFor="name">Name</label>

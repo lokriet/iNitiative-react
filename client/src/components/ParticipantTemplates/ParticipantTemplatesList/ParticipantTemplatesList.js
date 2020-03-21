@@ -43,8 +43,8 @@ const ParticipantTemplatesList = props => {
   );
 
   const handleDeleteTemplate = useCallback(
-    templateId => {
-      dispatch(actions.deleteParticipantTemplate(templateId));
+    template => {
+      dispatch(actions.deleteParticipantTemplate(template));
     },
     [dispatch]
   );
