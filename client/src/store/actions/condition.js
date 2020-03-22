@@ -24,7 +24,7 @@ export const addCondition = (condition, isHomebrew, setSubmitted) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        'http://localhost:3001/conditions/condition',
+        `${constants.serverUrl}/conditions/condition`,
         {
           method: 'POST',
           headers: {
@@ -204,7 +204,7 @@ export const getSharedConditions = () => {
 
     try {
       dispatch(startFetchingSharedConditions());
-      const response = await fetch('http://localhost:3001/conditions/shared');
+      const response = await fetch(`${constants.serverUrl}/conditions/shared`);
       if (response.status === 200) {
         const conditions = await response.json();
         dispatch(setSharedConditions(conditions));
@@ -242,7 +242,7 @@ export const getHomebrewConditions = () => {
       dispatch(startFetchingHomebrewConditions());
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        'http://localhost:3001/conditions/homebrew',
+        `${constants.serverUrl}/conditions/homebrew`,
         {
           headers: {
             Authorization: `Bearer ${idToken}`

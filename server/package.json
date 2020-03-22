@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "start-prev": "cross-env NODE_ENV=development nodemon app.js",
-    "startnode": "node app.js",
-    "start": "nodemon app.js --config nodemon.json"
-    
+    "start": "node app.js",
+    "start:dev": "nodemon app.js --config nodemon.json"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.0",
@@ -25,5 +24,8 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
+  },
+  "engines": {
+    "node": "13.5.0"
   }
 }

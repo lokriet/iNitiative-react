@@ -49,7 +49,7 @@ export const editEncounter = (encounterId, encounterData, actionOptions) => {
       const idToken = await getState().auth.firebase.doGetIdToken();
       let response;
       if (encounterId == null) {
-        response = await fetch('http://localhost:3001/encounters/encounter', {
+        response = await fetch(`${constants.serverUrl}/encounters/encounter`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -315,7 +315,7 @@ export const getEncounters = () => {
     try {
       dispatch(startFetchingEncounters());
       const idToken = await getState().auth.firebase.doGetIdToken();
-      const response = await fetch('http://localhost:3001/encounters', {
+      const response = await fetch(`${constants.serverUrl}/encounters`, {
         headers: {
           Authorization: `Bearer ${idToken}`
         }

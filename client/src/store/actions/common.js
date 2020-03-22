@@ -1,9 +1,11 @@
+import constants from "../../util/constants";
+
 export const cleanUpAvatarUrls = (avatarUrlsToCheck) => {
   return async (dispatch, getState) => {
     try {
       if (avatarUrlsToCheck.length > 0) {
         const idToken = await getState().auth.firebase.doGetIdToken();
-        const response = await fetch('http://localhost:3001/images/userAvatarUrls', {
+        const response = await fetch(`${constants.serverUrl}/images/userAvatarUrls`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${idToken}`

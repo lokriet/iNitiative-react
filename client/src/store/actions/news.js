@@ -19,7 +19,7 @@ export const getNews= () => {
 
     try {
       dispatch(startFetchingNews());
-      const response = await fetch('http://localhost:3001/news');
+      const response = await fetch(`${constants.serverUrl}/news`);
       if (response.status === 200) {
         const news = await response.json();
         dispatch(setNews(news));

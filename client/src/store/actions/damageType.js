@@ -24,7 +24,7 @@ export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        'http://localhost:3001/damageTypes/damageType',
+        `${constants.serverUrl}/damageTypes/damageType`,
         {
           method: 'POST',
           headers: {
@@ -205,7 +205,7 @@ export const getSharedDamageTypes = () => {
 
     try {
       dispatch(startFetchingSharedDamageTypes());
-      const response = await fetch('http://localhost:3001/damageTypes/shared');
+      const response = await fetch(`${constants.serverUrl}/damageTypes/shared`);
       if (response.status === 200) {
         const damageTypes = await response.json();
         dispatch(setSharedDamageTypes(damageTypes));
@@ -243,7 +243,7 @@ export const getHomebrewDamageTypes = () => {
       dispatch(startFetchingHomebrewDamageTypes());
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        'http://localhost:3001/damageTypes/homebrew',
+        `${constants.serverUrl}/damageTypes/homebrew`,
         {
           headers: {
             Authorization: `Bearer ${idToken}`

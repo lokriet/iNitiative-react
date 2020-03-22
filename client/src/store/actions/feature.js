@@ -21,7 +21,7 @@ export const addFeature = (feature, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
-      const response = await fetch('http://localhost:3001/features/feature', {
+      const response = await fetch(`${constants.serverUrl}/features/feature`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ export const getSharedFeatures = () => {
 
     try {
       dispatch(startFetchingFeatures());
-      const response = await fetch('http://localhost:3001/features/shared');
+      const response = await fetch(`${constants.serverUrl}/features/shared`);
       if (response.status === 200) {
         const features = await response.json();
         dispatch(setSharedFeatures(features));
@@ -235,7 +235,7 @@ export const getHomebrewFeatures = () => {
     try {
       dispatch(startFetchingFeatures());
       const idToken = await getState().auth.firebase.doGetIdToken();
-      const response = await fetch('http://localhost:3001/features/homebrew', {
+      const response = await fetch(`${constants.serverUrl}/features/homebrew`, {
         headers: {
           Authorization: `Bearer ${idToken}`
         }

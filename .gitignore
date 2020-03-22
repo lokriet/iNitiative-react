@@ -28,3 +28,7 @@ client/src/firebase-credentials.js
 server/secret
 client/src/components/Firebase/firebase.js
 3fca8671a38d.png
+server/new 4.txt
+client/.firebaserc
+client/firebase.json
+client/.firebase/hosting.YnVpbGQ.cache

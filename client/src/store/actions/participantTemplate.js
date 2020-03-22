@@ -34,7 +34,7 @@ export const editParticipantTemplate = (
       if (templateId == null) {
         // create
         response = await fetch(
-          'http://localhost:3001/participantTemplates/template',
+          `${constants.serverUrl}/participantTemplates/template`,
           {
             method: 'POST',
             headers: {
@@ -178,7 +178,7 @@ export const getParticipantTemplates = () => {
       dispatch(startFetchingParticipantTemplates());
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        'http://localhost:3001/participantTemplates',
+        `${constants.serverUrl}/participantTemplates`,
         {
           headers: {
             Authorization: `Bearer ${idToken}`

@@ -2,6 +2,7 @@ import { put, select } from 'redux-saga/effects';
 import ErrorType from '../../util/error';
 
 import * as actions from '../actions/index';
+import constants from '../../util/constants';
 
 const INTERNAL_ERROR_MESSAGE =
   'Internal server error occured while authenticating. Please try again.';
@@ -13,8 +14,8 @@ export function* authSaga(action) {
 
   try {
     const url = action.isRegister
-      ? 'http://localhost:3001/auth/signup'
-      : 'http://localhost:3001/auth/signin';
+      ? `${constants.serverUrl}/auth/signup`
+      : `${constants.serverUrl}/auth/signin`;
 
     const body = {
       email: action.payload.email,
@@ -96,7 +97,7 @@ export function* checkAuthStateSaga(action) {
     const firebase = yield select(getFirebase);
     yield firebase.doSignInWithCustomToken(token);
     const idToken = yield firebase.doGetIdToken();
-    const response = yield fetch('http://localhost:3001/users/userinfo', {
+    const response = yield fetch(`${constants.serverUrl}/users/userinfo`, {
       headers: {
         Authorization: `Bearer ${idToken}`
       }
