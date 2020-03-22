@@ -47,7 +47,7 @@ export const editParticipantTemplate = (
       } else {
         // update
         response = await fetch(
-          `http://localhost:3001/participantTemplates/template/${templateId}`,
+          `${constants.serverUrl}/participantTemplates/template/${templateId}`,
           {
             method: 'PUT',
             headers: {
@@ -114,7 +114,7 @@ export const deleteParticipantTemplate = template => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/participantTemplates/template/${template._id}`,
+        `${constants.serverUrl}/participantTemplates/template/${template._id}`,
         {
           method: 'DELETE',
           headers: {
@@ -225,7 +225,7 @@ export const getParticipantTemplateById = templateId => {
       dispatch(startFetchingParticipantTemplates());
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/participantTemplates/${templateId}`,
+        `${constants.serverUrl}/participantTemplates/${templateId}`,
         {
           headers: {
             Authorization: `Bearer ${idToken}`

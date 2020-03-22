@@ -5,7 +5,7 @@ const prodConstants = {
 
 const devConstants = {
   refreshDataTimeout: 4 * 60 * 60 * 1000, // 4h,
-  serverUrl: "http://localhost:3001"
+  serverUrl: "${constants.serverUrl}"
 };
 
 const constants = process.env.NODE_ENV === 'production' ? prodConstants : devConstants;

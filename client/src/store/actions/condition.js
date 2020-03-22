@@ -86,7 +86,7 @@ export const updateCondition = (condition, isHomebrew, setSubmitted) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/conditions/condition/${condition._id}`,
+        `${constants.serverUrl}/conditions/condition/${condition._id}`,
         {
           method: 'PUT',
           headers: {
@@ -148,7 +148,7 @@ export const deleteCondition = conditionId => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/conditions/condition/${conditionId}`,
+        `${constants.serverUrl}/conditions/condition/${conditionId}`,
         {
           method: 'DELETE',
           headers: {

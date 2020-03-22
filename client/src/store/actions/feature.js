@@ -81,7 +81,7 @@ export const updateFeature = (feature, isHomebrew, setSubmitted) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/features/feature/${feature._id}`,
+        `${constants.serverUrl}/features/feature/${feature._id}`,
         {
           method: 'PUT',
           headers: {
@@ -143,7 +143,7 @@ export const deleteFeature = featureId => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/features/feature/${featureId}`,
+        `${constants.serverUrl}/features/feature/${featureId}`,
         {
           method: 'DELETE',
           headers: {

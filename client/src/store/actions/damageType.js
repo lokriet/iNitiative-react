@@ -86,7 +86,7 @@ export const updateDamageType = (damageType, isHomebrew, setSubmitted) => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/damageTypes/damageType/${damageType._id}`,
+        `${constants.serverUrl}/damageTypes/damageType/${damageType._id}`,
         {
           method: 'PUT',
           headers: {
@@ -148,7 +148,7 @@ export const deleteDamageType = damageTypeId => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/damageTypes/damageType/${damageTypeId}`,
+        `${constants.serverUrl}/damageTypes/damageType/${damageTypeId}`,
         {
           method: 'DELETE',
           headers: {

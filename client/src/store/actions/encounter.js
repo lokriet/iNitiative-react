@@ -60,7 +60,7 @@ export const editEncounter = (encounterId, encounterData, actionOptions) => {
       } else {
         // update
         response = await fetch(
-          `http://localhost:3001/encounters/encounter/${encounterId}`,
+          `${constants.serverUrl}/encounters/encounter/${encounterId}`,
           {
             method: 'PUT',
             headers: {
@@ -143,7 +143,7 @@ export const deleteEncounter = encounterId => {
       let avatarUrlsToCheck = [];
       try {
         const avatarsResponse = await fetch(
-          `http://localhost:3001/images/encounterAvatarUrls/${encounterId}`,
+          `${constants.serverUrl}/images/encounterAvatarUrls/${encounterId}`,
           {
             headers: {
               Authorization: `Bearer ${idToken}`
@@ -163,7 +163,7 @@ export const deleteEncounter = encounterId => {
       }
 
       const response = await fetch(
-        `http://localhost:3001/encounters/encounter/${encounterId}`,
+        `${constants.serverUrl}/encounters/encounter/${encounterId}`,
         {
           method: 'DELETE',
           headers: {
@@ -215,7 +215,7 @@ export const getLatestEncounter = () => {
     try {
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/encounters/latestEncounter`,
+        `${constants.serverUrl}/encounters/latestEncounter`,
         {
           headers: {
             Authorization: `Bearer ${idToken}`
@@ -261,7 +261,7 @@ export const getEncounterById = encounterId => {
       dispatch(startFetchingEncounters());
       const idToken = await getState().auth.firebase.doGetIdToken();
       const response = await fetch(
-        `http://localhost:3001/encounters/${encounterId}`,
+        `${constants.serverUrl}/encounters/${encounterId}`,
         {
           headers: {
             Authorization: `Bearer ${idToken}`
@@ -365,7 +365,7 @@ export const updateEncounterParticipantDetails = (
       const idToken = await getState().auth.firebase.doGetIdToken();
       let response;
       response = await fetch(
-        `http://localhost:3001/encounters/encounter/${encounterId}/participant/${participantId}`,
+        `${constants.serverUrl}/encounters/encounter/${encounterId}/participant/${participantId}`,
         {
           method: 'PUT',
           headers: {
