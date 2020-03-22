@@ -245,7 +245,7 @@ module.exports.updateEncounterParticipant = async (req, res, next) => {
 
     let participant = encounter.participants.find(
       item => item._id.toString() === participantId
-    ).lean();
+    );
     if (!participant) {
       next(httpErrors.pageNotFoundError());
       return;
@@ -253,7 +253,7 @@ module.exports.updateEncounterParticipant = async (req, res, next) => {
 
     const participantEditedFields = req.body.partialUpdate;
     let newParticipantData = {
-      ...participant,
+      ...participant._doc,
       ...participantEditedFields
     };
 
