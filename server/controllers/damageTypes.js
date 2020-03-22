@@ -50,6 +50,7 @@ module.exports.createDamageType = async (req, res, next) => {
 
     const damageType = new DamageType({
       name: damageTypeData.name,
+      color: damageTypeData.color,
       creator: req.userId,
       isHomebrew: isHomebrew
     });
@@ -124,6 +125,7 @@ module.exports.updateDamageType = async (req, res, next) => {
     }
 
     damageType.name = damageTypeData.name;
+    damageType.color = damageTypeData.color;
     const savedDamageType = await damageType.save();
 
     res.status(200).json({

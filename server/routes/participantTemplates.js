@@ -173,6 +173,7 @@ router.put(
       .trim(),
 
     body('template.avatarUrl').optional(),
+    body('template.color').optional(),
 
     body('template.initiativeModifier')
       .exists()

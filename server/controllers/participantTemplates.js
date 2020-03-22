@@ -99,6 +99,7 @@ module.exports.updateParticipantTemplate = async (req, res, next) => {
 
     participantTemplate.type = templateData.type;
     participantTemplate.avatarUrl = templateData.avatarUrl;
+    participantTemplate.color = templateData.color;
     participantTemplate.name = templateData.name;
     participantTemplate.initiativeModifier = templateData.initiativeModifier;
     participantTemplate.maxHp = templateData.maxHp;

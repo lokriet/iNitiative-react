@@ -8,10 +8,15 @@ import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
 import AddButton from '../../../UI/Form/Button/AddButton/AddButton';
 
 import classes from './AddDamageType.module.css';
+import Popup from 'reactjs-popup';
+import Color from '../../../UI/Color/Color';
+import ColorPicker from '../../../UI/Color/ColorPicker/ColorPicker';
+import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 
 const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
   const [adding, setAdding] = useState(false);
   const [isNameValid, setIsNameValid] = useState(true);
+  const [color, setColor] = useState('');
 
   const setSubmitted = useCallback(success => {
     if (success) {
@@ -31,7 +36,7 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
         if (value !== '') {
           if (onValidateName(null, value)) {
             setIsNameValid(true);
-            onSave(value, setSubmitted);
+            onSave({name: value, color}, setSubmitted);
           } else {
             setIsNameValid(false);
           }
@@ -43,13 +48,39 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
         onCancel(null);
       }
     },
-    [onValidateName, onSave, setSubmitted, onCancel]
+    [onValidateName, onSave, setSubmitted, onCancel, color]
+  );
+
+  const handleColorChange = useCallback(
+    (close, newColor) => {
+      setColor(newColor);
+      close();
+    },
+    [],
   );
 
   return (
     <div className={classes.AddDamageType}>
       {adding ? (
-        <>
+        <ItemsRow alignCentered>
+          <Popup
+            on="click"
+            trigger={open => (
+              <div className={classes.ColorButton}>
+                <Color color={color} />
+              </div>
+            )}
+            offsetY={10}
+            contentStyle={{ width: 'auto' }}
+          >
+            {close => (
+              <ColorPicker
+                selectedColor={color}
+                onSelected={newColor => handleColorChange(close, newColor)}
+                onCancel={close}
+              />
+            )}
+          </Popup>
           <InlineInput
             hidingBorder
             type="text"
@@ -58,12 +89,14 @@ const AddDamageType = ({ serverError, onSave, onValidateName, onCancel }) => {
             placeholder="Name"
             autoFocus
           />
-          {isNameValid ? null : <Error>Damage type with this name already exists</Error>}
+          {isNameValid ? null : (
+            <Error>Damage type with this name already exists</Error>
+          )}
           {serverError ? (
             <ServerValidationError serverError={serverError} />
           ) : null}
           {serverError ? <ServerError serverError={serverError} /> : null}
-        </>
+        </ItemsRow>
       ) : (
         <AddButton onClick={handleStartAdding} />
       )}

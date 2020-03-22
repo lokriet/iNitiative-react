@@ -13,3 +13,7 @@
 .NameInput {
   width: 13rem;
 }
+
+.ColorButton {
+  cursor: pointer;
+}

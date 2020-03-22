@@ -121,7 +121,8 @@ router.put(
       .exists()
       .trim()
       .notEmpty()
-      .withMessage('Name is required')
+      .withMessage('Name is required'),
+    body('damageType.color').optional()
   ],
   damageTypeController.updateDamageType
 );

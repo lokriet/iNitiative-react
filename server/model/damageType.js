@@ -6,6 +6,7 @@ const damageTypeSchema = new Schema({
     type: String,
     required: true
   },
+  color: String,
   creator: {
     type: Schema.Types.ObjectId,
     ref: 'User',

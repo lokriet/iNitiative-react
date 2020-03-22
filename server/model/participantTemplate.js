@@ -8,6 +8,7 @@ const participantTemplateSchema = new Schema({
   },
   
   avatarUrl: String,
+  color: String,
 
   name: {
     type: String,

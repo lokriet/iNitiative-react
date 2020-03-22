@@ -12,6 +12,9 @@ import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import SavedBadge from '../../../UI/SavedBadge/SavedBadge';
 
 import classes from './DamageType.module.css';
+import Color from '../../../UI/Color/Color';
+import Popup from 'reactjs-popup';
+import ColorPicker from '../../../UI/Color/ColorPicker/ColorPicker';
 
 const DamageType = ({
   damageType,
@@ -43,7 +46,7 @@ const DamageType = ({
       if (!damageType || damageType.name !== value) {
         if (onValidateName(damageType ? damageType._id : null, value)) {
           setIsNameValid(true);
-          onSave(damageType._id, event.target.value, setSubmitted);
+          onSave(damageType, {name: event.target.value}, setSubmitted);
         } else {
           setIsNameValid(false);
         }
@@ -72,6 +75,14 @@ const DamageType = ({
     [handleCancel]
   );
 
+  const handleColorChange = useCallback(
+    (close, newColor) => {
+      onSave(damageType, {color: newColor}, setSubmitted);
+      close();
+    },
+    [damageType, onSave, setSubmitted],
+  )
+
   useEffect(() => {
     if (serverError || !isNameValid) {
       setShowCancelButton(true);
@@ -84,6 +95,25 @@ const DamageType = ({
     <div className={classes.DamageType}>
       <div style={{ position: 'relative' }}>
         <ItemsRow alignCentered>
+          <Popup
+            on="click"
+            trigger={open => (
+              <div className={classes.ColorButton}>
+                <Color color={damageType.color} />
+              </div>
+            )}
+            offsetY={10}
+            contentStyle={{ width: 'auto' }}
+          >
+            {close => (
+              <ColorPicker
+                selectedColor={damageType.color}
+                onSelected={newColor => handleColorChange(close, newColor)}
+                onCancel={close}
+              />
+            )}
+          </Popup>
+
           <InlineInput
             hidingBorder
             className={classes.NameInput}
@@ -105,7 +135,9 @@ const DamageType = ({
         </ItemsRow>
         <SavedBadge show={showSavedBadge} onHide={handleHideSavedBadge} />
       </div>
-      {isNameValid ? null : <Error>Damage type with this name already exists</Error>}
+      {isNameValid ? null : (
+        <Error>Damage type with this name already exists</Error>
+      )}
       {serverError ? <ServerValidationError serverError={serverError} /> : null}
       {serverError ? <ServerError serverError={serverError} /> : null}
     </div>

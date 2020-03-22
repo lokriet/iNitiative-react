@@ -36,16 +36,16 @@ const DamageTypes = props => {
   );
 
   const handleAddDamageType = useCallback(
-    (name, setSubmitted) => {
-      dispatch(actions.addDamageType({ name }, props.isHomebrew, setSubmitted));
+    (damageType, setSubmitted) => {
+      dispatch(actions.addDamageType(damageType, props.isHomebrew, setSubmitted));
     },
     [dispatch, props.isHomebrew]
   );
 
   const handleUpdateDamageType = useCallback(
-    (_id, name, setSubmitted) => {
+    (damageType, partialUpdate, setSubmitted) => {
       dispatch(
-        actions.updateDamageType({ _id, name }, props.isHomebrew, setSubmitted)
+        actions.updateDamageType({ ...damageType, ...partialUpdate }, props.isHomebrew, setSubmitted)
       );
     },
     [dispatch, props.isHomebrew]
