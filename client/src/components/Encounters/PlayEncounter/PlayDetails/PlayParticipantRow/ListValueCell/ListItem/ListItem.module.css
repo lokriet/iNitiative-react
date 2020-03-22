@@ -6,6 +6,10 @@
   white-space: nowrap;
 }
 
+.Color {
+  margin-right: 0.25rem;
+}
+
 .Description {
   white-space: pre-wrap;
   width: 20rem;

@@ -112,15 +112,15 @@ module.exports.updateEncounter = async (req, res, next) => {
     let savedEncounter = null;
     if (withDataResponse) {
       savedEncounter = await Encounter.findById(encounterId)
-        .populate({ path: 'participants.vulnerabilities', select: 'name' })
-        .populate({ path: 'participants.resistances', select: 'name' })
+        .populate({ path: 'participants.vulnerabilities', select: 'name color' })
+        .populate({ path: 'participants.resistances', select: 'name color' })
         .populate({
           path: 'participants.features',
           select: 'name type description'
         })
         .populate({
           path: 'participants.immunities.damageTypes',
-          select: 'name'
+          select: 'name color'
         })
         .populate({
           path: 'participants.immunities.conditions',
@@ -178,13 +178,13 @@ module.exports.getEncounter = async (req, res, next) => {
       _id: encounterId,
       creator: req.userId
     })
-      .populate({ path: 'participants.vulnerabilities', select: 'name' })
-      .populate({ path: 'participants.resistances', select: 'name' })
+      .populate({ path: 'participants.vulnerabilities', select: 'name color' })
+      .populate({ path: 'participants.resistances', select: 'name color' })
       .populate({
         path: 'participants.features',
         select: 'name type description'
       })
-      .populate({ path: 'participants.immunities.damageTypes', select: 'name' })
+      .populate({ path: 'participants.immunities.damageTypes', select: 'name color' })
       .populate({
         path: 'participants.immunities.conditions',
         select: 'name description'

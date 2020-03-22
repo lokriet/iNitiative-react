@@ -145,7 +145,7 @@ const ListValueCell = ({
       {isImmunitiesList ? (
         <>
           {items.damageTypes.map(item => (
-            <ListItem item={item} onDelete={handleDeleteItem} key={item._id} />
+            <ListItem item={item} onDelete={handleDeleteItem} key={item._id} showColor />
           ))}
           {items.damageTypes.length > 0 && items.conditions.length > 0 ? <div>—</div> : null}
           {items.conditions.map(item => (
@@ -154,7 +154,7 @@ const ListValueCell = ({
         </>
       ) : (
         items.map(item => (
-          <ListItem item={item} onDelete={handleDeleteItem} key={item._id} />
+          <ListItem item={item} onDelete={handleDeleteItem} key={item._id} showColor />
         ))
       )}
       <Popup
