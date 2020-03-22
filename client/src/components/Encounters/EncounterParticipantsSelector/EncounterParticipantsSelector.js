@@ -13,7 +13,7 @@ const convertToEncounterParticipant = (participantTemplate, name) => {
   return {
     _tempId: new Date().getTime(),
     name,
-    color: null,
+    color: participantTemplate.color,
     avatarUrl: participantTemplate.avatarUrl,
     type: participantTemplate.type,
     initiativeModifier: participantTemplate.initiativeModifier,

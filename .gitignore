@@ -40,3 +40,4 @@ server/exportdb.js
 server/service-key.json
 TMP
 server/.gitignore
+Readme.txt

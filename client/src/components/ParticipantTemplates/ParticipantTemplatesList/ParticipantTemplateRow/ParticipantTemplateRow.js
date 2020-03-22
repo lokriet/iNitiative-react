@@ -12,8 +12,16 @@ import Spinner from '../../../UI/Spinner/Spinner';
 import Button from '../../../UI/Form/Button/Button';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import { connect } from 'react-redux';
+import { isEmpty } from '../../../../util/helper-methods';
+import Color from '../../../UI/Color/Color';
 
-const ParticipantTemplateRow = ({ template, onEdit, onDelete, onDeleteCancelled, serverError }) => {
+const ParticipantTemplateRow = ({
+  template,
+  onEdit,
+  onDelete,
+  onDeleteCancelled,
+  serverError
+}) => {
   const [deleting, setDeleting] = useState(false);
 
   const handleConfirmDelete = useCallback(() => {
@@ -22,28 +30,33 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete, onDeleteCancelled,
   }, [template, onDelete]);
 
   const handleCancelDelete = useCallback(
-    (close) => {
+    close => {
       onDeleteCancelled();
       close();
     },
-    [onDeleteCancelled],
-  )
+    [onDeleteCancelled]
+  );
 
   useEffect(() => {
     if (serverError) {
       setDeleting(false);
     }
-  }, [serverError])
-  
+  }, [serverError]);
+
   return (
     <tr className={classes.ParticipantTemplateRow}>
       <td className={classes.AvatarCell}>
-        {template.avatarUrl != null && template.avatarUrl !== '' ? (
+        {!isEmpty(template.avatarUrl) ? (
           <img
             src={template.avatarUrl}
             className={classes.Avatar}
             alt={template.name}
+            style={
+              isEmpty(template.color) ? {} : { borderColor: template.color }
+            }
           />
+        ) : !isEmpty(template.color) ? (
+          <Color color={template.color} />
         ) : null}
       </td>
       <td>{template.name}</td>
@@ -52,8 +65,12 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete, onDeleteCancelled,
       <td>{template.armorClass}</td>
       <td>
         <div>{template.speed}</div>
-        {template.swimSpeed == null ? null : <div>Swim {template.swimSpeed}</div>}
-        {template.climbSpeed == null ? null : <div>Climb {template.climbSpeed}</div>}
+        {template.swimSpeed == null ? null : (
+          <div>Swim {template.swimSpeed}</div>
+        )}
+        {template.climbSpeed == null ? null : (
+          <div>Climb {template.climbSpeed}</div>
+        )}
         {template.flySpeed == null ? null : <div>Fly {template.flySpeed}</div>}
       </td>
       <td>
@@ -85,7 +102,7 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete, onDeleteCancelled,
             arrow={false}
             closeOnDocumentClick={false}
             closeOnEscape={false}
-            contentStyle={{width: 'auto'}}
+            contentStyle={{ width: 'auto' }}
           >
             {close => (
               <>
@@ -99,7 +116,9 @@ const ParticipantTemplateRow = ({ template, onEdit, onDelete, onDeleteCancelled,
                 ) : (
                   <ItemsRow centered>
                     <Button onClick={handleConfirmDelete}>Delete!</Button>
-                    <Button onClick={() => handleCancelDelete(close)}>NO!</Button>
+                    <Button onClick={() => handleCancelDelete(close)}>
+                      NO!
+                    </Button>
                   </ItemsRow>
                 )}
               </>

@@ -17,6 +17,7 @@ import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Button from '../../UI/Form/Button/Button';
 import Spinner from '../../UI/Spinner/Spinner';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
+import FormikColorPicker from '../../UI/Color/ColorPicker/FormikColorPicker';
 
 const EditParticipantTemplate = props => {
   const queryParams = useQueryParams();
@@ -88,6 +89,7 @@ const EditParticipantTemplate = props => {
         initialValues={{
           type: editMode ? props.editedTemplate.type : participantType,
           avatarUrl: editMode ? props.editedTemplate.avatarUrl || '' : '',
+          color: editMode ? props.editedTemplate.color || '' : '',
           name: editMode ? props.editedTemplate.name : '',
           initiativeModifier: editMode
             ? props.editedTemplate.initiativeModifier
@@ -167,8 +169,10 @@ const EditParticipantTemplate = props => {
                 <label htmlFor="monster">Monster</label>
               </div>
 
-              <label className={classes.Avatar}>Avatar</label>
+              <label htmlFor="color">Color</label>
+              <Field id="color" name="color" component={FormikColorPicker} />
 
+              <label className={classes.Avatar}>Avatar</label>
               <div className={classes.Avatar}>
                 <Field id="avatarUrl" name="avatarUrl" component={Avatar} onAvatarChanged={handleAvatarChange} />
               </div>

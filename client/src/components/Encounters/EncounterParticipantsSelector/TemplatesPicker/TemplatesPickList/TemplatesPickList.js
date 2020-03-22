@@ -8,6 +8,8 @@ import { faPlus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import Popup from 'reactjs-popup';
 import TemplateDetailsPopup from './TemplateDetailsPopup/TemplateDetailsPopup';
 import { Link } from 'react-router-dom';
+import { isEmpty } from '../../../../../util/helper-methods';
+import Color from '../../../../UI/Color/Color';
 
 const TemplatesPickList = props => {
   const [filteredTemplates, setFilteredTemplates] = useState(props.templates);
@@ -29,6 +31,22 @@ const TemplatesPickList = props => {
         filteredTemplates.map(template => (
           <ItemsRow className={classes.TemplateRow} key={template._id}>
             <div className={classes.AvatarContainer}>
+              {!isEmpty(template.avatarUrl) ? (
+                <img
+                  src={template.avatarUrl}
+                  className={classes.Avatar}
+                  alt={template.name}
+                  style={
+                    isEmpty(template.color)
+                      ? {}
+                      : { borderColor: template.color }
+                  }
+                />
+              ) : !isEmpty(template.color) ? (
+                <Color color={template.color} />
+              ) : null}
+            </div>
+            {/* <div className={classes.AvatarContainer}>
               {template.avatarUrl != null && template.avatarUrl !== '' ? (
                 <img
                   className={classes.Avatar}
@@ -36,7 +54,7 @@ const TemplatesPickList = props => {
                   alt={template.name}
                 />
               ) : null}
-            </div>
+            </div> */}
             <div className={classes.Name}>{template.name}</div>
             <ItemsRow className={classes.Buttons} alignCentered>
               <Popup
@@ -67,7 +85,9 @@ const TemplatesPickList = props => {
         <div className={classes.EmptyTemplates}>
           <p>No characters found</p>
           <br />
-          <p><Link to="/templates">Add some!</Link></p>
+          <p>
+            <Link to="/templates">Add some!</Link>
+          </p>
         </div>
       )}
     </>
