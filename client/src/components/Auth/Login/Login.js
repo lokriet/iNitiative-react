@@ -19,7 +19,7 @@ const Login = props => {
   useEffect(() => {
     dispatch(actions.setAuthRedirectPath('/'));
     dispatch(actions.authInit());
-  }, [props.redirectPath, dispatch]);
+  }, [dispatch]);
 
   const handleSubmit = useCallback(
     formValues => {

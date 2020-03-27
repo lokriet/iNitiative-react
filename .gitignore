@@ -41,3 +41,5 @@ server/service-key.json
 TMP
 server/.gitignore
 Readme.txt
+encounters.json
+templates.json

@@ -7,8 +7,6 @@ module.exports.getUserAvatarUrls = async (req, res, next) => {
     const encounterAvatarUrls = await Encounter.find({
       creator: req.userId
     }).distinct('participants.avatarUrl');
-    console.log(encounterAvatarUrls);
-
     const templateAvatarUrls = await ParticipantTemplate.find({
       creator: req.userId
     }).distinct('avatarUrl');
