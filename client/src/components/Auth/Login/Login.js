@@ -49,11 +49,6 @@ const Login = props => {
           password: '',
           rememberMe: true
         }}
-        // initialValues={{
-        //   email: '1@1.com',
-        //   password: '1111111',
-        //   rememberMe: true
-        // }}
         validationSchema={Yup.object({
           email: Yup.string()
             .required('Required')

@@ -76,7 +76,8 @@ input[type="number"]:focus {
 
 a, 
 a:visited {
-  color: #0b0c47;
+  color: usnet;
+  text-decoration: none;
 }
 
 body {
