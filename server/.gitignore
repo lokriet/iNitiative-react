@@ -18,3 +18,4 @@ yarn-error.log*
 constants.js
 package-lock.json
 new 4.txt
+nodemon.json

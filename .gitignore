@@ -43,3 +43,4 @@ server/.gitignore
 Readme.txt
 encounters.json
 templates.json
+/server/nodemon.json
