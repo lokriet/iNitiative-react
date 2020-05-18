@@ -53,6 +53,24 @@ const authReducer = (state = initialState, action) => {
         ...state,
         initialAuthCheckDone: true
       };
+      case ActionTypes.auth.AUTH_OPERATION_START:
+        return {
+          ...state,
+          error: null,
+          loading: true
+        };
+        case ActionTypes.auth.AUTH_OPERATION_SUCCESS:
+      return {
+        ...state,
+        error: null,
+        loading: false
+      };
+      case ActionTypes.auth.AUTH_OPERATION_FAILED:
+      return {
+        ...state,
+        error: action.error,
+        loading: false
+      };
     default:
       return state;
   }

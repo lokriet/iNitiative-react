@@ -11,8 +11,9 @@ import Button from '../../UI/Form/Button/Button';
 import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 
 import classes from './Login.module.css';
+import Error from '../../UI/Errors/Error/Error';
 
-const Login = props => {
+const Login = (props) => {
   const [redirectPath] = useState(props.redirectPath);
   const dispatch = useDispatch();
 
@@ -22,7 +23,7 @@ const Login = props => {
   }, [dispatch]);
 
   const handleSubmit = useCallback(
-    formValues => {
+    (formValues) => {
       dispatch(
         actions.authenticate(false, {
           email: formValues.email,
@@ -39,7 +40,7 @@ const Login = props => {
   if (!props.isAuthenticated) {
     let operationErrorMessage = null;
     if (props.error && props.error.type !== ErrorType.VALIDATION_ERROR) {
-      operationErrorMessage = <div>{props.error.message}</div>;
+      operationErrorMessage = <Error>{props.error.message}</Error>;
     }
 
     form = (
@@ -61,41 +62,51 @@ const Login = props => {
           handleSubmit(values, setSubmitting)
         }
       >
-        <Form className={classes.LoginForm}>
-          <Field
-            name="email"
-            type="text"
-            placeholder="E-mail"
-            autoComplete="username"
-            serverError={props.error}
-            component={FormikInput}
-          />
+        {(formikForm) => (
+          <Form className={classes.LoginForm}>
+            <Field
+              name="email"
+              type="text"
+              placeholder="E-mail"
+              autoComplete="username"
+              serverError={props.error}
+              component={FormikInput}
+            />
 
-          <Field
-            name="password"
-            type="password"
-            placeholder="Password"
-            autoComplete="current-password"
-            serverError={props.error}
-            component={FormikInput}
-          />
+            <Field
+              name="password"
+              type="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              serverError={props.error}
+              component={FormikInput}
+            />
 
-          <label>
-            <Field name="rememberMe" type="checkbox" />
-            Remember me
-          </label>
+            <label>
+              <Field name="rememberMe" type="checkbox" />
+              Remember me
+            </label>
 
-          {operationErrorMessage}
+            <div>
+              <Link
+                to={`/requestPasswordReset?email=${formikForm.values.email}`}
+              >
+                Forgot password
+              </Link>
+            </div>
 
-          <Button type="submit" disabled={props.loading}>
-            Login
-          </Button>
+            {operationErrorMessage}
 
-          <div>
-            Don't have an account?
-            <Link to={'/register'}>Register</Link>
-          </div>
-        </Form>
+            <Button type="submit" disabled={props.loading}>
+              Login
+            </Button>
+
+            <div>
+              Don't have an account?
+              <Link to="/register">Register</Link>
+            </div>
+          </Form>
+        )}
       </Formik>
     );
   }
@@ -103,7 +114,7 @@ const Login = props => {
   return props.isAuthenticated ? <Redirect to={redirectPath} /> : form;
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     loading: state.auth.loading,
     error: state.auth.error,

@@ -17,8 +17,10 @@ import EncountersList from './components/Encounters/EncountersList/EncountersLis
 import EditEncounter from './components/Encounters/EditEncounter/EditEncounter';
 import PlayEncounter from './components/Encounters/PlayEncounter/PlayEncounter';
 import Discuss from './components/Discuss/Discuss';
+import PasswordResetRequest from './components/Auth/PasswordResetRequest/PasswordResetRequest';
+import PasswordReset from './components/Auth/PasswordReset/PasswordReset';
 
-const App = props => {
+const App = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -30,16 +32,16 @@ const App = props => {
   useEffect(() => {
     let unsubscribe = null;
     if (props.firebase) {
-      unsubscribe = props.firebase.auth.onAuthStateChanged(authUser => {
+      unsubscribe = props.firebase.auth.onAuthStateChanged((authUser) => {
         //TODO;
-      })
-    };
+      });
+    }
 
     return () => {
       if (unsubscribe != null) {
         unsubscribe();
       }
-    }
+    };
   }, [props.firebase]);
 
   useEffect(() => {
@@ -49,39 +51,73 @@ const App = props => {
   }, [props.isAuthenticated, props.initialAuthCheckDone, dispatch]);
 
   return props.initialAuthCheckDone ? (
-      <BrowserRouter>
-        <Layout>
-          {/* <Toolbar /> */}
-          <Switch>
-            <Route path="/" exact component={Home} />
-            <Route path="/register" component={Register} />
-            <Route path="/login" component={Login} />
-            <Route path="/admin" render={() => <MechanicsSetup isHomebrew={false} />} />
+    <BrowserRouter>
+      <Layout>
+        {/* <Toolbar /> */}
+        <Switch>
+          <Route path="/" exact component={Home} />
+          <Route path="/register" component={Register} />
+          <Route path="/login" component={Login} />
+          <Route
+            path="/admin"
+            render={() => <MechanicsSetup isHomebrew={false} />}
+          />
 
-            <Route path="/homebrew" render={() => <MechanicsSetup isHomebrew={true} />} />
+          <Route
+            path="/homebrew"
+            render={() => <MechanicsSetup isHomebrew={true} />}
+          />
 
-            <Route path="/templates/new" render={() => <EditParticipantTemplate isNew />} />
-            <Route path="/templates/edit/:templateId" component={EditParticipantTemplate} />
-            <Route path="/templates" component={ParticipantTemplates} />
-            
-            <Route path="/encounters/new" render={(routeProps) => <EditEncounter isNew {...routeProps} />} />
-            
-            <Route path="/encounters/edit/:encounterId" component={EditEncounter} />
-            <Route path="/encounters/play/:encounterId" component={PlayEncounter} />
-            <Route path="/encounters" exact component={EncountersList} />
-            <Route path="/discuss" component={Discuss} />
-            <Route path="/logout" component={Logout} />
-            <Route path="/404" component={PageNotFound} />
-            <Route path="/" component={PageNotFound} />
-          </Switch>
-        </Layout>
-      </BrowserRouter>
+          <Route
+            path="/templates/new"
+            render={() => <EditParticipantTemplate isNew />}
+          />
+          <Route
+            path="/templates/edit/:templateId"
+            component={EditParticipantTemplate}
+          />
+          <Route path="/templates" component={ParticipantTemplates} />
+
+          <Route
+            path="/encounters/new"
+            render={(routeProps) => <EditEncounter isNew {...routeProps} />}
+          />
+
+          <Route
+            path="/encounters/edit/:encounterId"
+            component={EditEncounter}
+          />
+          <Route
+            path="/encounters/play/:encounterId"
+            component={PlayEncounter}
+          />
+          <Route path="/encounters" exact component={EncountersList} />
+          <Route path="/discuss" component={Discuss} />
+          <Route path="/logout" component={Logout} />
+          <Route path="/404" component={PageNotFound} />
+
+          {props.isAuthenticated ? null : (
+            <Route
+              path="/requestPasswordReset"
+              component={PasswordResetRequest}
+            />
+          )}
+          {props.isAuthenticated ? null : (
+            <Route
+              path="/resetPassword/:resetPasswordToken"
+              component={PasswordReset}
+            />
+          )}
+          <Route path="/" component={PageNotFound} />
+        </Switch>
+      </Layout>
+    </BrowserRouter>
   ) : (
     <Spinner />
   );
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     isAuthenticated: state.auth.token != null,
     firebase: state.auth.firebase,

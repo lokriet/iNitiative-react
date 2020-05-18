@@ -17,6 +17,9 @@ const userSchema = new Schema({
   isAdmin: {
     type: Boolean,
     required: true
+  },
+  passwordResetIdentificator: {
+    type: String
   }
 });
 

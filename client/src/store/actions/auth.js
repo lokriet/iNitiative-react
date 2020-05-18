@@ -14,7 +14,13 @@ export const AuthActionTypes = {
 
   AUTH_CHECK_INITIAL_STATE: 'AUTH_CHECK_INITIAL_STATE',
   AUTH_CHECK_INITIAL_STATE_DONE: 'AUTH_CHECK_INITIAL_STATE_DONE',
-  SET_AUTH_REDIRECT_PATH: 'SET_AUTH_REDIRECT_PATH'
+  SET_AUTH_REDIRECT_PATH: 'SET_AUTH_REDIRECT_PATH',
+  AUTH_REQUEST_PASSWORD_RESET: 'AUTH_REQUEST_PASSWORD_RESET',
+  AUTH_RESET_PASSWORD: 'AUTH_RESET_PASSWORD',
+
+  AUTH_OPERATION_START: 'AUTH_OPERATION_START',
+  AUTH_OPERATION_FAILED: 'AUTH_OPERATION_FAILED',
+  AUTH_OPERATION_SUCCESS: 'AUTH_OPERATION_SUCCESS'
 };
 
 export const initFirebase = () => {
@@ -93,5 +99,41 @@ export const setAuthRedirectPath = redirectPath => {
   return {
     type: AuthActionTypes.SET_AUTH_REDIRECT_PATH,
     redirectPath
+  };
+};
+
+export const requestPasswordReset = (email, onOperationDone) => {
+  return {
+    type: AuthActionTypes.AUTH_REQUEST_PASSWORD_RESET,
+    email,
+    onOperationDone
+  };
+};
+
+export const resetPassword = (password, resetPasswordToken, onOperationDone) => {
+  return {
+    type: AuthActionTypes.AUTH_RESET_PASSWORD,
+    password,
+    resetPasswordToken,
+    onOperationDone
+  };
+};
+
+export const authOperationStart = () => {
+  return {
+    type: AuthActionTypes.AUTH_OPERATION_START
+  };
+};
+
+export const authOperationSuccess = () => {
+  return {
+    type: AuthActionTypes.AUTH_OPERATION_SUCCESS
+  };
+};
+
+export const authOperationFailed = (error) => {
+  return {
+    type: AuthActionTypes.AUTH_OPERATION_FAILED,
+    error
   };
 };

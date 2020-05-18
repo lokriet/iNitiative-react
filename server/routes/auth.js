@@ -140,4 +140,39 @@ router.post('/signin',
 
 authController.login);
 
+router.post('/sendPasswordResetEmail', 
+[
+  body('email')
+  .exists()
+  .isEmail()
+  .normalizeEmail()
+  .withMessage('Please enter a valid e-mail')
+  .bail()
+  .custom((value, { req }) => {
+    return User.findOne({ email: value })
+      .then(user => {
+        if (!user) {
+          return Promise.reject('User with this email does not exist');
+        }
+      });
+  })
+],
+
+authController.sendPasswordResetEmail);
+
+router.post('/resetPassword', 
+[
+  body('password')
+  .exists()
+  .notEmpty()
+  .withMessage('Password is required'),
+
+  body('resetPasswordToken')
+  .exists()
+  .notEmpty()
+  .withMessage('Token is required')
+],
+
+authController.resetPassword);
+
 module.exports = router;

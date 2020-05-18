@@ -7,7 +7,7 @@ import constants from '../../util/constants';
 const INTERNAL_ERROR_MESSAGE =
   'Internal server error occured while authenticating. Please try again.';
 
-export const getFirebase = state => state.auth.firebase;
+export const getFirebase = (state) => state.auth.firebase;
 
 export function* authSaga(action) {
   yield put(actions.authStart());
@@ -39,14 +39,17 @@ export function* authSaga(action) {
       yield put(
         actions.authFailed({
           type: ErrorType[response.status],
-          message: response.status === 401 ? responseData.message : INTERNAL_ERROR_MESSAGE
+          message:
+            response.status === 401
+              ? responseData.message
+              : INTERNAL_ERROR_MESSAGE
         })
       );
     } else if (response.status === 422) {
       yield put(
         actions.authFailed({
           type: ErrorType[response.status],
-          data: responseData.data
+          message: responseData.message
         })
       );
     } else if (response.status === 200 || response.status === 201) {
@@ -56,9 +59,7 @@ export function* authSaga(action) {
         yield localStorage.removeItem('token');
       }
       const firebase = yield select(getFirebase);
-      yield firebase.doSignInWithCustomToken(
-        responseData.data.token
-      );
+      yield firebase.doSignInWithCustomToken(responseData.data.token);
       yield put(actions.authSuccess(responseData.data));
     }
   } catch (error) {
@@ -116,3 +117,73 @@ export function* checkAuthStateSaga(action) {
     yield put(actions.authCheckInitialStateDone());
   }
 }
+
+export function* requestPasswordResetSaga(action) {
+  const errorMessage =
+    'Password reset request failed. Please check your internet connection and make sure you are using the correct email address';
+  try {
+    yield put(actions.authOperationStart());
+    const response = yield fetch(
+      `${constants.serverUrl}/auth/sendPasswordResetEmail`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: action.email
+        })
+      }
+    );
+    if (response.status === 200) {
+      yield put(actions.authOperationSuccess());
+      yield action.onOperationDone(true);
+    }  else {
+      yield put(actions.authOperationFailed({
+        type: ErrorType[response.status],
+        message: errorMessage
+      }));
+      yield action.onOperationDone(false);
+    }
+  } catch (error) {
+    yield put(actions.authOperationFailed({
+      type: ErrorType.INTERNAL_CLIENT_ERROR,
+      message: errorMessage
+    }));
+    yield action.onOperationDone(false);
+  }
+}
+
+export function* resetPasswordSaga(action) {
+  const errorMessage =
+    'Password reset failed. Please check your internet connection and make sure you are using the latest requested link from your inbox';
+    try {
+      yield put(actions.authOperationStart());
+      const response = yield fetch(`${constants.serverUrl}/auth/resetPassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          password: action.password,
+          resetPasswordToken: action.resetPasswordToken
+        })
+      });
+      if (response.status === 200) {
+        yield put(actions.authOperationSuccess());
+        yield action.onOperationDone(true);
+      } else {
+        yield put(actions.authOperationFailed({
+          type: ErrorType[response.status],
+          message: errorMessage
+        }));
+        yield action.onOperationDone(false);
+      }
+    } catch (error) {
+      yield put(actions.authOperationFailed({
+        type: ErrorType.INTERNAL_CLIENT_ERROR,
+        message: errorMessage
+      }));
+      yield action.onOperationDone(false);
+    }
+};
