@@ -1,9 +1,19 @@
 # iNitiative-react
 
 This is an encounter tracking application for Duntions & Dragons game masters.
-The production link is https://initiative-react.firebaseapp.com/
+
+It allows to create characters/monsters, keep track of their attributes during an encounter and create an interactive map.
+
+Visit https://initiative-react.firebaseapp.com/ for production version of the project.
+
 
 # Technology stack
-This is basically a MERN stack app.
+React, Redux, Formik
 
-#
+Node JS + Express
+
+MongoDB Atlas
+
+Firebase as image storage
+
+
