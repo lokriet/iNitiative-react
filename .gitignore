@@ -44,3 +44,4 @@ Readme.txt
 encounters.json
 templates.json
 /server/nodemon.json
+client/src/components/Firebase/firebaseConfig.js

@@ -1,15 +1,19 @@
-import React from 'react';
-import * as actions from '../../../store/actions/index';
-import { Redirect } from 'react-router-dom';
+import { useEffect } from 'react';
+import { logout } from '../authSlice';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+
 
 const Logout = () => {
   const dispatch = useDispatch();
-  dispatch(actions.logout());
-  
-  return (
-    <Redirect to="/" />
-  )
+  const history = useHistory();
+
+  useEffect(() => {
+    dispatch(logout());
+    history.push('/');
+  })
+
+  return null;
 };
 
 export default Logout;

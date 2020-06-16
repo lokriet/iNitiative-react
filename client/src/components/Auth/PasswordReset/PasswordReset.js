@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useDispatch, connect } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import * as actions from '../../../store/actions/index';
+import {authInit, resetPassword} from '../authSlice';
 import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 import Button from '../../UI/Form/Button/Button';
 import Error from '../../UI/Errors/Error/Error';
@@ -16,14 +16,14 @@ const PasswordReset = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.authInit());
+    dispatch(authInit());
   }, [dispatch]);
 
   const handleSubmit = useCallback(
     (formValues) => {
       setRequestSent(true);
       dispatch(
-        actions.resetPassword(
+        resetPassword(
           formValues.password,
           resetPasswordToken,
           setResetSuccess

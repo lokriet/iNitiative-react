@@ -4,7 +4,7 @@ import { Redirect, Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
-import * as actions from '../../../store/actions/index';
+import { setAuthRedirectPath, authInit, authenticate } from '../authSlice';
 import ErrorType from '../../../util/error';
 
 import Button from '../../UI/Form/Button/Button';
@@ -12,20 +12,21 @@ import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 
 import classes from './Register.module.css';
 
-const Register = props => {
+const Register = (props) => {
   const [redirectPath, setRedirectPath] = useState('/');
   const dispatch = useDispatch();
 
   useEffect(() => {
     setRedirectPath(props.redirectPath);
-    dispatch(actions.setAuthRedirectPath('/'));
-    dispatch(actions.authInit());
+    dispatch(setAuthRedirectPath('/'));
+    dispatch(authInit());
   }, [props.redirectPath, dispatch]);
 
   const handleSubmit = useCallback(
-    formValues => {
+    (formValues) => {
       dispatch(
-        actions.authenticate(true, {
+        authenticate({
+          isRegister: true,
           username: formValues.username,
           email: formValues.email,
           password: formValues.password,
@@ -127,7 +128,7 @@ const Register = props => {
   return props.isAuthenticated ? <Redirect to={redirectPath} /> : form;
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     loading: state.auth.loading,
     error: state.auth.error,

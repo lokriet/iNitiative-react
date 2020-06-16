@@ -1,6 +1,7 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 import * as actions from '../actions';
+import { firebaseObtainIdToken } from '../../components/Firebase/firebaseMiddleware';
 
 export const ConditionActionTypes = {
   RESET_CONDITION_STORE: 'RESET_CONDITION_STORE',
@@ -22,7 +23,8 @@ export const ConditionActionTypes = {
 export const addCondition = (condition, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/conditions/condition`,
         {
@@ -84,7 +86,8 @@ export const addCondition = (condition, isHomebrew, setSubmitted) => {
 export const updateCondition = (condition, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/conditions/condition/${condition._id}`,
         {
@@ -143,10 +146,11 @@ export const updateCondition = (condition, isHomebrew, setSubmitted) => {
   };
 };
 
-export const deleteCondition = conditionId => {
+export const deleteCondition = (conditionId) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/conditions/condition/${conditionId}`,
         {
@@ -240,7 +244,8 @@ export const getHomebrewConditions = () => {
 
     try {
       dispatch(startFetchingHomebrewConditions());
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/conditions/homebrew`,
         {
@@ -280,21 +285,21 @@ export const getHomebrewConditions = () => {
   };
 };
 
-export const addConditionSuccess = condition => {
+export const addConditionSuccess = (condition) => {
   return {
     type: ConditionActionTypes.ADD_CONDITION_SUCCESS,
     condition
   };
 };
 
-export const updateConditionSuccess = condition => {
+export const updateConditionSuccess = (condition) => {
   return {
     type: ConditionActionTypes.UPDATE_CONDITION_SUCCESS,
     condition
   };
 };
 
-export const deleteConditionSuccess = conditionId => {
+export const deleteConditionSuccess = (conditionId) => {
   return {
     type: ConditionActionTypes.DELETE_CONDITION_SUCCESS,
     conditionId
@@ -309,7 +314,7 @@ export const conditionOperationFailed = (conditionId, error) => {
   };
 };
 
-export const removeConditionError = conditionId => {
+export const removeConditionError = (conditionId) => {
   return {
     type: ConditionActionTypes.REMOVE_CONDITION_ERROR,
     conditionId
@@ -328,28 +333,28 @@ export const startFetchingHomebrewConditions = () => {
   };
 };
 
-export const setSharedConditions = conditions => {
+export const setSharedConditions = (conditions) => {
   return {
     type: ConditionActionTypes.SET_SHARED_CONDITIONS,
     conditions
   };
 };
 
-export const setHomebrewConditions = conditions => {
+export const setHomebrewConditions = (conditions) => {
   return {
     type: ConditionActionTypes.SET_HOMEBREW_CONDITIONS,
     conditions
   };
 };
 
-export const fetchSharedConditionsFailed = error => {
+export const fetchSharedConditionsFailed = (error) => {
   return {
     type: ConditionActionTypes.FETCH_SHARED_CONDITIONS_FAILED,
     error
   };
 };
 
-export const fetchHomebrewConditionsFailed = error => {
+export const fetchHomebrewConditionsFailed = (error) => {
   return {
     type: ConditionActionTypes.FETCH_HOMEBREW_CONDITIONS_FAILED,
     error

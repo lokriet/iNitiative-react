@@ -1,6 +1,7 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 import * as actions from '../actions';
+import { firebaseObtainIdToken } from '../../components/Firebase/firebaseMiddleware';
 
 export const DamageTypeActionTypes = {
   RESET_DAMAGE_TYPE_STORE: 'RESET_DAMAGE_TYPE_STORE',
@@ -22,7 +23,8 @@ export const DamageTypeActionTypes = {
 export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/damageTypes/damageType`,
         {
@@ -84,7 +86,8 @@ export const addDamageType = (damageType, isHomebrew, setSubmitted) => {
 export const updateDamageType = (damageType, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/damageTypes/damageType/${damageType._id}`,
         {
@@ -143,10 +146,11 @@ export const updateDamageType = (damageType, isHomebrew, setSubmitted) => {
   };
 };
 
-export const deleteDamageType = damageTypeId => {
+export const deleteDamageType = (damageTypeId) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/damageTypes/damageType/${damageTypeId}`,
         {
@@ -241,7 +245,8 @@ export const getHomebrewDamageTypes = () => {
 
     try {
       dispatch(startFetchingHomebrewDamageTypes());
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/damageTypes/homebrew`,
         {
@@ -281,21 +286,21 @@ export const getHomebrewDamageTypes = () => {
   };
 };
 
-export const addDamageTypeSuccess = damageType => {
+export const addDamageTypeSuccess = (damageType) => {
   return {
     type: DamageTypeActionTypes.ADD_DAMAGE_TYPE_SUCCESS,
     damageType
   };
 };
 
-export const updateDamageTypeSuccess = damageType => {
+export const updateDamageTypeSuccess = (damageType) => {
   return {
     type: DamageTypeActionTypes.UPDATE_DAMAGE_TYPE_SUCCESS,
     damageType
   };
 };
 
-export const deleteDamageTypeSuccess = damageTypeId => {
+export const deleteDamageTypeSuccess = (damageTypeId) => {
   return {
     type: DamageTypeActionTypes.DELETE_DAMAGE_TYPE_SUCCESS,
     damageTypeId
@@ -310,7 +315,7 @@ export const damageTypeOperationFailed = (damageTypeId, error) => {
   };
 };
 
-export const removeDamageTypeError = damageTypeId => {
+export const removeDamageTypeError = (damageTypeId) => {
   return {
     type: DamageTypeActionTypes.REMOVE_DAMAGE_TYPE_ERROR,
     damageTypeId
@@ -329,28 +334,28 @@ export const startFetchingHomebrewDamageTypes = () => {
   };
 };
 
-export const setSharedDamageTypes = damageTypes => {
+export const setSharedDamageTypes = (damageTypes) => {
   return {
     type: DamageTypeActionTypes.SET_SHARED_DAMAGE_TYPES,
     damageTypes
   };
 };
 
-export const setHomebrewDamageTypes = damageTypes => {
+export const setHomebrewDamageTypes = (damageTypes) => {
   return {
     type: DamageTypeActionTypes.SET_HOMEBREW_DAMAGE_TYPES,
     damageTypes
   };
 };
 
-export const fetchSharedDamageTypesFailed = error => {
+export const fetchSharedDamageTypesFailed = (error) => {
   return {
     type: DamageTypeActionTypes.FETCH_SHARED_DAMAGE_TYPES_FAILED,
     error
   };
 };
 
-export const fetchHomebrewDamageTypesFailed = error => {
+export const fetchHomebrewDamageTypesFailed = (error) => {
   return {
     type: DamageTypeActionTypes.FETCH_HOMEBREW_DAMAGE_TYPES_FAILED,
     error

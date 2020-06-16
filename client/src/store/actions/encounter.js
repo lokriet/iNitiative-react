@@ -1,6 +1,7 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 import * as actions from './index';
+import { firebaseObtainIdToken } from '../../components/Firebase/firebaseMiddleware';
 
 export const EncounterActionTypes = {
   RESET_ENCOUNTER_STORE: 'RESET_ENCOUNTER_STORE',
@@ -46,7 +47,8 @@ export const editEncounter = (encounterId, encounterData, actionOptions) => {
         dispatch(updateEditedEncounter(encounterData));
       }
 
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       let response;
       if (encounterId == null) {
         response = await fetch(`${constants.serverUrl}/encounters/encounter`, {
@@ -135,10 +137,11 @@ export const editEncounter = (encounterId, encounterData, actionOptions) => {
   };
 };
 
-export const deleteEncounter = encounterId => {
+export const deleteEncounter = (encounterId) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
 
       let avatarUrlsToCheck = [];
       try {
@@ -213,7 +216,8 @@ export const deleteEncounter = encounterId => {
 export const getLatestEncounter = () => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/encounters/latestEncounter`,
         {
@@ -255,11 +259,12 @@ export const getLatestEncounter = () => {
   };
 };
 
-export const getEncounterById = encounterId => {
+export const getEncounterById = (encounterId) => {
   return async (dispatch, getState) => {
     try {
       dispatch(startFetchingEncounters());
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/encounters/${encounterId}`,
         {
@@ -314,7 +319,8 @@ export const getEncounters = () => {
 
     try {
       dispatch(startFetchingEncounters());
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(`${constants.serverUrl}/encounters`, {
         headers: {
           Authorization: `Bearer ${idToken}`
@@ -362,7 +368,8 @@ export const updateEncounterParticipantDetails = (
 ) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       let response;
       response = await fetch(
         `${constants.serverUrl}/encounters/encounter/${encounterId}/participant/${participantId}`,
@@ -446,7 +453,7 @@ export const resetEncounterOperation = () => {
   };
 };
 
-export const addEncounterSuccess = encounter => {
+export const addEncounterSuccess = (encounter) => {
   return {
     type: EncounterActionTypes.ADD_ENCOUNTER_SUCCESS,
     encounter
@@ -461,7 +468,7 @@ export const updateEncounterSuccess = (encounter, overwriteError) => {
   };
 };
 
-export const deleteEncounterSuccess = encounterId => {
+export const deleteEncounterSuccess = (encounterId) => {
   return {
     type: EncounterActionTypes.DELETE_ENCOUNTER_SUCCESS,
     encounterId
@@ -504,21 +511,21 @@ export const startFetchingEncounters = () => {
   };
 };
 
-export const setEncounters = encounters => {
+export const setEncounters = (encounters) => {
   return {
     type: EncounterActionTypes.SET_ENCOUNTERS,
     encounters
   };
 };
 
-export const fetchEncountersFailed = error => {
+export const fetchEncountersFailed = (error) => {
   return {
     type: EncounterActionTypes.FETCH_ENCOUNTERS_FAILED,
     error
   };
 };
 
-export const setEditedEncounter = encounter => {
+export const setEditedEncounter = (encounter) => {
   return {
     type: EncounterActionTypes.SET_EDITED_ENCOUNTER,
     encounter
@@ -529,10 +536,10 @@ export const setLatestEncounter = (latestEncounter) => {
   return {
     type: EncounterActionTypes.SET_LATEST_ENCOUNTER,
     latestEncounter
-  }
-}
+  };
+};
 
-export const updateEditedEncounter = partialUpdate => {
+export const updateEditedEncounter = (partialUpdate) => {
   return {
     type: EncounterActionTypes.UPDATE_EDITED_ENCOUNTER,
     partialUpdate

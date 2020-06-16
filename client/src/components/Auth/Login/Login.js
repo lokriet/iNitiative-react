@@ -4,7 +4,7 @@ import { Redirect, Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
-import * as actions from '../../../store/actions/index';
+import {setAuthRedirectPath, authInit, authenticate} from '../authSlice';
 import ErrorType from '../../../util/error';
 
 import Button from '../../UI/Form/Button/Button';
@@ -18,14 +18,15 @@ const Login = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.setAuthRedirectPath('/'));
-    dispatch(actions.authInit());
+    dispatch(setAuthRedirectPath('/'));
+    dispatch(authInit());
   }, [dispatch]);
 
   const handleSubmit = useCallback(
     (formValues) => {
       dispatch(
-        actions.authenticate(false, {
+        authenticate({
+          isRegister: false,
           email: formValues.email,
           password: formValues.password,
           rememberMe: formValues.rememberMe

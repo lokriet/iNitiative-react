@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import classes from './PasswordResetRequest.module.css';
 import { useLocation, Link } from 'react-router-dom';
 import { connect, useDispatch } from 'react-redux';
-import * as actions from '../../../store/actions/index';
+import {authInit, requestPasswordReset} from '../authSlice';
 import { Formik, Form, Field } from 'formik';
 import Error from '../../UI/Errors/Error/Error';
 import * as Yup from 'yup';
@@ -16,14 +16,14 @@ const PasswordResetRequest = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.authInit());
+    dispatch(authInit());
   }, [dispatch]);
 
   const handleSubmit = useCallback(
     (formValues) => {
       setRequestSent(true);
       dispatch(
-        actions.requestPasswordReset(formValues.email, setRequestSuccess)
+        requestPasswordReset(formValues.email, setRequestSuccess)
       );
     },
     [dispatch, setRequestSuccess]

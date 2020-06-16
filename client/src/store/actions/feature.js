@@ -1,6 +1,7 @@
 import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 import * as actions from '../actions';
+import { firebaseObtainIdToken } from '../../components/Firebase/firebaseMiddleware';
 
 export const FeatureActionTypes = {
   RESET_FEATURE_STORE: 'RESET_FEATURE_STORE',
@@ -20,7 +21,8 @@ export const FeatureActionTypes = {
 export const addFeature = (feature, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(`${constants.serverUrl}/features/feature`, {
         method: 'POST',
         headers: {
@@ -79,7 +81,8 @@ export const addFeature = (feature, isHomebrew, setSubmitted) => {
 export const updateFeature = (feature, isHomebrew, setSubmitted) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/features/feature/${feature._id}`,
         {
@@ -138,10 +141,11 @@ export const updateFeature = (feature, isHomebrew, setSubmitted) => {
   };
 };
 
-export const deleteFeature = featureId => {
+export const deleteFeature = (featureId) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/features/feature/${featureId}`,
         {
@@ -234,7 +238,8 @@ export const getHomebrewFeatures = () => {
 
     try {
       dispatch(startFetchingFeatures());
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(`${constants.serverUrl}/features/homebrew`, {
         headers: {
           Authorization: `Bearer ${idToken}`
@@ -273,21 +278,21 @@ export const getHomebrewFeatures = () => {
   };
 };
 
-export const addFeatureSuccess = feature => {
+export const addFeatureSuccess = (feature) => {
   return {
     type: FeatureActionTypes.ADD_FEATURE_SUCCESS,
     feature
   };
 };
 
-export const updateFeatureSuccess = feature => {
+export const updateFeatureSuccess = (feature) => {
   return {
     type: FeatureActionTypes.UPDATE_FEATURE_SUCCESS,
     feature
   };
 };
 
-export const deleteFeatureSuccess = featureId => {
+export const deleteFeatureSuccess = (featureId) => {
   return {
     type: FeatureActionTypes.DELETE_FEATURE_SUCCESS,
     featureId
@@ -302,7 +307,7 @@ export const featureOperationFailed = (featureId, error) => {
   };
 };
 
-export const removeFeatureError = featureId => {
+export const removeFeatureError = (featureId) => {
   return {
     type: FeatureActionTypes.REMOVE_FEATURE_ERROR,
     featureId
@@ -315,7 +320,7 @@ export const startFetchingFeatures = () => {
   };
 };
 
-export const setSharedFeatures = features => {
+export const setSharedFeatures = (features) => {
   return {
     type: FeatureActionTypes.SET_SHARED_FEATURES,
     features
@@ -330,7 +335,7 @@ export const setHomebrewFeatures = (features, featureTypes) => {
   };
 };
 
-export const fetchFeaturesFailed = error => {
+export const fetchFeaturesFailed = (error) => {
   return {
     type: FeatureActionTypes.FETCH_FEATURES_FAILED,
     error

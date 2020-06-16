@@ -1,115 +1,28 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { useDispatch, connect } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
-import * as actions from './store/actions';
+import { authCheckInitialState } from './components/Auth/authSlice';
+
 import Layout from './components/UI/Layout/Layout';
-import Home from './components/Home/Home';
-import PageNotFound from './components/PageNotFound/PageNotFound';
-import Logout from './components/Auth/Logout/Logout';
 import Spinner from './components/UI/Spinner/Spinner';
-import Login from './components/Auth/Login/Login';
-import Register from './components/Auth/Register/Register';
-import MechanicsSetup from './components/MechanicsSetup/MechanicsSetup';
-import ParticipantTemplates from './components/ParticipantTemplates/ParticipantTemplates';
-import EditParticipantTemplate from './components/ParticipantTemplates/EditParticipantTemplate/EditParticipantTemplate';
-import EncountersList from './components/Encounters/EncountersList/EncountersList';
-import EditEncounter from './components/Encounters/EditEncounter/EditEncounter';
-import PlayEncounter from './components/Encounters/PlayEncounter/PlayEncounter';
-import Discuss from './components/Discuss/Discuss';
-import PasswordResetRequest from './components/Auth/PasswordResetRequest/PasswordResetRequest';
-import PasswordReset from './components/Auth/PasswordReset/PasswordReset';
+import Routes from './Routes';
 
-const App = (props) => {
+const App = () => {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth.token != null);
+  const { initialAuthCheckDone } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (props.firebase == null) {
-      dispatch(actions.initFirebase());
+    if (!isAuthenticated && !initialAuthCheckDone) {
+      dispatch(authCheckInitialState());
     }
-  }, [dispatch, props.firebase]);
+  }, [isAuthenticated, initialAuthCheckDone, dispatch]);
 
-  useEffect(() => {
-    let unsubscribe = null;
-    if (props.firebase) {
-      unsubscribe = props.firebase.auth.onAuthStateChanged((authUser) => {
-        //TODO;
-      });
-    }
-
-    return () => {
-      if (unsubscribe != null) {
-        unsubscribe();
-      }
-    };
-  }, [props.firebase]);
-
-  useEffect(() => {
-    if (!props.isAuthenticated && !props.initialAuthCheckDone) {
-      dispatch(actions.authCheckInitialState());
-    }
-  }, [props.isAuthenticated, props.initialAuthCheckDone, dispatch]);
-
-  return props.initialAuthCheckDone ? (
+  return initialAuthCheckDone ? (
     <BrowserRouter>
       <Layout>
-        {/* <Toolbar /> */}
-        <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/register" component={Register} />
-          <Route path="/login" component={Login} />
-          <Route
-            path="/admin"
-            render={() => <MechanicsSetup isHomebrew={false} />}
-          />
-
-          <Route
-            path="/homebrew"
-            render={() => <MechanicsSetup isHomebrew={true} />}
-          />
-
-          <Route
-            path="/templates/new"
-            render={() => <EditParticipantTemplate isNew />}
-          />
-          <Route
-            path="/templates/edit/:templateId"
-            component={EditParticipantTemplate}
-          />
-          <Route path="/templates" component={ParticipantTemplates} />
-
-          <Route
-            path="/encounters/new"
-            render={(routeProps) => <EditEncounter isNew {...routeProps} />}
-          />
-
-          <Route
-            path="/encounters/edit/:encounterId"
-            component={EditEncounter}
-          />
-          <Route
-            path="/encounters/play/:encounterId"
-            component={PlayEncounter}
-          />
-          <Route path="/encounters" exact component={EncountersList} />
-          <Route path="/discuss" component={Discuss} />
-          <Route path="/logout" component={Logout} />
-          <Route path="/404" component={PageNotFound} />
-
-          {props.isAuthenticated ? null : (
-            <Route
-              path="/requestPasswordReset"
-              component={PasswordResetRequest}
-            />
-          )}
-          {props.isAuthenticated ? null : (
-            <Route
-              path="/resetPassword/:resetPasswordToken"
-              component={PasswordReset}
-            />
-          )}
-          <Route path="/" component={PageNotFound} />
-        </Switch>
+        <Routes />
       </Layout>
     </BrowserRouter>
   ) : (
@@ -117,13 +30,4 @@ const App = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    isAuthenticated: state.auth.token != null,
-    firebase: state.auth.firebase,
-    initialAuthCheckDone: state.auth.initialAuthCheckDone,
-    isAdmin: state.auth.user != null && state.auth.user.isAdmin
-  };
-};
-
-export default connect(mapStateToProps)(App);
+export default App;

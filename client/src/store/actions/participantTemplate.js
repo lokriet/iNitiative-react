@@ -2,6 +2,7 @@ import ErrorType from '../../util/error';
 import constants from '../../util/constants';
 import * as actions from './index';
 import { isEmpty } from '../../util/helper-methods';
+import { firebaseObtainIdToken } from '../../components/Firebase/firebaseMiddleware';
 
 export const ParticipantTemplateActionTypes = {
   RESET_PARTICIPANT_TEMPLATE_STORE: 'RESET_PARTICIPANT_TEMPLATE_STORE',
@@ -29,7 +30,8 @@ export const editParticipantTemplate = (
 ) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       let response;
       if (templateId == null) {
         // create
@@ -109,10 +111,11 @@ export const editParticipantTemplate = (
   };
 };
 
-export const deleteParticipantTemplate = template => {
+export const deleteParticipantTemplate = (template) => {
   return async (dispatch, getState) => {
     try {
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/participantTemplates/template/${template._id}`,
         {
@@ -176,7 +179,8 @@ export const getParticipantTemplates = () => {
 
     try {
       dispatch(startFetchingParticipantTemplates());
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/participantTemplates`,
         {
@@ -219,11 +223,12 @@ export const getParticipantTemplates = () => {
   };
 };
 
-export const getParticipantTemplateById = templateId => {
+export const getParticipantTemplateById = (templateId) => {
   return async (dispatch, getState) => {
     try {
       dispatch(startFetchingParticipantTemplates());
-      const idToken = await getState().auth.firebase.doGetIdToken();
+      await dispatch(firebaseObtainIdToken());
+      const idToken = getState().firebase.idToken;
       const response = await fetch(
         `${constants.serverUrl}/participantTemplates/${templateId}`,
         {
@@ -272,35 +277,35 @@ export const resetParticipantTemplateOperation = () => {
   };
 };
 
-export const addParticipantTemplateSuccess = participantTemplate => {
+export const addParticipantTemplateSuccess = (participantTemplate) => {
   return {
     type: ParticipantTemplateActionTypes.ADD_PARTICIPANT_TEMPLATE_SUCCESS,
     participantTemplate
   };
 };
 
-export const updateParticipantTemplateSuccess = participantTemplate => {
+export const updateParticipantTemplateSuccess = (participantTemplate) => {
   return {
     type: ParticipantTemplateActionTypes.UPDATE_PARTICIPANT_TEMPLATE_SUCCESS,
     participantTemplate
   };
 };
 
-export const deleteParticipantTemplateSuccess = participantTemplateId => {
+export const deleteParticipantTemplateSuccess = (participantTemplateId) => {
   return {
     type: ParticipantTemplateActionTypes.DELETE_PARTICIPANT_TEMPLATE_SUCCESS,
     participantTemplateId
   };
 };
 
-export const participantTemplateOperationFailed = error => {
+export const participantTemplateOperationFailed = (error) => {
   return {
     type: ParticipantTemplateActionTypes.PARTICIPANT_TEMPLATE_OPERATION_FAILED,
     error
   };
 };
 
-export const removeParticipantTemplateError = participantTemplateId => {
+export const removeParticipantTemplateError = (participantTemplateId) => {
   return {
     type: ParticipantTemplateActionTypes.REMOVE_PARTICIPANT_TEMPLATE_ERROR,
     participantTemplateId
@@ -313,14 +318,14 @@ export const startFetchingParticipantTemplates = () => {
   };
 };
 
-export const setParticipantTemplates = participantTemplates => {
+export const setParticipantTemplates = (participantTemplates) => {
   return {
     type: ParticipantTemplateActionTypes.SET_PARTICIPANT_TEMPLATES,
     participantTemplates
   };
 };
 
-export const setEditedParticipantTemplate = participantTemplate => {
+export const setEditedParticipantTemplate = (participantTemplate) => {
   return {
     type: ParticipantTemplateActionTypes.SET_EDITED_PARTICIPANT_TEMPLATE,
     participantTemplate
@@ -334,7 +339,7 @@ export const resetEditedParticipantTemplate = () => {
   };
 };
 
-export const fetchParticipantTemplatesFailed = error => {
+export const fetchParticipantTemplatesFailed = (error) => {
   return {
     type: ParticipantTemplateActionTypes.FETCH_PARTICIPANT_TEMPLATES_FAILED,
     error
