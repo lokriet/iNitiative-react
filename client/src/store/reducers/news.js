@@ -37,10 +37,10 @@ const setNews = (state, action) => {
     error: null,
     news: action.news.map(item => ({
       ...item,
-      createdAt: new Date(item.createdAt),
-      updatedAt: new Date(item.updatedAt)
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
     })),
-    newsInitialised: new Date()
+    newsInitialised: new Date().getTime()
   };
 };
 

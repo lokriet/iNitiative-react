@@ -2,6 +2,8 @@ import React, { useCallback, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { faPlay, faCog, faTimes } from '@fortawesome/free-solid-svg-icons';
 
+import { formatDate } from '../../../../util/helper-methods';
+
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 import Popup from 'reactjs-popup';
@@ -11,11 +13,14 @@ import Spinner from '../../../UI/Spinner/Spinner';
 import classes from './EncounterRow.module.css';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 
-const formatDate = date => {
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-};
-
-const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onEdit, onPlay }) => {
+const EncounterRow = ({
+  encounter,
+  serverError,
+  onDelete,
+  onDeleteCancelled,
+  onEdit,
+  onPlay
+}) => {
   const [deleting, setDeleting] = useState(false);
 
   const handleConfirmDelete = useCallback(() => {
@@ -28,7 +33,7 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
       onDeleteCancelled();
       close();
     },
-    [onDeleteCancelled],
+    [onDeleteCancelled]
   );
 
   useEffect(() => {
@@ -48,14 +53,14 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
           <IconButton icon={faCog} onClick={() => onEdit(encounter._id)} />
 
           <Popup
-            trigger={open => <IconButton icon={faTimes} />}
+            trigger={(open) => <IconButton icon={faTimes} />}
             modal
             arrow={false}
             closeOnDocumentClick={false}
             closeOnEscape={false}
-            contentStyle={{width: 'auto'}}
+            contentStyle={{ width: 'auto' }}
           >
-            {close => (
+            {(close) => (
               <>
                 <div className={classes.ModalQuestion}>
                   Delete encounter {encounter.name}?
@@ -66,7 +71,9 @@ const EncounterRow = ({ encounter, serverError, onDelete, onDeleteCancelled, onE
                 ) : (
                   <ItemsRow centered>
                     <Button onClick={handleConfirmDelete}>Delete!</Button>
-                    <Button onClick={() => handleCancelDelete(close)}>NO!</Button>
+                    <Button onClick={() => handleCancelDelete(close)}>
+                      NO!
+                    </Button>
                   </ItemsRow>
                 )}
               </>

@@ -75,8 +75,8 @@ const addEncounterSuccess = (state, action) => {
       {
         _id: action.encounter._id,
         name: action.encounter.name,
-        createdAt: new Date(action.encounter.createdAt),
-        updatedAt: new Date(action.encounter.updatedAt)
+        createdAt: new Date(action.encounter.createdAt).getTime(),
+        updatedAt: new Date(action.encounter.updatedAt).getTime()
       },
       ...state.encounters
     ],
@@ -92,8 +92,8 @@ const updateEncounterSuccess = (state, action) => {
       {
         _id: action.encounter._id,
         name: action.encounter.name,
-        createdAt: new Date(action.encounter.createdAt),
-        updatedAt: new Date(action.encounter.updatedAt)
+        createdAt: new Date(action.encounter.createdAt).getTime(),
+        updatedAt: new Date(action.encounter.updatedAt).getTime()
       },
       ...state.encounters.filter(
         item => item._id.toString() !== action.encounter._id.toString()
@@ -137,8 +137,8 @@ const setEncounters = (state, action) => {
     encounters: action.encounters.map(item => ({
       _id: item._id,
       name: item.name,
-      createdAt: new Date(item.createdAt),
-      updatedAt: new Date(item.updatedAt)
+      createdAt: new Date(item.createdAt).getTime(),
+      updatedAt: new Date(item.updatedAt).getTime()
     })),
     encountersInitialised: new Date().getTime(),
     fetching: false,
@@ -166,7 +166,7 @@ const setEditedEncounter = (state, action) => {
 const setLatestEncounter = (state, action) => {
   return {
     ...state,
-    latestEncounter: action.latestEncounter ? {...action.latestEncounter, updatedAt: new Date(action.latestEncounter.updatedAt)} : null,
+    latestEncounter: action.latestEncounter ? {...action.latestEncounter, updatedAt: new Date(action.latestEncounter.updatedAt).getTime()} : null,
     fetching: false,
     fetchingError: null
   };
@@ -202,8 +202,8 @@ const encounterParticipantUpdateSuccess = (state, action) => {
       {
         _id: state.editedEncounter._id,
         name: state.editedEncounter.name,
-        createdAt: new Date(state.editedEncounter.createdAt),
-        updatedAt: new Date()
+        createdAt: new Date(state.editedEncounter.createdAt).getTime(),
+        updatedAt: new Date().getTime()
       },
       ...state.encounters.filter(
         item => item._id.toString() !== state.editedEncounter._id.toString()
@@ -241,7 +241,7 @@ const applyParticipantUpdate = (
   const newEncounter = {
     ...editedEncounter,
     participants: newParticipants,
-    updatedAt: new Date()
+    updatedAt: new Date().getTime()
   };
   return newEncounter;
 };

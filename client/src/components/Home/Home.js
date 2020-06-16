@@ -3,7 +3,7 @@ import { connect, useDispatch } from 'react-redux';
 import * as actions from '../../store/actions/index';
 import { Link } from 'react-router-dom';
 import classes from './Home.module.css';
-import { isEmpty } from '../../util/helper-methods';
+import { isEmpty, formatDate } from '../../util/helper-methods';
 import Spinner from '../UI/Spinner/Spinner';
 
 const Home = props => {
@@ -22,6 +22,7 @@ const Home = props => {
   if (props.fetching) {
     jumpRightInContent = <Spinner />;
   } else if (props.latestEncounter) {
+    const lastActivityDate = new Date(props.latestEncounter.updatedAt);
     jumpRightInContent = (
       <>
         <div>
@@ -32,11 +33,9 @@ const Home = props => {
         </div>
         <br />
         <div className={classes.SideNote}>
-          Last activity at: {props.latestEncounter.updatedAt.getHours()}:
-          {props.latestEncounter.updatedAt.getMinutes()}{' '}
-          {props.latestEncounter.updatedAt.getDate()}.
-          {props.latestEncounter.updatedAt.getMonth() + 1}.
-          {props.latestEncounter.updatedAt.getFullYear()}
+          Last activity at: {lastActivityDate.getHours()}:
+          {lastActivityDate.getMinutes()}{' '}
+          {formatDate(lastActivityDate)}
         </div>
       </>
     );
@@ -60,16 +59,16 @@ const Home = props => {
   } else {
     news = (
       <div className={classes.NewsContainer}>
-        {props.news.map(item => (
+        {props.news.map(item => {
+          return (
           <div key={item._id} className={classes.News}>
             <div className={classes.NewsHeader}>{item.title}</div>
             <div className={classes.NewsDate}>
-              {item.createdAt.getDate()}.{item.createdAt.getMonth() + 1}.
-              {item.createdAt.getFullYear()}
+              {formatDate(item.createdAt)}
             </div>
             <div className={classes.NewsContent}>{item.text}</div>
           </div>
-        ))}
+        )})}
       </div>
     );
   }
