@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../store/actions';
+import { getHomebrewConditions, getSharedConditions } from '../components/MechanicsSetup/Conditions/conditionSlice';
 
 const useDropdownValues = () => {
   const dispatch = useDispatch();
@@ -30,8 +31,8 @@ const useDropdownValues = () => {
   useEffect(() => {
     dispatch(actions.getSharedDamageTypes());
     dispatch(actions.getHomebrewDamageTypes());
-    dispatch(actions.getSharedConditions());
-    dispatch(actions.getHomebrewConditions());
+    dispatch(getSharedConditions());
+    dispatch(getHomebrewConditions());
     dispatch(actions.getSharedFeatures());
     dispatch(actions.getHomebrewFeatures());
   }, [dispatch]);

@@ -1,6 +1,6 @@
 import authReducer from './components/Auth/authSlice';
 import damageTypeReducer from './store/reducers/damageType';
-import conditionReducer from './store/reducers/condition';
+import conditionReducer from './components/MechanicsSetup/Conditions/conditionSlice';
 import featureReducer from './store/reducers/feature';
 import participantTemplateReducer from './store/reducers/participantTemplate';
 import encounterReducer from './store/reducers/encounter';

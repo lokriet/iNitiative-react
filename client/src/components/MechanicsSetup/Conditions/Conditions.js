@@ -4,8 +4,6 @@ import { connect, useDispatch } from 'react-redux';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { Prompt } from 'react-router';
 
-import * as actions from '../../../store/actions/index';
-
 import AddCondition from './AddCondition/AddCondition';
 import Condition from './Condition/Condition';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
@@ -17,8 +15,16 @@ import Popup from 'reactjs-popup';
 import Button from '../../UI/Form/Button/Button';
 
 import classes from './Conditions.module.css';
+import {
+  getHomebrewConditions,
+  getSharedConditions,
+  addCondition,
+  updateCondition,
+  removeConditionError,
+  deleteCondition
+} from './conditionSlice';
 
-const Conditions = props => {
+const Conditions = (props) => {
   const [saveCallbacks, setSaveCallbacks] = useState({});
   const [changedConditions, setChangedConditions] = useState(new Set());
 
@@ -34,19 +40,19 @@ const Conditions = props => {
 
   useEffect(() => {
     props.isHomebrew
-      ? dispatch(actions.getHomebrewConditions())
-      : dispatch(actions.getSharedConditions());
+      ? dispatch(getHomebrewConditions())
+      : dispatch(getSharedConditions());
   }, [dispatch, props.isHomebrew]);
 
   const handleRegisterSaveCallback = useCallback((featureId, newCallback) => {
-    setSaveCallbacks(previousSaveCallbacks => ({
+    setSaveCallbacks((previousSaveCallbacks) => ({
       ...previousSaveCallbacks,
       [featureId]: newCallback
     }));
   }, []);
 
-  const handleUnregisterSaveCallback = useCallback(featureId => {
-    setSaveCallbacks(previousSaveCallbacks => {
+  const handleUnregisterSaveCallback = useCallback((featureId) => {
+    setSaveCallbacks((previousSaveCallbacks) => {
       let newCallbacks = { ...previousSaveCallbacks };
       delete newCallbacks[featureId];
       return newCallbacks;
@@ -55,7 +61,7 @@ const Conditions = props => {
 
   const handleUnsavedChangesStateChange = useCallback(
     (conditionId, hasUnsavedChanges) => {
-      setChangedConditions(previousChangedConditions => {
+      setChangedConditions((previousChangedConditions) => {
         const newChangedConditions = new Set(previousChangedConditions);
         if (hasUnsavedChanges) {
           newChangedConditions.add(conditionId);
@@ -72,7 +78,7 @@ const Conditions = props => {
   const validateName = useCallback(
     (_id, name) => {
       const result = !allConditions.some(
-        item => (_id == null || item._id !== _id) && item.name === name
+        (item) => (_id == null || item._id !== _id) && item.name === name
       );
       return result;
     },
@@ -81,23 +87,21 @@ const Conditions = props => {
 
   const handleAddCondition = useCallback(
     (condition, setSubmitted) => {
-      dispatch(actions.addCondition(condition, props.isHomebrew, setSubmitted));
+      dispatch(addCondition(condition, props.isHomebrew, setSubmitted));
     },
     [dispatch, props.isHomebrew]
   );
 
   const handleUpdateCondition = useCallback(
     (condition, setSubmitted) => {
-      dispatch(
-        actions.updateCondition(condition, props.isHomebrew, setSubmitted)
-      );
+      dispatch(updateCondition(condition, props.isHomebrew, setSubmitted));
     },
     [dispatch, props.isHomebrew]
   );
 
   const handleDeleteConditionClicked = useCallback(
-    condition => {
-      dispatch(actions.removeConditionError(condition._id));
+    (condition) => {
+      dispatch(removeConditionError(condition._id));
       setDeletingCondition(condition);
       setDeleting(true);
     },
@@ -110,14 +114,14 @@ const Conditions = props => {
   }, []);
 
   const handleDeleteConditionConfirmed = useCallback(() => {
-    dispatch(actions.deleteCondition(deletingCondition._id));
+    dispatch(deleteCondition(deletingCondition._id));
     setDeletingCondition(null);
     setDeleting(false);
   }, [dispatch, deletingCondition]);
 
   const handleCancelChangingCondition = useCallback(
-    conditionId => {
-      dispatch(actions.removeConditionError(conditionId));
+    (conditionId) => {
+      dispatch(removeConditionError(conditionId));
     },
     [dispatch]
   );
@@ -128,7 +132,7 @@ const Conditions = props => {
     }
   }, [saveCallbacks]);
 
-  const handleItemsFiltered = useCallback(filteredItems => {
+  const handleItemsFiltered = useCallback((filteredItems) => {
     setFilteredConditions(filteredItems);
   }, []);
 
@@ -169,7 +173,7 @@ const Conditions = props => {
           </IconButton>
         </ItemsRow>
 
-        {filteredConditions.map(condition => (
+        {filteredConditions.map((condition) => (
           <Condition
             key={condition._id}
             condition={condition}
@@ -179,7 +183,7 @@ const Conditions = props => {
             onCancel={handleCancelChangingCondition}
             onRegisterSaveCallback={handleRegisterSaveCallback}
             onUnregisterSaveCallback={handleUnregisterSaveCallback}
-            onHaveUnsavedChangesStateChange={hasUnsavedChanges =>
+            onHaveUnsavedChangesStateChange={(hasUnsavedChanges) =>
               handleUnsavedChangesStateChange(
                 condition._id.toString(),
                 hasUnsavedChanges
@@ -218,7 +222,7 @@ Conditions.propTypes = {
   isHomebrew: PropTypes.bool
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     homebrewConditions: state.condition.homebrewConditions,
     sharedConditions: state.condition.sharedConditions,
