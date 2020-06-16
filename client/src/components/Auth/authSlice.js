@@ -2,12 +2,12 @@ import { createSlice } from '@reduxjs/toolkit';
 import constants from '../../util/constants';
 import ErrorType from '../../util/error';
 import * as actions from '../../store/actions';
-// import Firebase from './components/Firebase/firebase';
 import {
   firebaseSignInWithCustomToken,
   firebaseSignOut,
   firebaseObtainIdToken
 } from '../Firebase/firebaseMiddleware';
+import { resetConditionStore } from '../MechanicsSetup/Conditions/conditionSlice';
 
 const initialState = {
   error: null,
@@ -16,17 +16,12 @@ const initialState = {
   user: null,
   redirectPath: '/',
   initialAuthCheckDone: false
-  // firebase: null
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    // setFirebase(state, action) {
-    //   state.firebase = action.payload.firebase;
-    // },
-
     authInit(state, action) {
       state.loading = false;
       state.error = null;
@@ -47,7 +42,7 @@ const authSlice = createSlice({
     authFailure(state, action) {
       state.token = null;
       state.user = null;
-      state.error = action.payload.error;
+      state.error = action.payload;
       state.loading = false;
     },
 
@@ -59,7 +54,7 @@ const authSlice = createSlice({
     },
 
     setAuthRedirectPath(state, action) {
-      state.redirectPath = action.payload.redirectPath;
+      state.redirectPath = action.payload;
     },
 
     authCheckInitialStateDone(state, action) {
@@ -77,7 +72,7 @@ const authSlice = createSlice({
     },
 
     authOperationFailure(state, action) {
-      state.error = action.payload.error;
+      state.error = action.payload;
       state.loading = false;
     }
   }
@@ -167,7 +162,7 @@ export const logout = () => async (dispatch, getState) => {
   localStorage.removeItem('token');
   dispatch(firebaseSignOut());
 
-  dispatch(actions.resetConditionStore());
+  dispatch(resetConditionStore());
   dispatch(actions.resetDamageTypeStore());
   dispatch(actions.resetFeatureStore());
   dispatch(actions.resetParticipantTemplateStore());

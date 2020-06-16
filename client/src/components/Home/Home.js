@@ -10,13 +10,15 @@ const Home = props => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.getLatestEncounter());
+    if (props.isAuthenticated) {
+      dispatch(actions.getLatestEncounter());
+    }
     dispatch(actions.getNews());
 
     return () => {
       dispatch(actions.setLatestEncounter(null));
     };
-  }, [dispatch]);
+  }, [dispatch, props.isAuthenticated]);
 
   let jumpRightInContent;
   if (props.fetching) {
