@@ -24,9 +24,9 @@ const Avatar = ({
   };
 
   const avatarDeletedHandler = () => {
-    setAvatarUrl(null);
-    onAvatarChanged(null);
-    form.setFieldValue(field.name, null);
+    setAvatarUrl('');
+    onAvatarChanged('');
+    form.setFieldValue(field.name, '');
   };
 
   const imgSrc =

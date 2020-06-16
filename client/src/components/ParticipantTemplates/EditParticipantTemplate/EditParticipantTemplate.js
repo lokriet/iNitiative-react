@@ -70,7 +70,7 @@ const EditParticipantTemplate = props => {
 
   const handleAvatarChange = useCallback(
     (newAvatarUrl) => {
-      if (newAvatarUrl !== null) {
+      if (newAvatarUrl !== null && newAvatarUrl !== '') {
         const newAvatarUrlsToCheck = new Set(avatarUrlsToCheck);
         newAvatarUrlsToCheck.add(newAvatarUrl);
         setAvatarUrlsToCheck(newAvatarUrlsToCheck);
