@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { Prompt } from 'react-router';
 
@@ -16,33 +16,39 @@ import Button from '../../UI/Form/Button/Button';
 
 import classes from './Conditions.module.css';
 import {
-  getHomebrewConditions,
-  getSharedConditions,
+  fetchConditions,
   addCondition,
   updateCondition,
   removeConditionError,
   deleteCondition
 } from './conditionSlice';
 
-const Conditions = (props) => {
+import { selectors } from './conditionSlice';
+
+const Conditions = ({ isHomebrew }) => {
   const [saveCallbacks, setSaveCallbacks] = useState({});
   const [changedConditions, setChangedConditions] = useState(new Set());
 
   const [deleting, setDeleting] = useState(false);
   const [deletingCondition, setDeletingCondition] = useState(null);
 
+  const allConditions = useSelector((state) =>
+    isHomebrew
+      ? selectors.homebrew.selectAll(state.condition.homebrew)
+      : selectors.shared.selectAll(state.condition.shared)
+  );
+
+  const fetchingError = useSelector((state) => isHomebrew ? state.condition.homebrew.error : state.condition.shared.error);
+  const fetching = useSelector((state) => isHomebrew ? state.condition.homebrew.fetching : state.condition.shared.fetching);
+  const errors = useSelector((state) =>  isHomebrew ? state.condition.homebrew.errorsById : state.condition.shared.errorsById);
+
   const dispatch = useDispatch();
-  const allConditions = props.isHomebrew
-    ? props.homebrewConditions
-    : props.sharedConditions;
 
   const [filteredConditions, setFilteredConditions] = useState(allConditions);
 
   useEffect(() => {
-    props.isHomebrew
-      ? dispatch(getHomebrewConditions())
-      : dispatch(getSharedConditions());
-  }, [dispatch, props.isHomebrew]);
+    dispatch(fetchConditions(isHomebrew));
+  }, [dispatch, isHomebrew]);
 
   const handleRegisterSaveCallback = useCallback((featureId, newCallback) => {
     setSaveCallbacks((previousSaveCallbacks) => ({
@@ -87,25 +93,25 @@ const Conditions = (props) => {
 
   const handleAddCondition = useCallback(
     (condition, setSubmitted) => {
-      dispatch(addCondition(condition, props.isHomebrew, setSubmitted));
+      dispatch(addCondition(condition, isHomebrew, setSubmitted));
     },
-    [dispatch, props.isHomebrew]
+    [dispatch, isHomebrew]
   );
 
   const handleUpdateCondition = useCallback(
     (condition, setSubmitted) => {
-      dispatch(updateCondition(condition, props.isHomebrew, setSubmitted));
+      dispatch(updateCondition(condition, isHomebrew, setSubmitted));
     },
-    [dispatch, props.isHomebrew]
+    [dispatch, isHomebrew]
   );
 
   const handleDeleteConditionClicked = useCallback(
     (condition) => {
-      dispatch(removeConditionError(condition._id));
+      dispatch(removeConditionError(condition._id, isHomebrew));
       setDeletingCondition(condition);
       setDeleting(true);
     },
-    [dispatch]
+    [dispatch, isHomebrew]
   );
 
   const handleDeleteConditionCancelled = useCallback(() => {
@@ -114,16 +120,16 @@ const Conditions = (props) => {
   }, []);
 
   const handleDeleteConditionConfirmed = useCallback(() => {
-    dispatch(deleteCondition(deletingCondition._id));
+    dispatch(deleteCondition(deletingCondition._id, isHomebrew));
     setDeletingCondition(null);
     setDeleting(false);
-  }, [dispatch, deletingCondition]);
+  }, [dispatch, deletingCondition, isHomebrew]);
 
   const handleCancelChangingCondition = useCallback(
     (conditionId) => {
-      dispatch(removeConditionError(conditionId));
+      dispatch(removeConditionError(conditionId, isHomebrew));
     },
-    [dispatch]
+    [dispatch, isHomebrew]
   );
 
   const handleSaveAll = useCallback(() => {
@@ -136,12 +142,7 @@ const Conditions = (props) => {
     setFilteredConditions(filteredItems);
   }, []);
 
-  const fetchingError = props.isHomebrew
-    ? props.fetchingHomebrewError
-    : props.fetchingSharedError;
-  const fetching = props.isHomebrew
-    ? props.fetchingHomebrew
-    : props.fetchingShared;
+  
   let view;
   if (fetching) {
     view = <Spinner />;
@@ -155,7 +156,7 @@ const Conditions = (props) => {
           message="You have unsaved changes. Are you sure you want to leave?"
         />
         <AddCondition
-          serverError={props.errors.ADD}
+          serverError={errors.ADD}
           onValidateName={validateName}
           onSave={handleAddCondition}
           onCancel={handleCancelChangingCondition}
@@ -189,7 +190,7 @@ const Conditions = (props) => {
                 hasUnsavedChanges
               )
             }
-            serverError={props.errors[condition._id]}
+            serverError={errors[condition._id]}
           />
         ))}
 
@@ -222,16 +223,4 @@ Conditions.propTypes = {
   isHomebrew: PropTypes.bool
 };
 
-const mapStateToProps = (state) => {
-  return {
-    homebrewConditions: state.condition.homebrewConditions,
-    sharedConditions: state.condition.sharedConditions,
-    errors: state.condition.errors,
-    fetchingSharedError: state.condition.errorShared,
-    fetchingHomebrewError: state.condition.errorHomebrew,
-    fetchingShared: state.condition.fetchingShared,
-    fetchingHomebrew: state.condition.fetchingHomebrew
-  };
-};
-
-export default connect(mapStateToProps)(Conditions);
+export default Conditions;

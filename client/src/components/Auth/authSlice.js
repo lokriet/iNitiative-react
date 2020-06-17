@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAction } from '@reduxjs/toolkit';
 import constants from '../../util/constants';
 import ErrorType from '../../util/error';
 import * as actions from '../../store/actions';
@@ -7,7 +7,6 @@ import {
   firebaseSignOut,
   firebaseObtainIdToken
 } from '../Firebase/firebaseMiddleware';
-import { resetConditionStore } from '../MechanicsSetup/Conditions/conditionSlice';
 
 const initialState = {
   error: null,
@@ -162,7 +161,7 @@ export const logout = () => async (dispatch, getState) => {
   localStorage.removeItem('token');
   dispatch(firebaseSignOut());
 
-  dispatch(resetConditionStore());
+  dispatch(createAction('resetStore'));
   dispatch(actions.resetDamageTypeStore());
   dispatch(actions.resetFeatureStore());
   dispatch(actions.resetParticipantTemplateStore());
