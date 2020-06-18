@@ -27,8 +27,8 @@ const ImageUpload = ({
   const uploadFailedHandler = onUploadFailed || (() => {});
 
   const startUploadImageHandler = useCallback(
-    event => {
-      const file = event.target.files[0];
+    event => {}, []);
+      /*const file = event.target.files[0];
 
       if (file == null) {
         return;
@@ -137,7 +137,7 @@ const ImageUpload = ({
       onUploadFinished,
       uploadFailedHandler
     ]
-  );
+  );*/
 
   return (
     <div>
@@ -188,10 +188,5 @@ ImageUpload.propTypes = {
   showFileName: PropTypes.bool
 };
 
-const mapStateToProps = state => {
-  return {
-    firebase: state.auth.firebase
-  };
-};
 
-export default connect(mapStateToProps)(ImageUpload);
+export default ImageUpload;

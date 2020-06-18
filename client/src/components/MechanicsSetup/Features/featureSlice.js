@@ -1,4 +1,6 @@
 import union from 'lodash/union';
+import uniq from 'lodash/uniq';
+import { createSelector } from '@reduxjs/toolkit';
 
 const { createMechanicsTypeSlice } = require('../mechanicsTypeSlice');
 
@@ -16,27 +18,31 @@ export const updateFeature = actions.updateItem;
 export const deleteFeature = actions.deleteItem;
 export const removeFeatureError = actions.removeItemError;
 
-const selectHomebrewFeatureTypes = (featureState) =>
-  union(
-    featureSelectors.homebrew
-      .selectAll(featureState.homebrew)
-      .map((feature) => feature.type)
-  );
-const selectSharedFeatureTypes = (featureState) =>
-  union(
-    featureSelectors.shared
-      .selectAll(featureState.shared)
-      .map((feature) => feature.type)
-  );
-const selectAllFeatureTypes = (featureState) =>
-  union(
-    featureSelectors.homebrew
-      .selectAll(featureState.homebrew)
-      .map((feature) => feature.type),
-    featureSelectors.shared
-      .selectAll(featureState.shared)
-      .map((feature) => feature.type)
-  );
+const byLocale = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase());
+
+const homebrewFeaturesSelector = (state) =>
+  featureSelectors.homebrew.selectAll(state.feature.homebrew);
+const sharedFeaturesSelector = (state) =>
+  featureSelectors.shared.selectAll(state.feature.shared);
+
+const selectHomebrewFeatureTypes = createSelector(
+  [homebrewFeaturesSelector],
+  (homebrewFeatures) => uniq(homebrewFeatures.map((feature) => feature.type)).sort(byLocale)
+);
+
+const selectSharedFeatureTypes = createSelector(
+  [sharedFeaturesSelector],
+  (sharedFeatures) => uniq(sharedFeatures.map((feature) => feature.type)).sort(byLocale)
+);
+
+const selectAllFeatureTypes = createSelector(
+  [homebrewFeaturesSelector, sharedFeaturesSelector],
+  (homebrewFeatures, sharedFeatures) =>
+    union(
+      homebrewFeatures.map((feature) => feature.type),
+      sharedFeatures.map((feature) => feature.type)
+    ).sort(byLocale)
+);
 
 export const selectors = {
   common: {

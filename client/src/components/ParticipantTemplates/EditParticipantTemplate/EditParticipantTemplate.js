@@ -29,8 +29,7 @@ const EditParticipantTemplate = props => {
 
   const dispatch = useDispatch();
   const history = useHistory();
-  const [damageTypes, combined, features] = useDropdownValues();
-
+  const [damageTypes, combined, features] =  useDropdownValues();
 
   const [avatarUrlsToCheck, setAvatarUrlsToCheck] = useState(new Set());
   const avatarUrlsToCheckRef = useRef(avatarUrlsToCheck);
@@ -378,5 +377,7 @@ const mapStateToProps = state => {
     editedTemplate: state.participantTemplate.editedParticipantTemplate
   };
 };
+
+EditParticipantTemplate.whyDidYouRender = true
 
 export default connect(mapStateToProps)(withAuthCheck(EditParticipantTemplate));

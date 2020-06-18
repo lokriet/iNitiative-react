@@ -28,10 +28,9 @@ const AddFeature = ({
   const [descriptionValue, setDescriptionValue] = useState('');
   const [typeValue, setTypeValue] = useState(null);
 
-  const featureTypes = useSelector((state) =>
-    isHomebrew
-      ? selectors.common.selectAllFeatureTypes(state.feature)
-      : selectors.common.selectSharedFeatureTypes(state.feature)
+  const featureTypes = useSelector(isHomebrew
+      ? selectors.common.selectAllFeatureTypes
+      : selectors.common.selectSharedFeatureTypes
   );
 
   const handleStartAdding = useCallback(() => {

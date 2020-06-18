@@ -10,22 +10,22 @@ import { isEmpty } from '../../../../../util/helper-methods';
 import Error from '../../../../UI/Errors/Error/Error';
 import { connect } from 'react-redux';
 
-const LoadMap = ({ onNewMapLoaded, firebase }) => {
+const LoadMap = ({ onNewMapLoaded/*, firebase */}) => {
   const [gridWidth, setGridWidth] = useState('');
   const [gridHeight, setGridHeight] = useState('');
   const [loadedMapInfo, setLoadedMapInfo] = useState(null);
   const [gridSizeError, setGridSizeError] = useState(false);
 
   const handleMapUploaded = useCallback((mapUrl, mapSize) => {
-    if (loadedMapInfo) {
-      firebase.doDeleteImage(loadedMapInfo.mapUrl);
-    }
-    setLoadedMapInfo({
-      mapUrl,
-      mapWidth: mapSize ? mapSize.width : null,
-      mapHeight: mapSize ? mapSize.height : null
-    });
-  }, [firebase, loadedMapInfo]);
+    // if (loadedMapInfo) {
+    //   firebase.doDeleteImage(loadedMapInfo.mapUrl);
+    // }
+    // setLoadedMapInfo({
+    //   mapUrl,
+    //   mapWidth: mapSize ? mapSize.width : null,
+    //   mapHeight: mapSize ? mapSize.height : null
+    // });
+  }, [/*firebase, loadedMapInfo*/]);
 
   const handleConfirmNewMap = useCallback(
     close => {
@@ -63,12 +63,12 @@ const LoadMap = ({ onNewMapLoaded, firebase }) => {
 
   const handleCancelMapUpload = useCallback(
     (close) => {
-      if (loadedMapInfo) {
-        firebase.doDeleteImage(loadedMapInfo.mapUrl);
-      }
+      // if (loadedMapInfo) {
+      //   firebase.doDeleteImage(loadedMapInfo.mapUrl);
+      // }
       close();
     },
-    [firebase, loadedMapInfo],
+    [/*firebase, loadedMapInfo*/],
   )
 
   return (
@@ -152,13 +152,12 @@ const LoadMap = ({ onNewMapLoaded, firebase }) => {
 };
 
 LoadMap.propTypes = {
-  onNewMapLoaded: PropTypes.func.isRequired,
-  currentMapUrl: PropTypes.string
+  onNewMapLoaded: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
   return {
-    firebase: state.auth.firebase
+    // firebase: state.auth.firebase
   };
 };
 

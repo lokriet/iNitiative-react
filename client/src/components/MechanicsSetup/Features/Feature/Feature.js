@@ -44,10 +44,9 @@ const Feature = ({
   const [showSavedBadge, setShowSavedBadge] = useState(false);
   const [showSaveButtons, setShowSaveButtons] = useState(false);
 
-  const featureTypes = useSelector((state) =>
-    isHomebrew
-      ? selectors.common.selectAllFeatureTypes(state.feature)
-      : selectors.common.selectSharedFeatureTypes(state.feature)
+  const featureTypes = useSelector(isHomebrew
+      ? selectors.common.selectAllFeatureTypes
+      : selectors.common.selectSharedFeatureTypes
   );
 
   const handleHaveUnsavedChanges = useCallback(
