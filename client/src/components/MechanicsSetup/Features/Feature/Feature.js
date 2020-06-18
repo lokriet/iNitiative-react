@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import {
   faTimes,
@@ -7,7 +7,6 @@ import {
   faFish
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { connect } from 'react-redux';
 
 import InlineInput from '../../../UI/Form/Input/InlineInput/InlineInput';
 import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
@@ -19,246 +18,261 @@ import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
 
 import classes from './Feature.module.css';
+import { useSelector } from 'react-redux';
+import { selectors } from '../featureSlice';
 
-class Feature extends Component {
-  static propTypes = {
-    feature: PropTypes.object.isRequired,
-    serverError: PropTypes.object,
-    onValidateName: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    onRegisterSaveCallback: PropTypes.func.isRequired,
-    onUnregisterSaveCallback: PropTypes.func.isRequired,
-    onHaveUnsavedChangesStateChange: PropTypes.func.isRequired
-  };
+const Feature = ({
+  feature,
+  serverError,
+  onValidateName,
+  onSave,
+  onCancel,
+  onDelete,
+  onRegisterSaveCallback,
+  onUnregisterSaveCallback,
+  onHaveUnsavedChangesStateChange,
+  isHomebrew
+}) => {
+  const [nameValue, setNameValue] = useState(feature.name);
+  const [descriptionValue, setDescriptionValue] = useState(feature.description);
+  const [typeValue, setTypeValue] = useState(
+    !feature.type || feature.type.length === 0
+      ? null
+      : { label: feature.type, value: feature.type }
+  );
+  const [nameError, setNameError] = useState(null);
+  const [showSavedBadge, setShowSavedBadge] = useState(false);
+  const [showSaveButtons, setShowSaveButtons] = useState(false);
 
-  state = {
-    nameValue: this.props.feature.name,
-    descriptionValue: this.props.feature.description,
-    typeValue:
-      this.props.feature.type == null || this.props.feature.type.length === 0
-        ? null
-        : { label: this.props.feature.type, value: this.props.feature.type },
-    nameError: null,
-    showSavedBadge: false,
-    showSaveButtons: false
-  };
+  const featureTypes = useSelector((state) =>
+    isHomebrew
+      ? selectors.common.selectAllFeatureTypes(state.feature)
+      : selectors.common.selectSharedFeatureTypes(state.feature)
+  );
 
-  componentDidMount() {
-    this.props.onRegisterSaveCallback(this.props.feature._id, this.handleSave);
-  }
+  const handleHaveUnsavedChanges = useCallback(
+    (haveUnsavedChanges) => {
+      onHaveUnsavedChangesStateChange(feature._id.toString(), haveUnsavedChanges)
+    },
+    [onHaveUnsavedChangesStateChange, feature._id],
+  )
 
-  componentWillUnmount() {
-    this.props.onUnregisterSaveCallback(this.props.feature._id);
-  }
-
-  setSubmitted = success => {
+  const setSubmitted = useCallback((success) => {
     if (success) {
-      this.setState({ showSavedBadge: true, showSaveButtons: false });
-      this.props.onHaveUnsavedChangesStateChange(false);
+      setShowSavedBadge(true);
+      setShowSaveButtons(false);
+      handleHaveUnsavedChanges(false);
     }
+  }, [handleHaveUnsavedChanges]);
+
+  const handleHideSavedBadge = () => {
+    setShowSavedBadge(false);
   };
 
-  handleHideSavedBadge = () => {
-    this.setState({ showSavedBadge: false });
-  };
-
-  getTypeValueValue = typeValue => {
+  const getTypeValueValue = (typeValue) => {
     return typeValue == null ? null : typeValue.value;
   };
 
-  handleNameChanged = event => {
-    this.setState({ nameValue: event.target.value });
-
+  const handleNameChanged = (event) => {
+    setNameValue(event.target.value);
     if (
-      event.target.value !== this.props.feature.name ||
-      this.state.descriptionValue !== this.props.feature.description ||
-      this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
+      event.target.value !== feature.name ||
+      descriptionValue !== feature.description ||
+      getTypeValueValue(typeValue) !== feature.type
     ) {
-      if (!this.state.showSaveButtons) {
-        this.props.onHaveUnsavedChangesStateChange(true);
+      if (!showSaveButtons) {
+        handleHaveUnsavedChanges(true);
       }
-      this.setState({ showSaveButtons: true });
-    } else if (!this.props.serverError) {
-      if (this.state.showSaveButtons) {
-        this.props.onHaveUnsavedChangesStateChange(false);
+      setShowSaveButtons(true);
+    } else if (!serverError) {
+      if (showSaveButtons) {
+        handleHaveUnsavedChanges(false);
       }
-      this.setState({ showSaveButtons: false });
+      setShowSaveButtons(false);
     }
   };
 
-  handleDescriptionChanged = event => {
-    this.setState({ descriptionValue: event.target.value });
+  const handleDescriptionChanged = (event) => {
+    setDescriptionValue(event.target.value);
 
     if (
-      this.state.nameValue !== this.props.feature.name ||
-      event.target.value !== this.props.feature.description ||
-      this.getTypeValueValue(this.state.typeValue) !== this.props.feature.type
+      nameValue !== feature.name ||
+      event.target.value !== feature.description ||
+      getTypeValueValue(typeValue) !== feature.type
     ) {
-      if (!this.state.showSaveButtons) {
-        this.props.onHaveUnsavedChangesStateChange(true);
+      if (!showSaveButtons) {
+        handleHaveUnsavedChanges(true);
       }
-      this.setState({ showSaveButtons: true });
+      setShowSaveButtons(true);
     } else {
-      if (this.state.showSaveButtons) {
-        this.props.onHaveUnsavedChangesStateChange(false);
+      if (showSaveButtons) {
+        handleHaveUnsavedChanges(false);
       }
-      this.setState({ showSaveButtons: false });
+      setShowSaveButtons(false);
     }
   };
 
-  handleTypeChanged = (newValue, action) => {
-    this.setState({ typeValue: newValue });
+  const handleTypeChanged = (newValue, action) => {
+    setTypeValue(newValue);
 
     if (
-      this.state.nameValue !== this.props.feature.name ||
-      this.state.descriptionValue !== this.props.feature.description ||
-      this.getTypeValueValue(newValue) !== this.props.feature.type
+      nameValue !== feature.name ||
+      descriptionValue !== feature.description ||
+      getTypeValueValue(newValue) !== feature.type
     ) {
-      this.setState({ showSaveButtons: true });
-      this.props.onHaveUnsavedChangesStateChange(true);
+      setShowSaveButtons(true);
+      handleHaveUnsavedChanges(true);
     } else {
-      this.setState({ showSaveButtons: false });
-      this.props.onHaveUnsavedChangesStateChange(false);
+      setShowSaveButtons(false);
+      handleHaveUnsavedChanges(false);
     }
   };
 
-  handleSave = () => {
-    if (!this.state.showSaveButtons) {
+  const handleSave = useCallback(() => {
+    if (!showSaveButtons) {
       return;
     }
 
-    if (this.state.nameValue.trim() === '') {
-      this.setState({ nameError: 'Name is required' });
+    if (nameValue.trim() === '') {
+      setNameError('Name is required');
       return;
     }
-    if (
-      !this.props.onValidateName(this.props.feature._id, this.state.nameValue)
-    ) {
-      this.setState({ nameError: 'Feature already exists' });
+    if (!onValidateName(feature._id, nameValue)) {
+      setNameError('Feature already exists');
       return;
     }
 
-    this.setState({ nameError: null });
-    this.props.onSave(
+    setNameError(null);
+    onSave(
       {
-        _id: this.props.feature._id,
-        name: this.state.nameValue,
-        description: this.state.descriptionValue,
-        type: this.getTypeValueValue(this.state.typeValue)
+        _id: feature._id,
+        name: nameValue,
+        description: descriptionValue,
+        type: getTypeValueValue(typeValue)
       },
-      this.setSubmitted
+      setSubmitted
     );
+  }, [showSaveButtons, nameValue, descriptionValue, typeValue, feature._id, onValidateName, onSave, setSubmitted]);
+
+  const handleCancel = () => {
+    setNameError(null);
+    setShowSaveButtons(false);
+    setNameValue(feature.name);
+    setTypeValue(
+      !feature.type || feature.type.length === 0
+        ? null
+        : { label: feature.type, value: feature.type }
+    );
+    setDescriptionValue(feature.description);
+    handleHaveUnsavedChanges(false);
+
+    onCancel(feature._id);
   };
+  
+  useEffect(() => {
+    onRegisterSaveCallback(feature._id, handleSave);
+    return () => {
+      onUnregisterSaveCallback(feature._id);
+    };
+  }, [feature._id, handleSave, onRegisterSaveCallback, onUnregisterSaveCallback]);
 
-  handleCancel = () => {
-    this.setState({
-      nameError: null,
-      showSaveButtons: false,
-      nameValue: this.props.feature.name,
-      typeValue:
-        this.props.feature.type == null || this.props.feature.type.length === 0
-          ? null
-          : { label: this.props.feature.type, value: this.props.feature.type },
-      descriptionValue: this.props.feature.description
-    });
-    this.props.onHaveUnsavedChangesStateChange(false);
 
-    this.props.onCancel(this.props.feature._id);
-  };
+  const featureTypeOptions = featureTypes.map((item) => ({
+    label: item,
+    value: item
+  }));
 
-  render() {
-    const featureTypeOptions = this.props.featureTypes.map(item => ({
-      label: item,
-      value: item
-    }));
-
-    return (
-      <div className={classes.Feature}>
-        <div className={classes.FeatureForm}>
-          <ItemsRow className={classes.InputFieldsRow}>
-            <InlineSelect
-              options={featureTypeOptions}
-              onChange={this.handleTypeChanged}
-              isClearable
-              isCreatable
-              isObjectBased={false}
-              placeholder="Type"
-              className={classes.Type}
-              value={this.state.typeValue}
-            />
-
-            <InlineInput
-              hidingBorder
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={this.state.nameValue}
-              onChange={this.handleNameChanged}
-              className={classes.Name}
-            />
-            <InlineInput
-              hidingBorder
-              className={classes.Description}
-              inputType="textarea"
-              name="description"
-              placeholder="Description"
-              value={this.state.descriptionValue}
-              onChange={this.handleDescriptionChanged}
-            />
-            <IconButton
-              icon={faTimes}
-              onClick={() => this.props.onDelete(this.props.feature)}
-            />
-            <ItemsRow className={classes.SaveButtons}>
-              {this.state.showSaveButtons ? (
-                <>
-                  <IconButton icon={faCheck} onClick={this.handleSave} />
-                  <IconButton icon={faUndoAlt} onClick={this.handleCancel} />
-                </>
-              ) : null}
-            </ItemsRow>
-          </ItemsRow>
-          <SavedBadge
-            show={this.state.showSavedBadge}
-            onHide={this.handleHideSavedBadge}
+  return (
+    <div className={classes.Feature}>
+      <div className={classes.FeatureForm}>
+        <ItemsRow className={classes.InputFieldsRow}>
+          <InlineSelect
+            options={featureTypeOptions}
+            onChange={handleTypeChanged}
+            isClearable
+            isCreatable
+            isObjectBased={false}
+            placeholder="Type"
+            className={classes.Type}
+            value={typeValue}
           />
-          {this.state.nameError ? <Error>{this.state.nameError}</Error> : null}
-          {this.props.serverError ? (
-            <ServerValidationError serverError={this.props.serverError} />
-          ) : null}
-          {this.props.serverError ? (
-            <ServerError serverError={this.props.serverError} />
-          ) : null}
-        </div>
 
-        <br />
-        <ItemsRow>
-          <FontAwesomeIcon
-            icon={faFish}
-            className={classes.Fish}
-          ></FontAwesomeIcon>
-          <FontAwesomeIcon
-            icon={faFish}
-            flip={'horizontal'}
-            className={classes.Fish}
-          ></FontAwesomeIcon>
-          <FontAwesomeIcon
-            icon={faFish}
-            flip={'horizontal'}
-            className={classes.Fish}
-          ></FontAwesomeIcon>
+          <InlineInput
+            hidingBorder
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={nameValue}
+            onChange={handleNameChanged}
+            className={classes.Name}
+          />
+          <InlineInput
+            hidingBorder
+            className={classes.Description}
+            inputType="textarea"
+            name="description"
+            placeholder="Description"
+            value={descriptionValue}
+            onChange={handleDescriptionChanged}
+          />
+          <IconButton
+            icon={faTimes}
+            onClick={() => onDelete(feature)}
+          />
+          <ItemsRow className={classes.SaveButtons}>
+            {showSaveButtons ? (
+              <>
+                <IconButton icon={faCheck} onClick={handleSave} />
+                <IconButton icon={faUndoAlt} onClick={handleCancel} />
+              </>
+            ) : null}
+          </ItemsRow>
         </ItemsRow>
+        <SavedBadge
+          show={showSavedBadge}
+          onHide={handleHideSavedBadge}
+        />
+        {nameError ? <Error>{nameError}</Error> : null}
+        {serverError ? (
+          <ServerValidationError serverError={serverError} />
+        ) : null}
+        {serverError ? (
+          <ServerError serverError={serverError} />
+        ) : null}
       </div>
-    );
-  }
-}
 
-const mapStateToProps = state => {
-  return {
-    featureTypes: state.feature.featureTypes
-  };
+      <br />
+      <ItemsRow>
+        <FontAwesomeIcon
+          icon={faFish}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          flip={'horizontal'}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
+        <FontAwesomeIcon
+          icon={faFish}
+          flip={'horizontal'}
+          className={classes.Fish}
+        ></FontAwesomeIcon>
+      </ItemsRow>
+    </div>
+  );
 };
 
-export default connect(mapStateToProps)(Feature);
+
+Feature.propTypes = {
+  feature: PropTypes.object.isRequired,
+  serverError: PropTypes.object,
+  onValidateName: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onRegisterSaveCallback: PropTypes.func.isRequired,
+  onUnregisterSaveCallback: PropTypes.func.isRequired,
+  onHaveUnsavedChangesStateChange: PropTypes.func.isRequired
+};
+
+export default Feature;

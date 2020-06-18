@@ -195,20 +195,21 @@ module.exports.getHomebrewFeatures = async (req, res, next) => {
       .collation({ locale: 'en' })
       .sort({ name: 1 });
 
-    const featureTypes = await Feature.distinct('type', {
-      $or: [
-        {
-          isHomebrew: true,
-          creator: req.userId,
-          $and: [{ type: { $ne: null } }, { type: { $ne: '' } }]
-        },
-        {
-          isHomebrew: false,
-          $and: [{ type: { $ne: null } }, { type: { $ne: '' } }]
-        }
-      ]
-    });
-    res.status(200).json({ features, featureTypes });
+    // const featureTypes = await Feature.distinct('type', {
+    //   $or: [
+    //     {
+    //       isHomebrew: true,
+    //       creator: req.userId,
+    //       $and: [{ type: { $ne: null } }, { type: { $ne: '' } }]
+    //     },
+    //     {
+    //       isHomebrew: false,
+    //       $and: [{ type: { $ne: null } }, { type: { $ne: '' } }]
+    //     }
+    //   ]
+    // });
+    // res.status(200).json({ features, featureTypes });
+    res.status(200).json(features);
   } catch (error) {
     next(error);
   }

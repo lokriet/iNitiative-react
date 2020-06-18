@@ -164,7 +164,6 @@ export const logout = () => async (dispatch, getState) => {
   dispatch(firebaseSignOut());
 
   dispatch(resetStore());
-  dispatch(actions.resetFeatureStore());
   dispatch(actions.resetParticipantTemplateStore());
   dispatch(actions.resetEncounterStore());
 

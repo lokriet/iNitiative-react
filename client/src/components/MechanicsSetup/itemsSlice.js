@@ -202,7 +202,6 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
 
       [updateItem.fulfilled]: (state, action) => {
         state.errorsById = removeErrorById(state.errorsById, action.payload._id);
-        console.log('updated', action.payload);
         entityAdapter.updateOne(state, {id: action.payload._id, changes: {...action.payload}});
       },
 
@@ -211,13 +210,11 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
       },
 
       [deleteItem.fulfilled]: (state, action) => {
-        console.log('in delete fulfilled', state, action);
         state.errorsById = removeErrorById(state.errorsById, action.payload);
         entityAdapter.removeOne(state, action.payload);
       },
 
       [deleteItem.rejected]: (state, action) => {
-        console.log('in delete rejected', state, action);
         state.errorsById[action.payload.itemId] = action.payload.error;
       },
 

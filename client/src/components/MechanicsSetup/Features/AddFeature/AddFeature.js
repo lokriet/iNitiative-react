@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import ServerValidationError from '../../../UI/Errors/ServerValidationError/ServerValidationError';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
@@ -13,19 +13,26 @@ import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 
 import classes from './AddFeature.module.css';
 import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
+import { selectors } from '../featureSlice';
 
 const AddFeature = ({
   serverError,
   onValidateName,
   onSave,
   onCancel,
-  featureTypes
+  isHomebrew
 }) => {
   const [adding, setAdding] = useState(false);
   const [nameError, setNameError] = useState(null);
   const [nameValue, setNameValue] = useState('');
   const [descriptionValue, setDescriptionValue] = useState('');
   const [typeValue, setTypeValue] = useState(null);
+
+  const featureTypes = useSelector((state) =>
+    isHomebrew
+      ? selectors.common.selectAllFeatureTypes(state.feature)
+      : selectors.common.selectSharedFeatureTypes(state.feature)
+  );
 
   const handleStartAdding = useCallback(() => {
     setNameValue('');
@@ -34,7 +41,7 @@ const AddFeature = ({
     setAdding(true);
   }, []);
 
-  const setSubmitted = useCallback(success => {
+  const setSubmitted = useCallback((success) => {
     if (success) {
       setAdding(false);
     }
@@ -65,7 +72,7 @@ const AddFeature = ({
   ]);
 
   const handleKeyDown = useCallback(
-    event => {
+    (event) => {
       if (event.keyCode === 27) {
         //esc
         setAdding(false);
@@ -76,19 +83,19 @@ const AddFeature = ({
     [onCancel]
   );
 
-  const handleNameChanged = useCallback(event => {
+  const handleNameChanged = useCallback((event) => {
     setNameValue(event.target.value);
   }, []);
 
-  const handleDescriptionChanged = useCallback(event => {
+  const handleDescriptionChanged = useCallback((event) => {
     setDescriptionValue(event.target.value);
   }, []);
 
-  const handleTypeChanged = useCallback(newValue => {
+  const handleTypeChanged = useCallback((newValue) => {
     setTypeValue(newValue ? newValue.value : null);
   }, []);
 
-  const featureTypeOptions = featureTypes.map(item => ({
+  const featureTypeOptions = featureTypes.map((item) => ({
     label: item,
     value: item
   }));
@@ -128,7 +135,11 @@ const AddFeature = ({
                 placeholder="Description"
               />
             </ItemsRow>
-            <IconButton icon={faCheck} onClick={handleSave} className={classes.SaveButton} />
+            <IconButton
+              icon={faCheck}
+              onClick={handleSave}
+              className={classes.SaveButton}
+            />
           </ItemsRow>
           {nameError ? <Error>{nameError}</Error> : null}
           {serverError ? (
@@ -150,10 +161,4 @@ AddFeature.propTypes = {
   onCancel: PropTypes.func
 };
 
-const mapStateToProps = state => {
-  return {
-    featureTypes: state.feature.featureTypes
-  };
-};
-
-export default connect(mapStateToProps)(AddFeature);
+export default AddFeature;

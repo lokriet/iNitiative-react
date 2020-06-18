@@ -1,10 +1,8 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { Prompt } from 'react-router';
-
-import * as actions from '../../../store/actions/index';
 
 import AddFeature from './AddFeature/AddFeature';
 import Feature from './Feature/Feature';
@@ -18,7 +16,16 @@ import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import Popup from 'reactjs-popup';
 import Button from '../../UI/Form/Button/Button';
 
-const Features = props => {
+import {
+  fetchFeatures,
+  addFeature,
+  updateFeature,
+  deleteFeature,
+  removeFeatureError,
+  selectors
+} from './featureSlice';
+
+const Features = ({ isHomebrew }) => {
   const [saveCallbacks, setSaveCallbacks] = useState({});
   const [changedFeatures, setChangedFeatures] = useState(new Set());
 
@@ -26,22 +33,34 @@ const Features = props => {
   const [deletingFeature, setDeletingFeature] = useState(null);
 
   const dispatch = useDispatch();
-  const allFeatures = props.isHomebrew
-    ? props.homebrewFeatures
-    : props.sharedFeatures;
-
+  const allFeatures = useSelector((state) =>
+    isHomebrew
+      ? selectors.homebrew.selectAll(state.feature.homebrew)
+      : selectors.shared.selectAll(state.feature.shared)
+  );
+  const fetching = useSelector((state) =>
+    isHomebrew
+      ? state.feature.homebrew.fetching
+      : state.feature.shared.fetching
+  );
+  const fetchingError = useSelector((state) =>
+    isHomebrew ? state.feature.homebrew.error : state.feature.shared.error
+  );
+  const errors = useSelector((state) =>
+    isHomebrew
+      ? state.feature.homebrew.errorsById
+      : state.feature.shared.errorsById
+  );
   const [filteredFeatures, setFilteredFeatures] = useState(allFeatures);
 
   useEffect(() => {
-    props.isHomebrew
-      ? dispatch(actions.getHomebrewFeatures())
-      : dispatch(actions.getSharedFeatures());
-  }, [dispatch, props.isHomebrew]);
+    dispatch(fetchFeatures(isHomebrew));
+  }, [dispatch, isHomebrew]);
 
   const validateName = useCallback(
     (_id, name) => {
       const result = !allFeatures.some(
-        item => (_id == null || item._id !== _id) && item.name === name
+        (item) => (_id == null || item._id !== _id) && item.name === name
       );
       return result;
     },
@@ -49,14 +68,14 @@ const Features = props => {
   );
 
   const handleRegisterSaveCallback = useCallback((featureId, newCallback) => {
-    setSaveCallbacks(previousSaveCallbacks => ({
+    setSaveCallbacks((previousSaveCallbacks) => ({
       ...previousSaveCallbacks,
       [featureId]: newCallback
     }));
   }, []);
 
-  const handleUnregisterSaveCallback = useCallback(featureId => {
-    setSaveCallbacks(previousSaveCallbacks => {
+  const handleUnregisterSaveCallback = useCallback((featureId) => {
+    setSaveCallbacks((previousSaveCallbacks) => {
       let newCallbacks = { ...previousSaveCallbacks };
       delete newCallbacks[featureId];
       return newCallbacks;
@@ -65,25 +84,25 @@ const Features = props => {
 
   const handleAddFeature = useCallback(
     (feature, setSubmitted) => {
-      dispatch(actions.addFeature(feature, props.isHomebrew, setSubmitted));
+      dispatch(addFeature(feature, isHomebrew, setSubmitted));
     },
-    [dispatch, props.isHomebrew]
+    [dispatch, isHomebrew]
   );
 
   const handleUpdateFeature = useCallback(
     (feature, setSubmitted) => {
-      dispatch(actions.updateFeature(feature, props.isHomebrew, setSubmitted));
+      dispatch(updateFeature(feature, isHomebrew, setSubmitted));
     },
-    [dispatch, props.isHomebrew]
+    [dispatch, isHomebrew]
   );
 
   const handleDeleteFeatureClicked = useCallback(
-    feature => {
-      dispatch(actions.removeFeatureError(feature._id));
+    (feature) => {
+      dispatch(removeFeatureError(feature._id, isHomebrew));
       setDeletingFeature(feature);
       setDeleting(true);
     },
-    [dispatch]
+    [dispatch, isHomebrew]
   );
 
   const handleDeleteFeatureCancelled = useCallback(() => {
@@ -92,16 +111,16 @@ const Features = props => {
   }, []);
 
   const handleDeleteFeatureConfirmed = useCallback(() => {
-    dispatch(actions.deleteFeature(deletingFeature._id));
+    dispatch(deleteFeature(deletingFeature._id, isHomebrew));
     setDeletingFeature(null);
     setDeleting(false);
-  }, [dispatch, deletingFeature]);
+  }, [dispatch, deletingFeature, isHomebrew]);
 
   const handleCancelChangingFeature = useCallback(
-    featureId => {
-      dispatch(actions.removeFeatureError(featureId));
+    (featureId) => {
+      dispatch(removeFeatureError(featureId, isHomebrew));
     },
-    [dispatch]
+    [dispatch, isHomebrew]
   );
 
   const handleSaveAll = useCallback(() => {
@@ -110,13 +129,13 @@ const Features = props => {
     }
   }, [saveCallbacks]);
 
-  const handleItemsFiltered = useCallback(filteredItems => {
+  const handleItemsFiltered = useCallback((filteredItems) => {
     setFilteredFeatures(filteredItems);
   }, []);
 
   const handleUnsavedChangesStateChange = useCallback(
     (featureId, hasUnsavedChanges) => {
-      setChangedFeatures(previousChangedFeatures => {
+      setChangedFeatures((previousChangedFeatures) => {
         const newChangedFeatures = new Set(previousChangedFeatures);
         if (hasUnsavedChanges) {
           newChangedFeatures.add(featureId);
@@ -130,12 +149,6 @@ const Features = props => {
     []
   );
 
-  const fetching = props.isHomebrew
-    ? props.fetchingHomebrew
-    : props.fetchingShared;
-  const fetchingError = props.isHomebrew
-    ? props.errorHomebrew
-    : props.errorShared;
   let view;
   if (fetching) {
     view = <Spinner />;
@@ -149,10 +162,11 @@ const Features = props => {
           message="You have unsaved changes. Are you sure you want to leave?"
         />
         <AddFeature
-          serverError={props.errors.ADD}
+          serverError={errors.ADD}
           onValidateName={validateName}
           onSave={handleAddFeature}
           onCancel={handleCancelChangingFeature}
+          isHomebrew={isHomebrew}
         />
 
         <ItemsRow centered alignCentered className={classes.SearchRow}>
@@ -167,7 +181,7 @@ const Features = props => {
           </IconButton>
         </ItemsRow>
 
-        {filteredFeatures.map(feature => (
+        {filteredFeatures.map((feature) => (
           <Feature
             key={feature._id}
             feature={feature}
@@ -177,13 +191,9 @@ const Features = props => {
             onCancel={handleCancelChangingFeature}
             onRegisterSaveCallback={handleRegisterSaveCallback}
             onUnregisterSaveCallback={handleUnregisterSaveCallback}
-            onHaveUnsavedChangesStateChange={hasUnsavedChanges =>
-              handleUnsavedChangesStateChange(
-                feature._id.toString(),
-                hasUnsavedChanges
-              )
-            }
-            serverError={props.errors[feature._id]}
+            onHaveUnsavedChangesStateChange={handleUnsavedChangesStateChange}
+            serverError={errors[feature._id]}
+            isHomebrew={isHomebrew}
           />
         ))}
 
@@ -196,8 +206,7 @@ const Features = props => {
         >
           <div>
             <div>
-              Delete feature {deletingFeature ? deletingFeature.name : ''}
-              ?
+              Delete feature {deletingFeature ? deletingFeature.name : ''}?
             </div>
             <br />
             <ItemsRow centered>
@@ -216,16 +225,5 @@ Features.propTypes = {
   isHomebrew: PropTypes.bool
 };
 
-const mapStateToProps = state => {
-  return {
-    homebrewFeatures: state.feature.homebrewFeatures,
-    sharedFeatures: state.feature.sharedFeatures,
-    errors: state.feature.errors,
-    errorShared: state.feature.errorShared,
-    errorHomebrew: state.feature.errorHomebrew,
-    fetchingShared: state.feature.fetchingShared,
-    fetchingHomebrew: state.feature.fetchingHomebrew
-  };
-};
 
-export default connect(mapStateToProps)(Features);
+export default Features;
