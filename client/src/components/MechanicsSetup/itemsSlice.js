@@ -202,7 +202,8 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
 
       [updateItem.fulfilled]: (state, action) => {
         state.errorsById = removeErrorById(state.errorsById, action.payload._id);
-        entityAdapter.updateOne(state, action.payload);
+        console.log('updated', action.payload);
+        entityAdapter.updateOne(state, {id: action.payload._id, changes: {...action.payload}});
       },
 
       [updateItem.rejected]: (state, action) => {

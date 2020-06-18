@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../store/actions';
-import { fetchConditions } from '../components/MechanicsSetup/Conditions/conditionSlice';
+import { fetchConditions, selectors as conditionSelectors } from '../components/MechanicsSetup/Conditions/conditionSlice';
+import { fetchDamageTypes, selectors as damageTypeSelectors } from '../components/MechanicsSetup/DamageTypes/damageTypeSlice';
 
 const useDropdownValues = () => {
   const dispatch = useDispatch();
@@ -13,24 +14,24 @@ const useDropdownValues = () => {
   const [damageTypes, setDamageTypes] = useState([]);
 
   const sharedDamageTypes = useSelector(
-    state => state.damageType.sharedDamageTypes
+    state => damageTypeSelectors.shared.selectAll(state.damageType.shared)
   );
   const homebrewDamageTypes = useSelector(
-    state => state.damageType.homebrewDamageTypes
+    state => damageTypeSelectors.homebrew.selectAll(state.damageType.homebrew)
   );
   const sharedConditions = useSelector(
-    state => state.condition.sharedConditions
+    state => conditionSelectors.shared.selectAll(state.condition.shared)
   );
   const homebrewConditions = useSelector(
-    state => state.condition.homebrewConditions
+    state => conditionSelectors.homebrew.selectAll(state.condition.homebrew)
   );
   const sharedFeatures = useSelector(state => state.feature.sharedFeatures);
   const homebrewFeatures = useSelector(state => state.feature.homebrewFeatures);
   const featureTypes = useSelector(state => state.feature.featureTypes);
 
   useEffect(() => {
-    dispatch(actions.getSharedDamageTypes());
-    dispatch(actions.getHomebrewDamageTypes());
+    dispatch(fetchDamageTypes(true));
+    dispatch(fetchDamageTypes(false));
     dispatch(fetchConditions(true));
     dispatch(fetchConditions(false));
     dispatch(actions.getSharedFeatures());

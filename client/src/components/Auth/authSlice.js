@@ -157,12 +157,13 @@ export const authenticate = ({
   }
 };
 
+const resetStore = createAction('resetStore');
+
 export const logout = () => async (dispatch, getState) => {
   localStorage.removeItem('token');
   dispatch(firebaseSignOut());
 
-  dispatch(createAction('resetStore'));
-  dispatch(actions.resetDamageTypeStore());
+  dispatch(resetStore());
   dispatch(actions.resetFeatureStore());
   dispatch(actions.resetParticipantTemplateStore());
   dispatch(actions.resetEncounterStore());
@@ -183,7 +184,7 @@ export const authCheckInitialState = () => async (dispatch, getState) => {
       dispatch(authSlice.actions.authCheckInitialStateDone());
       return;
     }
-    
+
     dispatch(autoLogin(token));
   }
 };

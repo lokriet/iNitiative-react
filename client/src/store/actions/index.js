@@ -1,4 +1,3 @@
-export * from './damageType';
 export * from './feature';
 export * from './participantTemplate';
 export * from './encounter';
