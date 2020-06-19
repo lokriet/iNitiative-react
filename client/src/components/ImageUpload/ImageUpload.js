@@ -1,11 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import ImageTools from '../../util/image-tools';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Error from '../UI/Errors/Error/Error';
 import classes from './ImageUpload.module.css';
 import ItemsRow from '../UI/ItemsRow/ItemsRow';
 import Popup from 'reactjs-popup';
+import {firebaseUploadImage} from '../Firebase/firebaseMiddleware';
 
 const ImageUpload = ({
   buttonClassName,
@@ -15,129 +16,73 @@ const ImageUpload = ({
   showFileName,
   onUploadFailed,
   onUploadFinished,
-  firebase,
   children
 }) => {
-  const [statusMessage, setStatusMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [progress, setProgress] = useState(null);
   const [fileName, setFileName] = useState(null);
+  const [newFileSize, setNewFileSize] = useState(null);
+  const [waitingForResult, setWaitingForResult] = useState(false);
+
+  const { loading, progress, error: firebaseErrorMessage, downloadUrl } = useSelector(
+    (state) => state.firebase.image
+  );
 
   const uploadFailedHandler = onUploadFailed || (() => {});
 
-  const startUploadImageHandler = useCallback(
-    event => {}, []);
-      /*const file = event.target.files[0];
+  const dispatch = useDispatch();
 
-      if (file == null) {
+  const startUploadImageHandler = useCallback((event) => {
+    const file = event.target.files[0];
+
+    if (file == null) {
+      return;
+    }
+
+    if (maxFileSize != null) {
+      const fileSize = file.size / 1024;
+      if (fileSize > maxFileSize) {
+        const maxFileSizeString =
+          maxFileSize > 1024
+            ? (maxFileSize / 1024).toFixed(2) + 'M'
+            : maxFileSize.toFixed(0) + 'K';
+        setErrorMessage(`File size should be less than ${maxFileSizeString}`);
+        uploadFailedHandler();
         return;
       }
+    }
 
-      if (maxFileSize != null) {
-        const fileSize = file.size / 1024;
-        if (fileSize > maxFileSize) {
-          const maxFileSizeString =
-            maxFileSize > 1024
-              ? (maxFileSize / 1024).toFixed(2) + 'M'
-              : maxFileSize.toFixed(0) + 'K';
-          setErrorMessage(`File size should be less than ${maxFileSizeString}`);
-          uploadFailedHandler();
-          return;
-        }
-      }
+    try {
+      ImageTools.resize(
+        file,
+        {
+          width: maxWidth,
+          height: maxHeight
+        },
+        (blob, didItResize, newSize) => {
+          dispatch(firebaseUploadImage({filename: file.name, imageFile: blob}));
+          setFileName(file.name);
+          setNewFileSize(newSize);
+          setWaitingForResult(true);
+        });
+    } catch(error) {
+      setErrorMessage('Image upload failed');
+      uploadFailedHandler();
+    }
+  }, [dispatch, maxHeight, maxWidth, maxFileSize, uploadFailedHandler]);
 
-      try {
-        ImageTools.resize(
-          file,
-          {
-            width: maxWidth,
-            height: maxHeight
-          },
-          (blob, didItResize, newSize) => {
-            const uploadTask = firebase.doUploadImage(blob, file.name);
-            setIsUploading(true);
-            setStatusMessage('Uploading...');
-            setErrorMessage(null);
+  useEffect(() => {
+    if (downloadUrl && waitingForResult) {
+      onUploadFinished(downloadUrl, newFileSize);
+      console.log('call upload finished', downloadUrl);
+      setWaitingForResult(false);
+    }
+  }, [downloadUrl, onUploadFinished, waitingForResult, newFileSize]);
 
-            uploadTask.on(
-              'state_changed',
-              snapshot => {
-                setProgress(
-                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-                );
-                // switch (snapshot.state) {
-                //   case 'paused':
-                //     setStatusMessage('Upload is paused');
-                //     break;
-                //   case 'running':
-                //     setStatusMessage('Uploading...');
-                //     break;
-                //   default:
-                // do nothing
-                // }
-              },
-
-              error => {
-                // A full list of error codes is available at
-                // https://firebase.google.com/docs/storage/web/handle-errors
-                switch (error.code) {
-                  case 'storage/unauthenticated':
-                    setErrorMessage('You are not logged in');
-                    break;
-
-                  case 'storage/unauthorized':
-                    setErrorMessage('Permission denied');
-                    break;
-
-                  case 'storage/canceled':
-                    setErrorMessage('Upload cancelled');
-                    break;
-
-                  case 'storage/unknown':
-                  default:
-                    setErrorMessage('Image upload failed');
-                }
-                setStatusMessage(null);
-                setIsUploading(false);
-                setProgress(null);
-                uploadFailedHandler();
-              },
-
-              () => {
-                // Upload completed successfully, now we can get the download URL
-                uploadTask.snapshot.ref
-                  .getDownloadURL()
-                  .then(function(downloadURL) {
-                    setIsUploading(false);
-                    setStatusMessage(null);
-                    setErrorMessage(null);
-                    setProgress(null);
-                    setFileName(file.name);
-                    onUploadFinished(downloadURL, newSize);
-                  });
-              }
-            );
-          }
-        );
-      } catch (error) {
-        console.log(error);
-        setErrorMessage('Image upload failed');
-        setStatusMessage(null);
-        setIsUploading(false);
-        setProgress(null);
-        uploadFailedHandler();
-      }
-    },
-    [
-      firebase,
-      maxHeight,
-      maxWidth,
-      maxFileSize,
-      onUploadFinished,
-      uploadFailedHandler
-    ]
-  );*/
+  useEffect(() => {
+    if (firebaseErrorMessage) {
+      uploadFailedHandler();
+    }
+  }, [firebaseErrorMessage, uploadFailedHandler]);
 
   return (
     <div>
@@ -159,7 +104,7 @@ const ImageUpload = ({
           <Popup
             on="hover"
             arrow={false}
-            contentStyle={{width: 'auto'}}
+            contentStyle={{ width: 'auto' }}
             offsetY={10}
             trigger={<span className={classes.FileName}> {fileName}</span>}
           >
@@ -167,11 +112,11 @@ const ImageUpload = ({
           </Popup>
         ) : null}
       </ItemsRow>
-      {statusMessage || errorMessage || isUploading ? (
+      {errorMessage || firebaseErrorMessage || loading ? (
         <div className={classes.Details}>
-          {statusMessage ? <div>{statusMessage}</div> : null}
-          {errorMessage ? <Error>{errorMessage}</Error> : null}
-          {isUploading ? <progress value={progress} max="100" /> : null}
+          {loading ? <div>Uploading...</div> : null}
+          {errorMessage || firebaseErrorMessage ? <Error>{errorMessage || firebaseErrorMessage}</Error> : null}
+          {loading ? <progress value={progress} max="100" /> : null}
         </div>
       ) : null}
     </div>
@@ -187,6 +132,5 @@ ImageUpload.propTypes = {
   onUploadFinished: PropTypes.func.isRequired,
   showFileName: PropTypes.bool
 };
-
 
 export default ImageUpload;

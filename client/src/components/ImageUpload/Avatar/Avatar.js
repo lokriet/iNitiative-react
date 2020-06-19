@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import ImageUpload from '../ImageUpload';
 import defaultMonsterImg from '../../../assets/images/bat.svg';
 import defaultPlayerImg from '../../../assets/images/hero.svg';
@@ -15,13 +15,14 @@ const Avatar = ({
   const [avatarUrl, setAvatarUrl] = useState(field.value);
   const isMonster = form.values.type === ParticipantType.Monster;
   const onAvatarChanged = props.onAvatarChanged || (() => {});
+  const setFieldValue = form.setFieldValue;
 
-  const avatarUploadedHandler = url => {
+  const avatarUploadedHandler = useCallback(url => {
     setAvatarUrl(url);
     
     onAvatarChanged(url);
-    form.setFieldValue(field.name, url);
-  };
+    setFieldValue(field.name, url);
+  }, [field.name, setFieldValue, onAvatarChanged]);
 
   const avatarDeletedHandler = () => {
     setAvatarUrl('');

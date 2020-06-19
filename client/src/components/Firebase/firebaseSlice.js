@@ -12,20 +12,21 @@ const imageSlice = createSlice({
   initialState,
   reducers: {
     uploadStart(state, action) {
-      state = { ...initialState, loading: true };
+      return { ...initialState, loading: true };
     },
     uploadProgress(state, action) {
-      state.progress = action.payload.progress;
+      state.progress = action.payload;
     },
     uploadFailure(state, action) {
-      state.error = action.payload.error;
+      state.error = action.payload;
       state.loading = false;
       state.progress = null;
     },
     uploadSuccess(state, action) {
       state.loading = false;
       state.progress = null;
-      state.downloadUrl = action.payload.downloadUrl;
+      state.error = null;
+      state.downloadUrl = action.payload;
     }
   }
 });

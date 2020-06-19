@@ -19,7 +19,7 @@ import Spinner from '../../UI/Spinner/Spinner';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import FormikColorPicker from '../../UI/Color/ColorPicker/FormikColorPicker';
 
-const EditParticipantTemplate = props => {
+const EditParticipantTemplate = (props) => {
   const queryParams = useQueryParams();
   const [participantType] = useState(
     queryParams.get('type') || ParticipantType.Player
@@ -29,7 +29,7 @@ const EditParticipantTemplate = props => {
 
   const dispatch = useDispatch();
   const history = useHistory();
-  const [damageTypes, combined, features] =  useDropdownValues();
+  const [damageTypes, combined, features] = useDropdownValues();
 
   const [avatarUrlsToCheck, setAvatarUrlsToCheck] = useState(new Set());
   const avatarUrlsToCheckRef = useRef(avatarUrlsToCheck);
@@ -37,8 +37,10 @@ const EditParticipantTemplate = props => {
 
   useEffect(() => {
     return () => {
-      dispatch(actions.cleanUpAvatarUrls(Array.from(avatarUrlsToCheckRef.current)));
-    }
+      dispatch(
+        actions.cleanUpAvatarUrls(Array.from(avatarUrlsToCheckRef.current))
+      );
+    };
   }, [dispatch]);
 
   useEffect(() => {
@@ -69,20 +71,20 @@ const EditParticipantTemplate = props => {
 
   const handleAvatarChange = useCallback(
     (newAvatarUrl) => {
-      if (newAvatarUrl !== null && newAvatarUrl !== '') {
-        const newAvatarUrlsToCheck = new Set(avatarUrlsToCheck);
-        newAvatarUrlsToCheck.add(newAvatarUrl);
-        setAvatarUrlsToCheck(newAvatarUrlsToCheck);
+      const newAvatarUrlsToCheck = new Set(avatarUrlsToCheck);
+      if (props.editedTemplate != null && props.editedTemplate.avatarUrl) {
+        newAvatarUrlsToCheck.add(props.editedTemplate.avatarUrl);
       }
+      if (newAvatarUrl !== null && newAvatarUrl !== '') {
+        newAvatarUrlsToCheck.add(newAvatarUrl);
+      }
+      setAvatarUrlsToCheck(newAvatarUrlsToCheck);
     },
-    [avatarUrlsToCheck],
+    [avatarUrlsToCheck, props.editedTemplate]
   );
 
   let form;
-  if (
-    !editMode ||
-    (props.editedTemplate != null)
-  ) {
+  if (!editMode || props.editedTemplate != null) {
     form = (
       <Formik
         initialValues={{
@@ -122,9 +124,15 @@ const EditParticipantTemplate = props => {
           speed: Yup.number()
             .required('Speed is required')
             .min(0, 'Speed should be positive'),
-          swimSpeed: Yup.number().min(0, 'Speed should be positive').nullable(true),
-          climbSpeed: Yup.number().min(0, 'Speed should be positive').nullable(true),
-          flySpeed: Yup.number().min(0, 'Speed should be positive').nullable(true),
+          swimSpeed: Yup.number()
+            .min(0, 'Speed should be positive')
+            .nullable(true),
+          climbSpeed: Yup.number()
+            .min(0, 'Speed should be positive')
+            .nullable(true),
+          flySpeed: Yup.number()
+            .min(0, 'Speed should be positive')
+            .nullable(true),
           mapSize: Yup.number()
             .required('Map size is required')
             .min(1, 'Map size should be more than 0'),
@@ -138,7 +146,7 @@ const EditParticipantTemplate = props => {
           handleSubmit(values, setSubmitting)
         }
       >
-        {formProps => {
+        {(formProps) => {
           return formProps.submitCount > 0 &&
             !formProps.isSubmitting &&
             formProps.isValid &&
@@ -173,7 +181,12 @@ const EditParticipantTemplate = props => {
 
               <label className={classes.Avatar}>Avatar</label>
               <div className={classes.Avatar}>
-                <Field id="avatarUrl" name="avatarUrl" component={Avatar} onAvatarChanged={handleAvatarChange} />
+                <Field
+                  id="avatarUrl"
+                  name="avatarUrl"
+                  component={Avatar}
+                  onAvatarChanged={handleAvatarChange}
+                />
               </div>
 
               <label htmlFor="name">Name</label>
@@ -370,7 +383,7 @@ const EditParticipantTemplate = props => {
   }
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     operationSuccess: state.participantTemplate.operationSuccess,
     serverError: state.participantTemplate.error,
@@ -378,6 +391,6 @@ const mapStateToProps = state => {
   };
 };
 
-EditParticipantTemplate.whyDidYouRender = true
+EditParticipantTemplate.whyDidYouRender = true;
 
 export default connect(mapStateToProps)(withAuthCheck(EditParticipantTemplate));
