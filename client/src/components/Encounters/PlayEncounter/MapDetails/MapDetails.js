@@ -15,6 +15,7 @@ import classes from './MapDetails.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { sum } from './Map/AreaEffects/aoe-utils';
+import { firebaseDeleteImage } from '../../../Firebase/firebaseMiddleware';
 
 const MapDetails = props => {
   const dispatch = useDispatch();
@@ -23,60 +24,60 @@ const MapDetails = props => {
     close => {
       if (props.editedEncounter) {
         if (props.editedEncounter.map) {
-          // props.firebase.doDeleteImage(props.editedEncounter.map.mapUrl);
-          // dispatch(
-          //   actions.editEncounter(
-          //     props.editedEncounter._id,
-          //     { map: null },
-          //     {
-          //       editedEncounterAction: EditedEncounterAction.Update,
-          //       applyChangesOnError: true,
-          //       overwriteError: false
-          //     }
-          //   )
-          // );
+          dispatch(firebaseDeleteImage(props.editedEncounter.map.mapUrl));
+          dispatch(
+            actions.editEncounter(
+              props.editedEncounter._id,
+              { map: null },
+              {
+                editedEncounterAction: EditedEncounterAction.Update,
+                applyChangesOnError: true,
+                overwriteError: false
+              }
+            )
+          );
         }
       }
       close();
     },
-    [props.editedEncounter, /*dispatch, props.firebase*/]
+    [props.editedEncounter, dispatch]
   );
 
   const handleNewMapUploaded = useCallback(
     mapInfo => {
-      // if (props.editedEncounter) {
-      //   if (props.editedEncounter.map) {
-      //     props.firebase.doDeleteImage(props.editedEncounter.map.mapUrl);
-      //   }
-      // }
+      if (props.editedEncounter) {
+        if (props.editedEncounter.map) {
+          dispatch(firebaseDeleteImage(props.editedEncounter.map.mapUrl));
+        }
+      }
 
-      // dispatch(
-      //   actions.editEncounter(
-      //     props.editedEncounter._id,
-      //     {
-      //       map: {
-      //         ...mapInfo,
-      //         gridColor: '#aaaaaa',
-      //         showGrid:
-      //           !isEmpty(mapInfo.gridWidth) && !isEmpty(mapInfo.gridHeight),
-      //         showInfo: true,
-      //         showDead: false,
-      //         snapToGrid:
-      //           !isEmpty(mapInfo.gridWidth) && !isEmpty(mapInfo.gridHeight),
+      dispatch(
+        actions.editEncounter(
+          props.editedEncounter._id,
+          {
+            map: {
+              ...mapInfo,
+              gridColor: '#aaaaaa',
+              showGrid:
+                !isEmpty(mapInfo.gridWidth) && !isEmpty(mapInfo.gridHeight),
+              showInfo: true,
+              showDead: false,
+              snapToGrid:
+                !isEmpty(mapInfo.gridWidth) && !isEmpty(mapInfo.gridHeight),
 
-      //         participantCoordinates: [],
-      //         areaEffects: []
-      //       }
-      //     },
-      //     {
-      //       editedEncounterAction: EditedEncounterAction.Update,
-      //       applyChangesOnError: true,
-      //       overwriteError: false
-      //     }
-      //   )
-      // );
+              participantCoordinates: [],
+              areaEffects: []
+            }
+          },
+          {
+            editedEncounterAction: EditedEncounterAction.Update,
+            applyChangesOnError: true,
+            overwriteError: false
+          }
+        )
+      );
     },
-    [/*dispatch, props.editedEncounter, props.firebase*/]
+    [dispatch, props.editedEncounter]
   );
 
   const handleAddParticipantOnMap = useCallback(
@@ -375,8 +376,6 @@ MapDetails.propTypes = {};
 
 const mapStateToProps = state => {
   return {
-    // firebase: state.auth.firebase,
-
     saveError: state.encounter.operationError,
     saveSuccess: state.encounter.operationSuccess,
     editedEncounter: state.encounter.editedEncounter,

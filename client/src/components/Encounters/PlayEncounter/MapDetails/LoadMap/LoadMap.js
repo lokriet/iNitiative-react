@@ -8,24 +8,26 @@ import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
 import classes from './LoadMap.module.css';
 import { isEmpty } from '../../../../../util/helper-methods';
 import Error from '../../../../UI/Errors/Error/Error';
-import { connect } from 'react-redux';
+import {firebaseDeleteImage} from '../../../../Firebase/firebaseMiddleware';
+import { useDispatch } from 'react-redux';
 
-const LoadMap = ({ onNewMapLoaded/*, firebase */}) => {
+const LoadMap = ({ onNewMapLoaded}) => {
   const [gridWidth, setGridWidth] = useState('');
   const [gridHeight, setGridHeight] = useState('');
   const [loadedMapInfo, setLoadedMapInfo] = useState(null);
   const [gridSizeError, setGridSizeError] = useState(false);
+  const dispatch = useDispatch()
 
   const handleMapUploaded = useCallback((mapUrl, mapSize) => {
-    // if (loadedMapInfo) {
-    //   firebase.doDeleteImage(loadedMapInfo.mapUrl);
-    // }
-    // setLoadedMapInfo({
-    //   mapUrl,
-    //   mapWidth: mapSize ? mapSize.width : null,
-    //   mapHeight: mapSize ? mapSize.height : null
-    // });
-  }, [/*firebase, loadedMapInfo*/]);
+    if (loadedMapInfo) {
+      dispatch(firebaseDeleteImage(loadedMapInfo.mapUrl));
+    }
+    setLoadedMapInfo({
+      mapUrl,
+      mapWidth: mapSize ? mapSize.width : null,
+      mapHeight: mapSize ? mapSize.height : null
+    });
+  }, [loadedMapInfo, dispatch]);
 
   const handleConfirmNewMap = useCallback(
     close => {
@@ -63,12 +65,12 @@ const LoadMap = ({ onNewMapLoaded/*, firebase */}) => {
 
   const handleCancelMapUpload = useCallback(
     (close) => {
-      // if (loadedMapInfo) {
-      //   firebase.doDeleteImage(loadedMapInfo.mapUrl);
-      // }
+      if (loadedMapInfo) {
+        dispatch(firebaseDeleteImage(loadedMapInfo.mapUrl));
+      }
       close();
     },
-    [/*firebase, loadedMapInfo*/],
+    [loadedMapInfo, dispatch],
   )
 
   return (
@@ -155,10 +157,4 @@ LoadMap.propTypes = {
   onNewMapLoaded: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    // firebase: state.auth.firebase
-  };
-};
-
-export default connect(mapStateToProps)(LoadMap);
+export default LoadMap;
