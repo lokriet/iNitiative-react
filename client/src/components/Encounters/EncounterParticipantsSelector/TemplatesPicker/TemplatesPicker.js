@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {fetchTemplates, selectParticipantTemplatesByType} from '../../../ParticipantTemplates/participantTemplatesSlice';
+import {fetchTemplates, selectParticipantTemplatesByType} from '../../../ParticipantTemplates/participantTemplateSlice';
 
 import { ParticipantType } from '../../../ParticipantTemplates/ParticipantTemplates';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';

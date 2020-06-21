@@ -19,7 +19,7 @@ import {
   updateTemplate,
   addTemplate,
   selectEditedParticipantTemplate
-} from '../participantTemplatesSlice';
+} from '../participantTemplateSlice';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Button from '../../UI/Form/Button/Button';
