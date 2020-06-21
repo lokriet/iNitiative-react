@@ -14,8 +14,8 @@ import classes from './TemplatesPicker.module.css';
 
 const TemplatesPicker = ({onAdd}) => {
   const [templatesType, setTemplatesType] = useState(ParticipantType.Player);
-  const monsters = useSelector(selectParticipantTemplatesByType(ParticipantType.Monster));
-  const players = useState(selectParticipantTemplatesByType(ParticipantType.Player));
+  const monsters = useSelector(state => selectParticipantTemplatesByType(state, ParticipantType.Monster));
+  const players = useSelector(state => selectParticipantTemplatesByType(state, ParticipantType.Player));
   const {fetching, error: fetchingError} = useSelector(state => state.participantTemplate);
 
   const dispatch = useDispatch();
