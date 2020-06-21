@@ -10,22 +10,31 @@ import ImmunitiesSelect from '../../UI/Form/Select/ImmunitiesSelect/ImmunitiesSe
 import classes from './EditParticipantTemplate.module.css';
 import useDropdownValues from '../../../hooks/useDropdownValues';
 import Avatar from '../../ImageUpload/Avatar/Avatar';
-import { useDispatch, connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../../../store/actions';
+import {
+  resetTemplateOperation,
+  fetchEditedTemplate,
+  resetEditedTemplate,
+  updateTemplate,
+  addTemplate,
+  selectEditedParticipantTemplate
+} from '../participantTemplatesSlice';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Button from '../../UI/Form/Button/Button';
 import Spinner from '../../UI/Spinner/Spinner';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import FormikColorPicker from '../../UI/Color/ColorPicker/FormikColorPicker';
+import PropTypes from 'prop-types';
 
-const EditParticipantTemplate = (props) => {
+const EditParticipantTemplate = ({ isNew }) => {
   const queryParams = useQueryParams();
   const [participantType] = useState(
     queryParams.get('type') || ParticipantType.Player
   );
   const { templateId } = useParams();
-  const editMode = !props.isNew;
+  const editMode = !isNew;
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -34,6 +43,12 @@ const EditParticipantTemplate = (props) => {
   const [avatarUrlsToCheck, setAvatarUrlsToCheck] = useState(new Set());
   const avatarUrlsToCheckRef = useRef(avatarUrlsToCheck);
   avatarUrlsToCheckRef.current = avatarUrlsToCheck;
+
+  const serverError = useSelector((state) => state.participantTemplate.error);
+  const operationSuccess = useSelector(
+    (state) => state.participantTemplate.operationSuccess
+  );
+  const editedTemplate = useSelector(selectEditedParticipantTemplate);
 
   useEffect(() => {
     return () => {
@@ -44,27 +59,23 @@ const EditParticipantTemplate = (props) => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(actions.resetParticipantTemplateOperation());
+    dispatch(resetTemplateOperation());
     if (editMode) {
-      dispatch(actions.getParticipantTemplateById(templateId));
+      dispatch(fetchEditedTemplate(templateId));
     }
 
     return () => {
       if (editMode) {
-        dispatch(actions.resetEditedParticipantTemplate());
+        dispatch(resetEditedTemplate());
       }
     };
   }, [dispatch, editMode, templateId]);
 
   const handleSubmit = useCallback(
     (values, setSubmitting) => {
-      dispatch(
-        actions.editParticipantTemplate(
-          editMode ? templateId : null,
-          values,
-          setSubmitting
-        )
-      );
+      editMode
+        ? dispatch(updateTemplate(templateId, values, setSubmitting))
+        : dispatch(addTemplate(null, values, setSubmitting));
     },
     [dispatch, editMode, templateId]
   );
@@ -72,43 +83,41 @@ const EditParticipantTemplate = (props) => {
   const handleAvatarChange = useCallback(
     (newAvatarUrl) => {
       const newAvatarUrlsToCheck = new Set(avatarUrlsToCheck);
-      if (props.editedTemplate != null && props.editedTemplate.avatarUrl) {
-        newAvatarUrlsToCheck.add(props.editedTemplate.avatarUrl);
+      if (editedTemplate != null && editedTemplate.avatarUrl) {
+        newAvatarUrlsToCheck.add(editedTemplate.avatarUrl);
       }
       if (newAvatarUrl !== null && newAvatarUrl !== '') {
         newAvatarUrlsToCheck.add(newAvatarUrl);
       }
       setAvatarUrlsToCheck(newAvatarUrlsToCheck);
     },
-    [avatarUrlsToCheck, props.editedTemplate]
+    [avatarUrlsToCheck, editedTemplate]
   );
 
   let form;
-  if (!editMode || props.editedTemplate != null) {
+  if (!editMode || editedTemplate != null) {
     form = (
       <Formik
         initialValues={{
-          type: editMode ? props.editedTemplate.type : participantType,
-          avatarUrl: editMode ? props.editedTemplate.avatarUrl || '' : '',
-          color: editMode ? props.editedTemplate.color || '' : '',
-          name: editMode ? props.editedTemplate.name : '',
-          initiativeModifier: editMode
-            ? props.editedTemplate.initiativeModifier
-            : 0,
-          maxHp: editMode ? props.editedTemplate.maxHp : '',
-          armorClass: editMode ? props.editedTemplate.armorClass : '',
-          speed: editMode ? props.editedTemplate.speed : '',
-          swimSpeed: editMode ? props.editedTemplate.swimSpeed || '' : '',
-          climbSpeed: editMode ? props.editedTemplate.climbSpeed || '' : '',
-          flySpeed: editMode ? props.editedTemplate.flySpeed || '' : '',
-          mapSize: editMode ? props.editedTemplate.mapSize : 1,
+          type: editMode ? editedTemplate.type : participantType,
+          avatarUrl: editMode ? editedTemplate.avatarUrl || '' : '',
+          color: editMode ? editedTemplate.color || '' : '',
+          name: editMode ? editedTemplate.name : '',
+          initiativeModifier: editMode ? editedTemplate.initiativeModifier : 0,
+          maxHp: editMode ? editedTemplate.maxHp : '',
+          armorClass: editMode ? editedTemplate.armorClass : '',
+          speed: editMode ? editedTemplate.speed : '',
+          swimSpeed: editMode ? editedTemplate.swimSpeed || '' : '',
+          climbSpeed: editMode ? editedTemplate.climbSpeed || '' : '',
+          flySpeed: editMode ? editedTemplate.flySpeed || '' : '',
+          mapSize: editMode ? editedTemplate.mapSize : 1,
           immunities: editMode
-            ? props.editedTemplate.immunities
+            ? editedTemplate.immunities
             : { damageTypes: [], conditions: [] },
-          vulnerabilities: editMode ? props.editedTemplate.vulnerabilities : [],
-          resistances: editMode ? props.editedTemplate.resistances : [],
-          features: editMode ? props.editedTemplate.features : [],
-          comment: editMode ? props.editedTemplate.comment : ''
+          vulnerabilities: editMode ? editedTemplate.vulnerabilities : [],
+          resistances: editMode ? editedTemplate.resistances : [],
+          features: editMode ? editedTemplate.features : [],
+          comment: editMode ? editedTemplate.comment : ''
         }}
         validationSchema={Yup.object({
           type: Yup.string().required('Type is required'),
@@ -150,7 +159,7 @@ const EditParticipantTemplate = (props) => {
           return formProps.submitCount > 0 &&
             !formProps.isSubmitting &&
             formProps.isValid &&
-            props.operationSuccess ? (
+            operationSuccess ? (
             <Redirect to={`/templates/${formProps.values.type}s`} />
           ) : (
             <Form className={classes.EditParticipantTemplateForm}>
@@ -162,7 +171,7 @@ const EditParticipantTemplate = (props) => {
                   id="player"
                   value={ParticipantType.Player}
                   component={Input}
-                  serverError={props.serverError}
+                  serverError={serverError}
                 />
                 <label htmlFor="player">Player</label>
                 <Field
@@ -171,7 +180,7 @@ const EditParticipantTemplate = (props) => {
                   id="monster"
                   value={ParticipantType.Monster}
                   component={Input}
-                  serverError={props.serverError}
+                  serverError={serverError}
                 />
                 <label htmlFor="monster">Monster</label>
               </div>
@@ -197,7 +206,7 @@ const EditParticipantTemplate = (props) => {
                 name="name"
                 hidingBorder
                 component={Input}
-                serverError={props.serverError}
+                serverError={serverError}
               />
 
               <label htmlFor="initiativeModifier">Initiative Modifier</label>
@@ -208,7 +217,7 @@ const EditParticipantTemplate = (props) => {
                 id="initiativeModifier"
                 hidingBorder
                 component={Input}
-                serverError={props.serverError}
+                serverError={serverError}
               />
 
               <label htmlFor="maxHp">Max HP</label>
@@ -220,7 +229,7 @@ const EditParticipantTemplate = (props) => {
                 min={1}
                 hidingBorder
                 component={Input}
-                serverError={props.serverError}
+                serverError={serverError}
               />
 
               <label htmlFor="armorClass">Armor class</label>
@@ -232,7 +241,7 @@ const EditParticipantTemplate = (props) => {
                 min={0}
                 hidingBorder
                 component={Input}
-                serverError={props.serverError}
+                serverError={serverError}
               />
 
               <label htmlFor="speed">Speed</label>
@@ -244,7 +253,7 @@ const EditParticipantTemplate = (props) => {
                 min={0}
                 hidingBorder
                 component={Input}
-                serverError={props.serverError}
+                serverError={serverError}
               />
 
               <div className={classes.FullRow}>
@@ -258,7 +267,7 @@ const EditParticipantTemplate = (props) => {
                     min={0}
                     hidingBorder
                     component={Input}
-                    serverError={props.serverError}
+                    serverError={serverError}
                   />
 
                   <label htmlFor="climbSpeed">Climb</label>
@@ -270,7 +279,7 @@ const EditParticipantTemplate = (props) => {
                     min={0}
                     hidingBorder
                     component={Input}
-                    serverError={props.serverError}
+                    serverError={serverError}
                   />
                   <label htmlFor="flySpeed">Fly</label>
                   <Field
@@ -281,7 +290,7 @@ const EditParticipantTemplate = (props) => {
                     min={0}
                     hidingBorder
                     component={Input}
-                    serverError={props.serverError}
+                    serverError={serverError}
                   />
                 </ItemsRow>
               </div>
@@ -295,7 +304,7 @@ const EditParticipantTemplate = (props) => {
                 min={1}
                 hidingBorder
                 component={Input}
-                serverError={props.serverError}
+                serverError={serverError}
               />
 
               <label htmlFor="immunities">Immunities</label>
@@ -348,12 +357,12 @@ const EditParticipantTemplate = (props) => {
                 id="comment"
                 hidingBorder
                 component={Input}
-                serverError={props.serverError}
+                serverError={serverError}
               />
-              {props.serverError ? (
+              {serverError ? (
                 <ServerError
                   className={classes.FullRow}
-                  serverError={props.serverError}
+                  serverError={serverError}
                 />
               ) : null}
 
@@ -372,9 +381,9 @@ const EditParticipantTemplate = (props) => {
     );
   }
 
-  if (editMode && !props.editedTemplate) {
-    if (props.serverError) {
-      return <ServerError serverError={props.serverError} />;
+  if (editMode && !editedTemplate) {
+    if (serverError) {
+      return <ServerError serverError={serverError} />;
     } else {
       return <Spinner />;
     }
@@ -383,14 +392,8 @@ const EditParticipantTemplate = (props) => {
   }
 };
 
-const mapStateToProps = (state) => {
-  return {
-    operationSuccess: state.participantTemplate.operationSuccess,
-    serverError: state.participantTemplate.error,
-    editedTemplate: state.participantTemplate.editedParticipantTemplate
-  };
+EditParticipantTemplate.propTypes = {
+  isNew: PropTypes.bool
 };
 
-EditParticipantTemplate.whyDidYouRender = true;
-
-export default connect(mapStateToProps)(withAuthCheck(EditParticipantTemplate));
+export default withAuthCheck(EditParticipantTemplate);

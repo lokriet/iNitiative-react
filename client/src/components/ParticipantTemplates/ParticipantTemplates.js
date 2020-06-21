@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useRouteMatch, Switch, Route, Redirect } from 'react-router-dom';
 
 import withAuthCheck from '../../hoc/withAuthCheck';
@@ -13,10 +13,12 @@ export const ParticipantType = {
   Monster: 'monster'
 };
 
-const ParticipantTemplates = props => {
-  let { path, url } = useRouteMatch();
+const ParticipantTemplates = () => {
+  const { path, url } = useRouteMatch();
 
-  return props.isAuthenticated ? (
+  const isAuthenticated = useSelector(state => state.auth.token != null);
+
+  return isAuthenticated ? (
     <>
       <TabbedNavigation>
         <TabbedNavigationItem link={`${url}/players`}>
@@ -45,11 +47,4 @@ const ParticipantTemplates = props => {
   ) : null;
 };
 
-const mapStateToProps = state => {
-  return {
-    isAuthenticated: state.auth.token != null,
-    initialAuthCheckDone: state.auth.initialAuthCheckDone
-  };
-};
-
-export default connect(mapStateToProps)(withAuthCheck(ParticipantTemplates));
+export default withAuthCheck(ParticipantTemplates);

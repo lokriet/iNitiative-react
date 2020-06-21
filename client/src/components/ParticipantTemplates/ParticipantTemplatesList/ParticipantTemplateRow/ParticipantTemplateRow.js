@@ -11,7 +11,7 @@ import Popup from 'reactjs-popup';
 import Spinner from '../../../UI/Spinner/Spinner';
 import Button from '../../../UI/Form/Button/Button';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { isEmpty } from '../../../../util/helper-methods';
 import Color from '../../../UI/Color/Color';
 
@@ -19,10 +19,11 @@ const ParticipantTemplateRow = ({
   template,
   onEdit,
   onDelete,
-  onDeleteCancelled,
-  serverError
+  onDeleteCancelled
 }) => {
   const [deleting, setDeleting] = useState(false);
+
+  const serverError = useSelector(state => state.participantTemplate.error);
 
   const handleConfirmDelete = useCallback(() => {
     setDeleting(true);
@@ -137,10 +138,4 @@ ParticipantTemplateRow.propTypes = {
   onDeleteCancelled: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    serverError: state.participantTemplate.error
-  };
-};
-
-export default connect(mapStateToProps)(ParticipantTemplateRow);
+export default ParticipantTemplateRow;

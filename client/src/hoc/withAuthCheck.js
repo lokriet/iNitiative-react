@@ -1,14 +1,17 @@
 import React, { useCallback } from 'react';
 
-import { connect, useDispatch } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import Spinner from '../components/UI/Spinner/Spinner';
 import { useHistory } from 'react-router-dom';
 import { setAuthRedirectPath } from '../components/Auth/authSlice';
 
 const withAuthCheck = (WrappedComponent) => {
-  return connect(mapStateToProps)((props) => {
+  return (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
+
+    const isAuthenticated = useSelector(state => state.auth.token != null);
+    const initialAuthCheckDone = useSelector(state => state.auth.initialAuthCheckDone);
 
     const handleLogin = useCallback(() => {
       dispatch(
@@ -17,9 +20,9 @@ const withAuthCheck = (WrappedComponent) => {
       history.push('/login');
     }, [dispatch, history]);
 
-    if (!props.initialAuthCheckDone) {
+    if (!initialAuthCheckDone) {
       return <Spinner />;
-    } else if (!props.isAuthenticated && props.initialAuthCheckDone) {
+    } else if (!isAuthenticated && initialAuthCheckDone) {
       return (
         <div style={{ width: 'fit-content', margin: 'auto' }}>
           <div>You are not logged in</div>
@@ -31,13 +34,6 @@ const withAuthCheck = (WrappedComponent) => {
     } else {
       return <WrappedComponent {...props} />;
     }
-  });
-};
-
-const mapStateToProps = (state) => {
-  return {
-    isAuthenticated: state.auth.user != null,
-    initialAuthCheckDone: state.auth.initialAuthCheckDone
   };
 };
 

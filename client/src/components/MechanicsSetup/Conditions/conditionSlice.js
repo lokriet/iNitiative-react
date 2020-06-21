@@ -1,4 +1,4 @@
-const { createMechanicsTypeSlice } = require('../mechanicsTypeSlice');
+import { createMechanicsTypeSlice } from '../mechanicsTypeSlice';
 
 const { reducer, actions, selectors } = createMechanicsTypeSlice('condition');
 

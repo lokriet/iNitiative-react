@@ -29,7 +29,6 @@ class EditEncounter extends Component {
 
   componentDidMount = () => {
     this.props.resetEncounterOperation();
-    this.props.getParticipantTemplates();
 
     if (!this.props.isNew) {
       this.props.getEncounterById(this.props.match.params.encounterId);
@@ -230,7 +229,6 @@ const mapActionsToProps = dispatch => {
   return {
     resetEditedEncounter: () => dispatch(actions.resetEditedEncounter()),
     resetEncounterOperation: () => dispatch(actions.resetEncounterOperation()),
-    getParticipantTemplates: () => dispatch(actions.getParticipantTemplates()),
     getEncounterById: encounterId =>
       dispatch(actions.getEncounterById(encounterId)),
     editEncounter: (encounterId, partialUpdate) =>

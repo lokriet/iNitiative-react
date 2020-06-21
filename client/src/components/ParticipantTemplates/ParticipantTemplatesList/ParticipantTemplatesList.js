@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useHistory } from 'react-router-dom';
-import { useDispatch, connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import * as actions from '../../../store/actions';
+import {
+  fetchTemplates,
+  deleteTemplate,
+  resetTemplateOperation,
+  selectParticipantTemplatesByType
+} from '../participantTemplatesSlice';
 
 import ParticipantTemplateRow from './ParticipantTemplateRow/ParticipantTemplateRow';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
@@ -12,45 +17,46 @@ import AddButton from '../../UI/Form/Button/AddButton/AddButton';
 
 import classes from './ParticipantTemplatesList.module.css';
 import Spinner from '../../UI/Spinner/Spinner';
+import Error from '../../UI/Errors/Error/Error';
 
-const ParticipantTemplatesList = props => {
-  const [allTemplates, setAllTemplates] = useState([]);
-  const [filteredTemplates, setFilteredTemplates] = useState(allTemplates);
+const ParticipantTemplatesList = ({ type }) => {
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const { error, fetching } = useSelector((state) => state.participantTemplate);
+  const allTemplates = useSelector((state) =>
+    selectParticipantTemplatesByType(state, type)
+  );
+  const [filteredTemplates, setFilteredTemplates] = useState([]);
+
   useEffect(() => {
-    dispatch(actions.getParticipantTemplates());
+    dispatch(fetchTemplates());
   }, [dispatch]);
 
   useEffect(() => {
-    const allTemplates = props.participantTemplates
-      ? props.participantTemplates.filter(item => item.type === props.type)
-      : [];
-    setAllTemplates(allTemplates);
     setFilteredTemplates(allTemplates);
-  }, [props.type, props.participantTemplates]);
+  }, [allTemplates]);
 
-  const handleItemsFiltered = useCallback(filteredItems => {
+  const handleItemsFiltered = useCallback((filteredItems) => {
     setFilteredTemplates(filteredItems);
   }, []);
 
   const handleEditTemplate = useCallback(
-    templateId => {
+    (templateId) => {
       history.push(`/templates/edit/${templateId}`);
     },
     [history]
   );
 
   const handleDeleteTemplate = useCallback(
-    template => {
-      dispatch(actions.deleteParticipantTemplate(template));
+    (template) => {
+      dispatch(deleteTemplate(template));
     },
     [dispatch]
   );
 
   const handleCancelDeleteTemplate = useCallback(() => {
-    dispatch(actions.resetParticipantTemplateOperation());
+    dispatch(resetTemplateOperation());
   }, [dispatch]);
 
   return (
@@ -63,14 +69,16 @@ const ParticipantTemplatesList = props => {
               onItemsFiltered={handleItemsFiltered}
             />
           </div>
-          <Link to={`/templates/new?type=${props.type}`}>
+          <Link to={`/templates/new?type=${type}`}>
             <AddButton />
           </Link>
         </ItemsRow>
       </div>
 
-      {props.fetching ? (
+      {fetching ? (
         <Spinner />
+      ) : error ? (
+        <Error>{error}</Error>
       ) : (
         <table className={classes.Table}>
           <thead>
@@ -91,7 +99,7 @@ const ParticipantTemplatesList = props => {
             </tr>
           </thead>
           <tbody>
-            {filteredTemplates.map(item => (
+            {filteredTemplates.map((item) => (
               <ParticipantTemplateRow
                 key={item._id}
                 template={item}
@@ -111,12 +119,4 @@ ParticipantTemplatesList.propTypes = {
   type: PropTypes.string.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    participantTemplates: state.participantTemplate.participantTemplates,
-    error: state.participantTemplate.error,
-    fetching: state.participantTemplate.fetching
-  };
-};
-
-export default connect(mapStateToProps)(ParticipantTemplatesList);
+export default ParticipantTemplatesList;

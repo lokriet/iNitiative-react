@@ -32,7 +32,7 @@ const Routes = () => {
 
       <Route
         path="/templates/new"
-        render={() => <editParticipantTemplate isNew />}
+        render={() => <EditParticipantTemplate isNew />}
       />
       <Route
         path="/templates/edit/:templateId"

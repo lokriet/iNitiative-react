@@ -1,6 +1,6 @@
-const { combineReducers } = require('redux');
-const { createItemsSlice } = require('./itemsSlice');
-const { itemsApi } = require('../../api/api');
+import { combineReducers } from '@reduxjs/toolkit';
+import { createItemsSlice } from './itemsSlice';
+import { itemsApi } from '../../api/itemsApi';
 
 export const createMechanicsTypeSlice = (typeName) => {
   const homebrewSlice = createItemsSlice(
@@ -58,5 +58,5 @@ export const createMechanicsTypeSlice = (typeName) => {
     fetchItems
   };
 
-  return {selectors, actions, reducer};
+  return { selectors, actions, reducer };
 };

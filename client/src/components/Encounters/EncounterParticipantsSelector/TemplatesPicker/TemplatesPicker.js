@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import * as actions from '../../../../store/actions';
+import {fetchTemplates, selectParticipantTemplatesByType} from '../../../ParticipantTemplates/participantTemplatesSlice';
 
 import { ParticipantType } from '../../../ParticipantTemplates/ParticipantTemplates';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
@@ -12,51 +12,32 @@ import ServerError from '../../../UI/Errors/ServerError/ServerError';
 
 import classes from './TemplatesPicker.module.css';
 
-const TemplatesPicker = props => {
+const TemplatesPicker = ({onAdd}) => {
   const [templatesType, setTemplatesType] = useState(ParticipantType.Player);
-  const [templates, setTemplates] = useState({ initialized: false });
+  const monsters = useSelector(selectParticipantTemplatesByType(ParticipantType.Monster));
+  const players = useState(selectParticipantTemplatesByType(ParticipantType.Player));
+  const {fetching, error: fetchingError} = useSelector(state => state.participantTemplate);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.getParticipantTemplates());
+    dispatch(fetchTemplates());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (props.allTemplates && !props.fetching && !props.fetchingError) {
-      const players = [];
-      const monsters = [];
-
-      props.allTemplates.forEach(template => {
-        if (template.type === ParticipantType.Player) {
-          players.push(template);
-        } else {
-          monsters.push(template);
-        }
-      });
-
-      setTemplates({
-        initialized: true,
-        players,
-        monsters
-      });
-    }
-  }, [props.allTemplates, props.fetchingError, props.fetching]);
-
   let templatesList;
-  if (props.fetchingError) {
-    templatesList = <ServerError serverError={props.fetchingError} />;
-  } else if (props.fetching) {
+  if (fetchingError) {
+    templatesList = <ServerError serverError={fetchingError} />;
+  } else if (fetching) {
     templatesList = <Spinner />;
   } else {
     templatesList = (
       <TemplatesPickList
         templates={
           templatesType === ParticipantType.Player
-            ? templates.players
-            : templates.monsters
+            ? players
+            : monsters
         }
-        onAdd={props.onAdd}
+        onAdd={onAdd}
       />
     );
   }
@@ -86,12 +67,4 @@ TemplatesPicker.propTypes = {
   onAdd: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    allTemplates: state.participantTemplate.participantTemplates,
-    fetching: state.participantTemplate.fetching,
-    fetchingError: state.participantTemplate.error
-  };
-};
-
-export default connect(mapStateToProps)(TemplatesPicker);
+export default TemplatesPicker;

@@ -2,7 +2,7 @@ import union from 'lodash/union';
 import uniq from 'lodash/uniq';
 import { createSelector } from '@reduxjs/toolkit';
 
-const { createMechanicsTypeSlice } = require('../mechanicsTypeSlice');
+import { createMechanicsTypeSlice } from '../mechanicsTypeSlice';
 
 const {
   reducer,
@@ -27,12 +27,14 @@ const sharedFeaturesSelector = (state) =>
 
 const selectHomebrewFeatureTypes = createSelector(
   [homebrewFeaturesSelector],
-  (homebrewFeatures) => uniq(homebrewFeatures.map((feature) => feature.type)).sort(byLocale)
+  (homebrewFeatures) =>
+    uniq(homebrewFeatures.map((feature) => feature.type)).sort(byLocale)
 );
 
 const selectSharedFeatureTypes = createSelector(
   [sharedFeaturesSelector],
-  (sharedFeatures) => uniq(sharedFeatures.map((feature) => feature.type)).sort(byLocale)
+  (sharedFeatures) =>
+    uniq(sharedFeatures.map((feature) => feature.type)).sort(byLocale)
 );
 
 const selectAllFeatureTypes = createSelector(
