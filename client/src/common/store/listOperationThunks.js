@@ -31,11 +31,14 @@ export const parseItemOperationError = async (response) => {
 };
 
 
-export const createFetchItemsThunk = (slicePath, api) => createAsyncThunk(
+export const createFetchItemsThunk = (slicePath, api, withToken=true) => createAsyncThunk(
   `${slicePath.replace('.', '/')}/fetchItems`,
   async (_, thunkApi) => {
-    await thunkApi.dispatch(firebaseObtainIdToken());
-    const idToken = thunkApi.getState().firebase.idToken;
+    let idToken = null;
+    if (withToken) {
+      await thunkApi.dispatch(firebaseObtainIdToken());
+      idToken = thunkApi.getState().firebase.idToken;
+    }
 
     const response = await api.fetchItems(idToken);
     if (response.ok) {

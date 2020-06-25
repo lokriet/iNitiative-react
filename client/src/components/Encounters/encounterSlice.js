@@ -311,10 +311,6 @@ const encounterSlice = createSlice({
         action.payload.participantId,
         action.payload.partialUpdate
       );
-      // entityAdapter.updateOne(state, {
-      //   id: action.payload.encounterId,
-      //   changes: { updatedAt: new Date() }
-      // });
     },
     [updateChildItem.rejected]: (state, action) => {
       state.operationError = action.payload.error;
@@ -326,10 +322,6 @@ const encounterSlice = createSlice({
         action.payload.participantId,
         action.payload.partialUpdate
       );
-      // entityAdapter.updateOne(state, {
-      //   id: action.payload.encounterId,
-      //   changes: { updatedAt: new Date() }
-      // });
     },
 
     resetStore: (state, action) => initialState

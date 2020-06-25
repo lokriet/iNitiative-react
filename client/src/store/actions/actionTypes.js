@@ -1,1 +1,0 @@
-export { NewsActionTypes as news } from './news';

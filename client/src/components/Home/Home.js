@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as actions from '../../store/actions/index';
 import { Link } from 'react-router-dom';
 import classes from './Home.module.css';
 import { isEmpty, formatDate } from '../../util/helper-methods';
@@ -10,6 +9,7 @@ import {
   resetLatestEncounter,
   selectLatestEncounter
 } from '../Encounters/encounterSlice';
+import { selectAllNews, fetchNews } from './newsSlice';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -21,7 +21,7 @@ const Home = () => {
   const fetchingLatestEncounter = useSelector(state => state.encounter.fetching);
   const fetchingEncounterError = useSelector(state => state.encounter.fetchingError);
 
-  const news = useSelector(state => state.news.news);
+  const news = useSelector(selectAllNews);
   const fetchingNews = useSelector(state => state.news.fetching);
   const fetchingNewsError = useSelector(state => state.news.error);
 
@@ -30,7 +30,7 @@ const Home = () => {
     if (isAuthenticated) {
       dispatch(fetchLatestEncounter());
     }
-    dispatch(actions.getNews());
+    dispatch(fetchNews());
 
     return () => {
       dispatch(resetLatestEncounter());
