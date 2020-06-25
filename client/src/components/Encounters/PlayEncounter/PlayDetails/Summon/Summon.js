@@ -5,45 +5,54 @@ import EncounterParticipantSelector from '../../../EncounterParticipantsSelector
 import classes from './Summon.module.css';
 import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
 
-import { useDispatch, connect } from 'react-redux';
-import * as actions from '../../../../../store/actions';
+import { useDispatch, useSelector } from 'react-redux';
+// import * as actions from '../../../../../store/actions';
 import Error from '../../../../UI/Errors/Error/Error';
 import ServerError from '../../../../UI/Errors/ServerError/ServerError';
-import { EditedEncounterAction } from '../../../../../store/actions';
+import {
+  EditedEncounterAction,
+  resetEncounterOperation,
+  updateEncounter,
+  selectEditedEncounter
+} from '../../../encounterSlice';
 
 const emptyFunc = () => {};
-const Summon = props => {
+const Summon = () => {
   const [summonedParticipants, setSummonedParticipants] = useState([]);
   const [validationErrors, setValidationErrors] = useState([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [closeFunc, setCloseFunc] = useState({ func: emptyFunc });
 
+  const saveError = useSelector((state) => state.encounter.operationError);
+  const saveSuccess = useSelector((state) => state.encounter.operationSuccess);
+  const editedEncounter = useSelector(selectEditedEncounter);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.resetEncounterOperation());
+    dispatch(resetEncounterOperation());
   }, [dispatch]);
 
   const handleOpen = useCallback(() => {
-    dispatch(actions.resetEncounterOperation());
+    dispatch(resetEncounterOperation());
   }, [dispatch]);
 
   const handleClose = useCallback(() => {
     setSummonedParticipants([]);
     setValidationErrors([]);
     setSubmitAttempted(false);
-    dispatch(actions.resetEncounterOperation());
+    dispatch(resetEncounterOperation());
   }, [dispatch]);
 
   useEffect(() => {
-    if (submitAttempted && props.saveSuccess) {
+    if (submitAttempted && saveSuccess) {
       handleClose();
       closeFunc.func();
     }
-  }, [submitAttempted, props.saveSuccess, handleClose, closeFunc]);
+  }, [submitAttempted, saveSuccess, handleClose, closeFunc]);
 
   const handleSummon = useCallback(
-    close => {
+    (close) => {
       setCloseFunc({ func: close });
 
       let validationErrors = [];
@@ -53,13 +62,13 @@ const Summon = props => {
         if (checkedParticipant.name.trim() === '') {
           validationErrors.push(`#${i}: participant name should not be empty`);
         } else if (
-          summonedParticipants.some(participant => {
+          summonedParticipants.some((participant) => {
             return (
               participant._tempId !== checkedParticipant._tempId &&
               participant.name.trim() === checkedParticipant.name.trim()
             );
           }) ||
-          props.editedEncounter.participants.some(participant => {
+          editedEncounter.participants.some((participant) => {
             return participant.name.trim() === checkedParticipant.name.trim();
           })
         ) {
@@ -92,31 +101,27 @@ const Summon = props => {
       }
 
       setSubmitAttempted(true);
-      const participantsToSave = summonedParticipants.map(participant => {
+      const participantsToSave = summonedParticipants.map((participant) => {
         let newParticipant = { ...participant };
         delete newParticipant._tempId;
         return newParticipant;
       });
 
       const updatedEncounter = {
-        ...props.editedEncounter,
+        ...editedEncounter,
         participants: [
-          ...props.editedEncounter.participants,
+          ...editedEncounter.participants,
           ...participantsToSave
         ]
       };
 
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
-          updatedEncounter,
-          {
-            editedEncounterAction: EditedEncounterAction.Set
-          }
-        )
+        updateEncounter(editedEncounter._id, updatedEncounter, {
+          editedEncounterAction: EditedEncounterAction.Set
+        })
       );
     },
-    [summonedParticipants, props.editedEncounter, dispatch]
+    [summonedParticipants, editedEncounter, dispatch]
   );
 
   return (
@@ -133,33 +138,33 @@ const Summon = props => {
         overflow: 'auto'
       }}
     >
-      {close => (
-          <div className={classes.Container}>
-            <div className={classes.SummonView}>
-              <EncounterParticipantSelector
-                participants={summonedParticipants}
-                nameCheckParticipants={props.editedEncounter.participants}
-                onParticipantsChanged={newSummonedParticipants =>
-                  setSummonedParticipants(newSummonedParticipants)
-                }
-              />
-            </div>
-
-            <div className={classes.Errors}>
-              {validationErrors.map((error, index) => (
-                <Error key={index}>{error}</Error>
-              ))}
-              {props.saveError ? (
-                <div>
-                  <ServerError serverError={props.saveError} />
-                </div>
-              ) : null}
-            </div>
-            <ItemsRow>
-              <Button onClick={() => handleSummon(close)}>Summon!</Button>
-              <Button onClick={close}>Close</Button>
-            </ItemsRow>
+      {(close) => (
+        <div className={classes.Container}>
+          <div className={classes.SummonView}>
+            <EncounterParticipantSelector
+              participants={summonedParticipants}
+              nameCheckParticipants={editedEncounter.participants}
+              onParticipantsChanged={(newSummonedParticipants) =>
+                setSummonedParticipants(newSummonedParticipants)
+              }
+            />
           </div>
+
+          <div className={classes.Errors}>
+            {validationErrors.map((error, index) => (
+              <Error key={index}>{error}</Error>
+            ))}
+            {saveError ? (
+              <div>
+                <ServerError serverError={saveError} />
+              </div>
+            ) : null}
+          </div>
+          <ItemsRow>
+            <Button onClick={() => handleSummon(close)}>Summon!</Button>
+            <Button onClick={close}>Close</Button>
+          </ItemsRow>
+        </div>
       )}
     </Popup>
   );
@@ -167,12 +172,4 @@ const Summon = props => {
 
 Summon.propTypes = {};
 
-const mapStateToProps = state => {
-  return {
-    saveError: state.encounter.operationError,
-    saveSuccess: state.encounter.operationSuccess,
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(Summon);
+export default Summon;

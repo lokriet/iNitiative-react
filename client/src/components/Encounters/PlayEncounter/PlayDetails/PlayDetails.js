@@ -1,12 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   faPlay,
   faDiceD6,
   faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
-import { EditedEncounterAction } from '../../../../store/actions/encounter';
-import * as actions from '../../../../store/actions';
+import {
+  EditedEncounterAction,
+  updateEncounterParticipant,
+  updateEncounter,
+  selectEditedEncounter
+} from '../../encounterSlice';
 
 import Spinner from '../../../UI/Spinner/Spinner';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
@@ -23,7 +27,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../../../UI/Form/Button/Button';
 import Popup from 'reactjs-popup';
 
-const getIni = participant => {
+const getIni = (participant) => {
   const rolledInitiative =
     participant.rolledInitiative == null || participant.rolledInitiative === ''
       ? 0
@@ -41,51 +45,56 @@ const compareParticipants = (a, b) => {
   }
 };
 
-const PlayDetails = props => {
+const PlayDetails = () => {
   const [showDead, setShowDead] = useState(false);
   const [filteredParticipants, setFilteredParticipants] = useState([]);
 
   const [damageTypes, combined, features, conditions] = useDropdownValues();
 
+  const saveError = useSelector((state) => state.encounter.operationError);
+  const editedEncounter = useSelector(selectEditedEncounter);
+  const fetchingEncounterError = useSelector(
+    (state) => state.encounter.fetchingError
+  );
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (props.editedEncounter) {
+    if (editedEncounter) {
       if (!showDead) {
         setFilteredParticipants(
-          props.editedEncounter.participants
-            .filter(item => item.currentHp > 0)
+          editedEncounter.participants
+            .filter((item) => item.currentHp > 0)
             .sort(compareParticipants)
         );
       } else {
         setFilteredParticipants(
-          props.editedEncounter.participants.sort(compareParticipants)
+          [...editedEncounter.participants].sort(compareParticipants)
         );
       }
     }
-  }, [props.editedEncounter, showDead]);
+  }, [editedEncounter, showDead]);
 
   const handleParticipantUpdate = useCallback(
     (partialUpdate, participant) => {
-      if (props.editedEncounter) {
+      if (editedEncounter) {
         dispatch(
-          actions.updateEncounterParticipantDetails(
-            props.editedEncounter._id,
+          updateEncounterParticipant(
+            editedEncounter._id,
             participant._id,
-            partialUpdate,
-            true
+            partialUpdate
           )
         );
       }
     },
-    [props.editedEncounter, dispatch]
+    [editedEncounter, dispatch]
   );
 
   const handleValidateName = useCallback(
     (newName, participantId) => {
-      if (props.editedEncounter) {
-        const result = !props.editedEncounter.participants.some(
-          participant =>
+      if (editedEncounter) {
+        const result = !editedEncounter.participants.some(
+          (participant) =>
             participant._id !== participantId &&
             participant.name === newName.trim()
         );
@@ -94,34 +103,33 @@ const PlayDetails = props => {
         return false;
       }
     },
-    [props.editedEncounter]
+    [editedEncounter]
   );
 
   const handleRollEmptyInitiatives = useCallback(() => {
-    if (props.editedEncounter) {
-      props.editedEncounter.participants.forEach(participant => {
+    if (editedEncounter) {
+      editedEncounter.participants.forEach((participant) => {
         if (isEmpty(participant.rolledInitiative)) {
           dispatch(
-            actions.updateEncounterParticipantDetails(
-              props.editedEncounter._id,
+            updateEncounterParticipant(
+              editedEncounter._id,
               participant._id,
-              { rolledInitiative: generateInitiative() },
-              true
+              { rolledInitiative: generateInitiative() }
             )
           );
         }
       });
     }
-  }, [dispatch, props.editedEncounter]);
+  }, [dispatch, editedEncounter]);
 
   const handleNextMove = useCallback(() => {
-    if (props.editedEncounter) {
+    if (editedEncounter) {
       let activeParticipantId;
-      if (isEmpty(props.editedEncounter.activeParticipantId)) {
+      if (isEmpty(editedEncounter.activeParticipantId)) {
         activeParticipantId = filteredParticipants[0]._id;
       } else {
         let currentIndex = filteredParticipants.findIndex(
-          item => item._id === props.editedEncounter.activeParticipantId
+          (item) => item._id === editedEncounter.activeParticipantId
         );
         let attemptsNo = 0;
         currentIndex = (currentIndex + 1) % filteredParticipants.length;
@@ -135,10 +143,10 @@ const PlayDetails = props => {
         activeParticipantId = filteredParticipants[currentIndex]._id;
       }
 
-      if (activeParticipantId !== props.editedEncounter.activeParticipantId) {
+      if (activeParticipantId !== editedEncounter.activeParticipantId) {
         dispatch(
-          actions.editEncounter(
-            props.editedEncounter._id,
+          updateEncounter(
+            editedEncounter._id,
             { activeParticipantId: activeParticipantId },
             {
               editedEncounterAction: EditedEncounterAction.Update,
@@ -149,33 +157,33 @@ const PlayDetails = props => {
         );
       }
     }
-  }, [dispatch, filteredParticipants, props.editedEncounter]);
+  }, [dispatch, filteredParticipants, editedEncounter]);
 
   const handleAttemptErrorFix = useCallback(() => {
     dispatch(
-      actions.editEncounter(
-        props.editedEncounter._id,
+      updateEncounter(
+        editedEncounter._id,
         {
-          ...props.editedEncounter
+          ...editedEncounter
         },
         { editedEncounterAction: EditedEncounterAction.Set }
       )
     );
-  }, [dispatch, props.editedEncounter]);
+  }, [dispatch, editedEncounter]);
 
   let view;
-  if (!props.editedEncounter && !props.fetchingEncounterError) {
+  if (!editedEncounter && !fetchingEncounterError) {
     view = <Spinner />;
-  } else if (props.fetchingEncounterError) {
-    view = <ServerError serverError={props.fetchingEncounterError} />;
+  } else if (fetchingEncounterError) {
+    view = <ServerError serverError={fetchingEncounterError} />;
   } else {
     view = (
       <div className={classes.Container}>
         <div className={classes.EncounterName}>
-          {props.editedEncounter.name}
+          {editedEncounter.name}
         </div>
         <div className={classes.TableDetailsContainer}>
-          {props.saveError ? (
+          {saveError ? (
             <div className={classes.SavingError}>
               <div className={classes.SavingErrorText}>
                 <FontAwesomeIcon
@@ -196,7 +204,7 @@ Please note, you can continue working, but if you reload the page before the pro
           ) : null}
           <ItemsRow alignCentered className={classes.ButtonsRow}>
             <IconButton icon={faPlay} bordered onClick={handleNextMove}>
-              {isEmpty(props.editedEncounter.activeParticipantId)
+              {isEmpty(editedEncounter.activeParticipantId)
                 ? 'First move'
                 : 'Next move'}
             </IconButton>
@@ -207,7 +215,7 @@ Please note, you can continue working, but if you reload the page before the pro
             >
               Roll empty initiatives
             </IconButton>
-            {props.saveError ? (
+            {saveError ? (
               <Popup on="hover" trigger={<Button disabled>Summon</Button>}>
                 <div>Summon functionality is unavailable in error state</div>
               </Popup>
@@ -220,17 +228,17 @@ Please note, you can continue working, but if you reload the page before the pro
                 name="showDead"
                 id="showDead"
                 checked={showDead}
-                onChange={event => {
+                onChange={(event) => {
                   setShowDead(event.target.checked);
                 }}
               />
               <label htmlFor="showDead">Show dead</label>
             </div>
           </ItemsRow>
-          {props.editedEncounter.participants.length === 0 ? (
+          {editedEncounter.participants.length === 0 ? (
             <div>
               You didn't add any participants to the encounter yet.{' '}
-              <Link to={`/encounters/edit/${props.editedEncounter._id}`}>
+              <Link to={`/encounters/edit/${editedEncounter._id}`}>
                 Go add some!
               </Link>
             </div>
@@ -269,7 +277,7 @@ Please note, you can continue working, but if you reload the page before the pro
                       participant={participant}
                       isActive={
                         participant._id ===
-                        props.editedEncounter.activeParticipantId
+                        editedEncounter.activeParticipantId
                       }
                       dropdownValues={[
                         damageTypes,
@@ -277,10 +285,10 @@ Please note, you can continue working, but if you reload the page before the pro
                         features,
                         conditions
                       ]}
-                      onInfoChanged={partialUpdate =>
+                      onInfoChanged={(partialUpdate) =>
                         handleParticipantUpdate(partialUpdate, participant)
                       }
-                      isNameValid={newName =>
+                      isNameValid={(newName) =>
                         handleValidateName(newName, participant._id)
                       }
                     />
@@ -299,13 +307,4 @@ Please note, you can continue working, but if you reload the page before the pro
 
 PlayDetails.propTypes = {};
 
-const mapStateToProps = state => {
-  return {
-    saveError: state.encounter.operationError,
-    saveSuccess: state.encounter.operationSuccess,
-    editedEncounter: state.encounter.editedEncounter,
-    fetchingEncounterError: state.encounter.fetchingError
-  };
-};
-
-export default connect(mapStateToProps)(PlayDetails);
+export default PlayDetails;

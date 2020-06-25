@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import * as actions from '../../../store/actions';
+// import * as actions from '../../../store/actions';
 import withAuthCheck from '../../../hoc/withAuthCheck';
 import { useDispatch } from 'react-redux';
 import {
@@ -15,17 +15,18 @@ import PlayDetails from './PlayDetails/PlayDetails';
 import TabbedNavigation from '../../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
 import MapDetails from './MapDetails/MapDetails';
+import {fetchEditedEncounter, resetEditedEncounter} from '../encounterSlice';
 
-const PlayEncounter = props => {
+const PlayEncounter = () => {
   const dispatch = useDispatch();
   const { encounterId } = useParams();
   let { path, url } = useRouteMatch();
 
   useEffect(() => {
-    dispatch(actions.getEncounterById(encounterId));
+    dispatch(fetchEditedEncounter(encounterId));
 
     return () => {
-      dispatch(actions.resetEditedEncounter());
+      dispatch(resetEditedEncounter());
     };
   }, [dispatch, encounterId]);
 

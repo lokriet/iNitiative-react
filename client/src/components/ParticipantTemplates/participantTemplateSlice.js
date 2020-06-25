@@ -13,11 +13,6 @@ import { firebaseObtainIdToken } from '../Firebase/firebaseMiddleware';
 import { isEmpty } from '../../util/helper-methods';
 import * as actions from '../../store/actions';
 
-const entityAdapter = createEntityAdapter({
-  selectId: (item) => item._id,
-  sortComparer: (a, b) => a.name.localeCompare(b.name)
-});
-
 const api = participantTemplateApi();
 const { fetchItems, fetchItem, addItem, updateItem } = createThunks(
   'participantTemplate',
@@ -29,37 +24,45 @@ export const fetchEditedTemplate = (templateId) =>
   fetchItem({ itemId: templateId });
 
 export const addTemplate = (_, templateValues, setSubmitting) =>
-  addItem({ item: templateValues, setSubmitted: () => setSubmitting(false) });
+  addItem({
+    item: templateValues,
+    onOperationDone: () => setSubmitting(false)
+  });
 
 export const updateTemplate = (templateId, templateValues, setSubmitting) =>
   updateItem({
     item: { ...templateValues, _id: templateId },
-    setSubmitted: () => setSubmitting(false)
+    onOperationDone: () => setSubmitting(false)
   });
 
 export const deleteTemplate = createAsyncThunk(
-    'participantTemplate/deleteItem',
-    async (template, thunkApi) => {
-      await thunkApi.dispatch(firebaseObtainIdToken());
-      const idToken = thunkApi.getState().firebase.idToken;
+  'participantTemplate/deleteItem',
+  async (template, thunkApi) => {
+    await thunkApi.dispatch(firebaseObtainIdToken());
+    const idToken = thunkApi.getState().firebase.idToken;
 
-      const response = await api.deleteItem(template._id, idToken);
-      if (response.ok) {
-        if (!isEmpty(template.avatarUrl)) {
-          thunkApi.dispatch(actions.cleanUpAvatarUrls([template.avatarUrl]));
-        }
-        return template._id;
-      } else {
-        console.log('delete item failed');
-        const error = await parseItemOperationError(response);
-        console.log(error);
-        return thunkApi.rejectWithValue({
-          itemId: template._id,
-          error
-        });
+    const response = await api.deleteItem(template._id, idToken);
+    if (response.ok) {
+      if (!isEmpty(template.avatarUrl)) {
+        thunkApi.dispatch(actions.cleanUpAvatarUrls([template.avatarUrl]));
       }
+      return template._id;
+    } else {
+      console.log('delete item failed');
+      const error = await parseItemOperationError(response);
+      console.log(error);
+      return thunkApi.rejectWithValue({
+        itemId: template._id,
+        error
+      });
     }
-  );
+  }
+);
+
+const entityAdapter = createEntityAdapter({
+  selectId: (item) => item._id,
+  sortComparer: (a, b) => a.name.localeCompare(b.name)
+});
 
 const initialState = entityAdapter.getInitialState({
   fetching: false,
@@ -77,10 +80,6 @@ const operationFailed = (state, action) => {
 const fetchingStart = (state, action) => {
   state.fetching = true;
   state.error = null;
-};
-const fetchingFailed = (state, action) => {
-  state.fetching = false;
-  state.error = action.payload.error;
 };
 
 const participantTemplateSlice = createSlice({
@@ -127,7 +126,10 @@ const participantTemplateSlice = createSlice({
       state.lastFetchTime = new Date().getTime();
       entityAdapter.setAll(state, action.payload);
     },
-    [fetchItems.rejected]: fetchingFailed,
+    [fetchItems.rejected]: (state, action) => {
+      state.fetching = false;
+      state.error = action.payload;
+    },
 
     [fetchItem.pending]: fetchingStart,
     [fetchItem.fulfilled]: (state, action) => {
@@ -136,7 +138,10 @@ const participantTemplateSlice = createSlice({
       state.editedItemId = action.payload._id;
       entityAdapter.upsertOne(state, action.payload);
     },
-    [fetchItem.rejected]: fetchingFailed,
+    [fetchItem.rejected]: (state, action) => {
+      state.fetching = false;
+      state.error = action.payload.error;
+    },
 
     resetStore: (state, action) => initialState
   }
@@ -148,8 +153,6 @@ export const resetTemplateOperation =
 export const resetEditedTemplate =
   participantTemplateSlice.actions.resetEditedTemplate;
 
-
-  
 const entitySelectors = entityAdapter.getSelectors();
 
 const selectAllParticipantTemplates = (state) =>

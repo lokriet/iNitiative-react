@@ -38,7 +38,6 @@ export const createFetchItemsThunk = (slicePath, api) => createAsyncThunk(
     const idToken = thunkApi.getState().firebase.idToken;
 
     const response = await api.fetchItems(idToken);
-
     if (response.ok) {
       const items = await response.json();
       return items;
@@ -73,7 +72,7 @@ export const createFetchItemByIdThunk = (slicePath, api) => createAsyncThunk(
     if (response.ok) {
       const responseData = await response.json();
       return responseData;
-    }else {
+    } else {
       const error = await parseItemOperationError(response);
       return thunkApi.rejectWithValue({
         itemId,
@@ -85,18 +84,18 @@ export const createFetchItemByIdThunk = (slicePath, api) => createAsyncThunk(
 
 export const createAddItemThunk = (slicePath, api) => createAsyncThunk(
   `${slicePath.replace('.', '/')}/addItem`,
-  async ({ item, setSubmitted }, thunkApi) => {
+  async ({ item, onOperationDone }, thunkApi) => {
     await thunkApi.dispatch(firebaseObtainIdToken());
     const idToken = thunkApi.getState().firebase.idToken;
 
     const response = await api.addItem(item, idToken);
     if (response.ok) {
       const responseData = await response.json();
-      setSubmitted(true);
+      if (onOperationDone) onOperationDone(true);
       return responseData.data;
     } else {
       const error = await parseItemOperationError(response);
-      setSubmitted(false);
+      if (onOperationDone) onOperationDone(true);
       return thunkApi.rejectWithValue({
         itemId: null,
         error
@@ -107,18 +106,18 @@ export const createAddItemThunk = (slicePath, api) => createAsyncThunk(
 
 export const createUpdateItemThunk = (slicePath, api) => createAsyncThunk(
   `${slicePath.replace('.', '/')}/updateItem`,
-  async ({ item, setSubmitted }, thunkApi) => {
+  async ({ item, onOperationDone }, thunkApi) => {
     await thunkApi.dispatch(firebaseObtainIdToken());
     const idToken = thunkApi.getState().firebase.idToken;
 
     const response = await api.updateItem(item, idToken);
     if (response.ok) {
       const responseData = await response.json();
-      setSubmitted(true);
+      if (onOperationDone) onOperationDone(true);
       return responseData.data;
     } else {
       const error = await parseItemOperationError(response);
-      setSubmitted(false);
+      if (onOperationDone) onOperationDone(true);
       return thunkApi.rejectWithValue({
         itemId: item._id,
         error

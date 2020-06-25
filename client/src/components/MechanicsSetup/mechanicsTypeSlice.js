@@ -24,15 +24,15 @@ export const createMechanicsTypeSlice = (typeName) => {
       ? homebrewSlice.actions.fetchItems()
       : sharedSlice.actions.fetchItems();
 
-  const addItem = (item, isHomebrew, setSubmitted) =>
+  const addItem = (item, isHomebrew, onOperationDone) =>
     isHomebrew
-      ? homebrewSlice.actions.addItem({ item, setSubmitted })
-      : sharedSlice.actions.addItem({ item, setSubmitted });
+      ? homebrewSlice.actions.addItem({ item, onOperationDone })
+      : sharedSlice.actions.addItem({ item, onOperationDone });
 
-  const updateItem = (item, isHomebrew, setSubmitted) =>
+  const updateItem = (item, isHomebrew, onOperationDone) =>
     isHomebrew
-      ? homebrewSlice.actions.updateItem({ item, setSubmitted })
-      : sharedSlice.actions.updateItem({ item, setSubmitted });
+      ? homebrewSlice.actions.updateItem({ item, onOperationDone })
+      : sharedSlice.actions.updateItem({ item, onOperationDone });
 
   const deleteItem = (itemId, isHomebrew) =>
     isHomebrew

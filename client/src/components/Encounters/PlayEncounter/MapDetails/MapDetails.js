@@ -3,12 +3,11 @@ import React, { useCallback } from 'react';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import Button from '../../../UI/Form/Button/Button';
 import LoadMap from './LoadMap/LoadMap';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../UI/Spinner/Spinner';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Popup from 'reactjs-popup';
-import * as actions from '../../../../store/actions';
-import { EditedEncounterAction } from '../../../../store/actions';
+import { EditedEncounterAction, updateEncounter, selectEditedEncounter } from '../../encounterSlice';
 import { isEmpty } from '../../../../util/helper-methods';
 import Map from './Map/Map';
 import classes from './MapDetails.module.css';
@@ -17,17 +16,21 @@ import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { sum } from './Map/AreaEffects/aoe-utils';
 import { firebaseDeleteImage } from '../../../Firebase/firebaseMiddleware';
 
-const MapDetails = props => {
+const MapDetails = () => {
+  const saveError = useSelector(state => state.encounter.operationError);
+  const editedEncounter = useSelector(selectEditedEncounter);
+  const fetchingEncounterError = useSelector(state => state.encounter.fetchingError);
+
   const dispatch = useDispatch();
 
   const handleDeleteMap = useCallback(
     close => {
-      if (props.editedEncounter) {
-        if (props.editedEncounter.map) {
-          dispatch(firebaseDeleteImage(props.editedEncounter.map.mapUrl));
+      if (editedEncounter) {
+        if (editedEncounter.map) {
+          dispatch(firebaseDeleteImage(editedEncounter.map.mapUrl));
           dispatch(
-            actions.editEncounter(
-              props.editedEncounter._id,
+            updateEncounter(
+              editedEncounter._id,
               { map: null },
               {
                 editedEncounterAction: EditedEncounterAction.Update,
@@ -40,20 +43,20 @@ const MapDetails = props => {
       }
       close();
     },
-    [props.editedEncounter, dispatch]
+    [editedEncounter, dispatch]
   );
 
   const handleNewMapUploaded = useCallback(
     mapInfo => {
-      if (props.editedEncounter) {
-        if (props.editedEncounter.map) {
-          dispatch(firebaseDeleteImage(props.editedEncounter.map.mapUrl));
+      if (editedEncounter) {
+        if (editedEncounter.map) {
+          dispatch(firebaseDeleteImage(editedEncounter.map.mapUrl));
         }
       }
 
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+        updateEncounter(
+          editedEncounter._id,
           {
             map: {
               ...mapInfo,
@@ -77,18 +80,18 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleAddParticipantOnMap = useCallback(
     newMapParticipant => {
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+        updateEncounter(
+          editedEncounter._id,
           {
             map: {
-              ...props.editedEncounter.map,
-              participantCoordinates: props.editedEncounter.map.participantCoordinates.concat(
+              ...editedEncounter.map,
+              participantCoordinates: editedEncounter.map.participantCoordinates.concat(
                 newMapParticipant
               )
             }
@@ -101,18 +104,18 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleMapParticipantChanged = useCallback(
     editedMapParticipant => {
-      const initialMapParticipant = props.editedEncounter.map.participantCoordinates.find(
+      const initialMapParticipant = editedEncounter.map.participantCoordinates.find(
         item =>
           item.participantId.toString() ===
           editedMapParticipant.participantId.toString()
       );
 
-      let newAreaEffects = props.editedEncounter.map.areaEffects;
+      let newAreaEffects = editedEncounter.map.areaEffects;
       if (
         editedMapParticipant.mapX !== initialMapParticipant.mapX ||
         editedMapParticipant.mapY !== initialMapParticipant.mapY
@@ -122,7 +125,7 @@ const MapDetails = props => {
           y: editedMapParticipant.mapY - initialMapParticipant.mapY
         };
 
-        newAreaEffects = props.editedEncounter.map.areaEffects.map(
+        newAreaEffects = editedEncounter.map.areaEffects.map(
           areaEffect => {
             if (
               areaEffect.followingParticipantId &&
@@ -141,12 +144,12 @@ const MapDetails = props => {
       }
 
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+       updateEncounter(
+          editedEncounter._id,
           {
             map: {
-              ...props.editedEncounter.map,
-              participantCoordinates: props.editedEncounter.map.participantCoordinates.map(
+              ...editedEncounter.map,
+              participantCoordinates: editedEncounter.map.participantCoordinates.map(
                 participantCoordinate =>
                   participantCoordinate.participantId.toString() ===
                   editedMapParticipant.participantId.toString()
@@ -164,12 +167,12 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleMapParticipantDeleted = useCallback(
     participantId => {
-      const newAreaEffects = props.editedEncounter.map.areaEffects.filter(
+      const newAreaEffects = editedEncounter.map.areaEffects.filter(
         areaEffect =>
           !areaEffect.followingParticipantId ||
           areaEffect.followingParticipantId.toString() !==
@@ -177,12 +180,12 @@ const MapDetails = props => {
       );
 
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+        updateEncounter(
+          editedEncounter._id,
           {
             map: {
-              ...props.editedEncounter.map,
-              participantCoordinates: props.editedEncounter.map.participantCoordinates.filter(
+              ...editedEncounter.map,
+              participantCoordinates: editedEncounter.map.participantCoordinates.filter(
                 participantCoordinate =>
                   participantCoordinate.participantId.toString() !==
                   participantId.toString()
@@ -198,17 +201,17 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleMapDetailsChanged = useCallback(
     mapDetails => {
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+        updateEncounter(
+          editedEncounter._id,
           {
             map: {
-              ...props.editedEncounter.map,
+              ...editedEncounter.map,
               ...mapDetails
             }
           },
@@ -220,19 +223,19 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleAreaEffectAdded = useCallback(
     areaEffect => {
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+        updateEncounter(
+          editedEncounter._id,
           {
             map: {
-              ...props.editedEncounter.map,
+              ...editedEncounter.map,
               areaEffects: [
-                ...props.editedEncounter.map.areaEffects,
+                ...editedEncounter.map.areaEffects,
                 areaEffect
               ]
             }
@@ -245,18 +248,18 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleAreaEffectChanged = useCallback(
     areaEffect => {
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+        updateEncounter(
+          editedEncounter._id,
           {
             map: {
-              ...props.editedEncounter.map,
-              areaEffects: props.editedEncounter.map.areaEffects.map(item =>
+              ...editedEncounter.map,
+              areaEffects: editedEncounter.map.areaEffects.map(item =>
                 item._id.toString() === areaEffect._id.toString()
                   ? areaEffect
                   : item
@@ -271,18 +274,18 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleAreaEffectDeleted = useCallback(
     areaEffectId => {
       dispatch(
-        actions.editEncounter(
-          props.editedEncounter._id,
+        updateEncounter(
+          editedEncounter._id,
           {
             map: {
-              ...props.editedEncounter.map,
-              areaEffects: props.editedEncounter.map.areaEffects.filter(
+              ...editedEncounter.map,
+              areaEffects: editedEncounter.map.areaEffects.filter(
                 item => item._id.toString() !== areaEffectId.toString()
               )
             }
@@ -295,30 +298,30 @@ const MapDetails = props => {
         )
       );
     },
-    [dispatch, props.editedEncounter]
+    [dispatch, editedEncounter]
   );
 
   const handleAttemptErrorFix = useCallback(() => {
     dispatch(
-      actions.editEncounter(
-        props.editedEncounter._id,
+      updateEncounter(
+        editedEncounter._id,
         {
-          ...props.editedEncounter
+          ...editedEncounter
         },
         { editedEncounterAction: EditedEncounterAction.Set }
       )
     );
-  }, [dispatch, props.editedEncounter]);
+  }, [dispatch, editedEncounter]);
 
   let view;
-  if (!props.editedEncounter && !props.fetchingEncounterError) {
+  if (!editedEncounter && !fetchingEncounterError) {
     view = <Spinner />;
-  } else if (props.fetchingEncounterError) {
-    view = <ServerError serverError={props.fetchingEncounterError} />;
+  } else if (fetchingEncounterError) {
+    view = <ServerError serverError={fetchingEncounterError} />;
   } else {
     view = (
       <div className={classes.Container}>
-        {props.saveError ? (
+        {saveError ? (
           <div className={classes.SavingError}>
             <div className={classes.SavingErrorText}>
               <FontAwesomeIcon
@@ -374,13 +377,4 @@ Please note, you can continue working, but if you reload the page before the pro
 
 MapDetails.propTypes = {};
 
-const mapStateToProps = state => {
-  return {
-    saveError: state.encounter.operationError,
-    saveSuccess: state.encounter.operationSuccess,
-    editedEncounter: state.encounter.editedEncounter,
-    fetchingEncounterError: state.encounter.fetchingError
-  };
-};
-
-export default connect(mapStateToProps)(MapDetails);
+export default MapDetails;

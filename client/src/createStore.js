@@ -3,7 +3,7 @@ import damageTypeReducer from './components/MechanicsSetup/DamageTypes/damageTyp
 import conditionReducer from './components/MechanicsSetup/Conditions/conditionSlice';
 import featureReducer from './components/MechanicsSetup/Features/featureSlice';
 import participantTemplateReducer from './components/ParticipantTemplates/participantTemplateSlice';
-import encounterReducer from './store/reducers/encounter';
+import encounterReducer from './components/Encounters/encounterSlice';
 import newsReducer from './store/reducers/news';
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import createFirebaseMiddleware from './components/Firebase/firebaseMiddleware';

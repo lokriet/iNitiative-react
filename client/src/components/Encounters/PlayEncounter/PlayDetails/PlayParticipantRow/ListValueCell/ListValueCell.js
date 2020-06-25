@@ -28,15 +28,15 @@ const ListValueCell = ({
     let newItems;
     if (isImmunitiesList) {
       newItems = {
-        damageTypes: itemsList.damageTypes.sort((a, b) =>
+        damageTypes: [...itemsList.damageTypes].sort((a, b) =>
           a.name.localeCompare(b.name)
         ),
-        conditions: itemsList.conditions.sort((a, b) =>
+        conditions: [...itemsList.conditions].sort((a, b) =>
           a.name.localeCompare(b.name)
         )
       };
     } else {
-      newItems = itemsList.sort((a, b) => a.name.localeCompare(b.name));
+      newItems = [...itemsList].sort((a, b) => a.name.localeCompare(b.name));
     }
     setItems(newItems);
   }, [isImmunitiesList, itemsList]);

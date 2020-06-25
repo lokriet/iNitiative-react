@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from 'react';
-import { useDispatch, connect } from 'react-redux';
+import { useDispatch,  useSelector } from 'react-redux';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import withAuthCheck from '../../../hoc/withAuthCheck';
-import * as actions from '../../../store/actions';
+import {fetchEncounters, deleteEncounter, resetEncounterOperation, selectAll} from '../encounterSlice';
 
 import { useHistory } from 'react-router-dom';
 import EncounterRow from './EncounterRow/EncounterRow';
@@ -13,12 +13,17 @@ import ServerError from '../../UI/Errors/ServerError/ServerError';
 import classes from './EncountersList.module.css';
 import Spinner from '../../UI/Spinner/Spinner';
 
-const EncountersList = props => {
+const EncountersList = () => {
+  const allEncounters = useSelector(selectAll);
+  const fetching = useSelector(state => state.encounter.fetching);
+  const fetchingError = useSelector(state => state.encounter.fetchingError);
+  const operationError = useSelector(state => state.encounter.operationError);
+
   const dispatch = useDispatch();
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(actions.getEncounters());
+    dispatch(fetchEncounters());
   }, [dispatch])
 
   const handleNewEncounter = useCallback((encounterId) => {
@@ -34,18 +39,18 @@ const EncountersList = props => {
   }, [history]);
   
   const handleDeleteEncounter = useCallback((encounterId) => {
-    dispatch(actions.deleteEncounter(encounterId))
+    dispatch(deleteEncounter(encounterId))
   }, [dispatch]);
 
   const handleCancelDeleteEncounter = useCallback(() => {
-    dispatch(actions.resetEncounterOperation());
+    dispatch(resetEncounterOperation());
   }, [dispatch]);
 
   let view;
-  if (props.fetching) {
+  if (fetching) {
     view = <Spinner />;
-  } else if (props.fetchingError) {
-    view = <ServerError serverError={props.error} />;
+  } else if (fetchingError) {
+    view = <ServerError serverError={fetchingError.message} />;
   } else {
     view = (
       <>
@@ -62,11 +67,11 @@ const EncountersList = props => {
             </tr>
           </thead>
           <tbody>
-            {props.allEncounters.map(item => (
+            {allEncounters.map(item => (
               <EncounterRow
                 key={item._id}
                 encounter={item}
-                serverError={props.operationError}
+                serverError={operationError}
                 onDelete={handleDeleteEncounter}
                 onDeleteCancelled={handleCancelDeleteEncounter}
                 onEdit={handleEditEncounter}
@@ -84,13 +89,4 @@ const EncountersList = props => {
 
 EncountersList.propTypes = {};
 
-const mapStateToProps = state => {
-  return {
-    allEncounters: state.encounter.encounters,
-    fetching: state.encounter.fetching,
-    fetchingError: state.encounter.fetchingError,
-    operationError: state.encounter.operationError
-  };
-};
-
-export default connect(mapStateToProps)(withAuthCheck(EncountersList));
+export default withAuthCheck(EncountersList);

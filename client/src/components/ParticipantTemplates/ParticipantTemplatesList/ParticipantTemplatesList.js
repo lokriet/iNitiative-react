@@ -78,7 +78,7 @@ const ParticipantTemplatesList = ({ type }) => {
       {fetching ? (
         <Spinner />
       ) : error ? (
-        <Error>{error}</Error>
+        <Error>{error.message}</Error>
       ) : (
         <table className={classes.Table}>
           <thead>

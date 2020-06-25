@@ -1,43 +1,59 @@
 import React, { useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../../store/actions/index';
 import { Link } from 'react-router-dom';
 import classes from './Home.module.css';
 import { isEmpty, formatDate } from '../../util/helper-methods';
 import Spinner from '../UI/Spinner/Spinner';
+import {
+  fetchLatestEncounter,
+  resetLatestEncounter,
+  selectLatestEncounter
+} from '../Encounters/encounterSlice';
 
-const Home = props => {
+const Home = () => {
   const dispatch = useDispatch();
 
+  const isAuthenticated = useSelector(state => state.auth.token != null);
+  const user = useSelector(state => state.auth.user);
+
+  const latestEncounter = useSelector(selectLatestEncounter);
+  const fetchingLatestEncounter = useSelector(state => state.encounter.fetching);
+  const fetchingEncounterError = useSelector(state => state.encounter.fetchingError);
+
+  const news = useSelector(state => state.news.news);
+  const fetchingNews = useSelector(state => state.news.fetching);
+  const fetchingNewsError = useSelector(state => state.news.error);
+
+
   useEffect(() => {
-    if (props.isAuthenticated) {
-      dispatch(actions.getLatestEncounter());
+    if (isAuthenticated) {
+      dispatch(fetchLatestEncounter());
     }
     dispatch(actions.getNews());
 
     return () => {
-      dispatch(actions.setLatestEncounter(null));
+      dispatch(resetLatestEncounter());
     };
-  }, [dispatch, props.isAuthenticated]);
+  }, [dispatch, isAuthenticated]);
 
   let jumpRightInContent;
-  if (props.fetching) {
+  if (fetchingLatestEncounter) {
     jumpRightInContent = <Spinner />;
-  } else if (props.latestEncounter) {
-    const lastActivityDate = new Date(props.latestEncounter.updatedAt);
+  } else if (latestEncounter) {
+    const lastActivityDate = new Date(latestEncounter.updatedAt);
     jumpRightInContent = (
       <>
         <div>
           Continue where you left off:{' '}
-          <Link to={`/encounters/play/${props.latestEncounter._id}`}>
-            {props.latestEncounter.name}
+          <Link to={`/encounters/play/${latestEncounter._id}`}>
+            {latestEncounter.name}
           </Link>
         </div>
         <br />
         <div className={classes.SideNote}>
           Last activity at: {lastActivityDate.getHours()}:
-          {lastActivityDate.getMinutes()}{' '}
-          {formatDate(lastActivityDate)}
+          {lastActivityDate.getMinutes()} {formatDate(lastActivityDate)}
         </div>
       </>
     );
@@ -53,24 +69,25 @@ const Home = props => {
     );
   }
 
-  let news;
-  if (props.fetchingNews) {
-    news = <Spinner />;
-  } else if (props.fetchingNewsError) {
-    news = <div>Oops, something went wrong</div>;
+  let newsView;
+  if (fetchingNews) {
+    newsView = <Spinner />;
+  } else if (fetchingNewsError) {
+    newsView = <div>Oops, something went wrong</div>;
   } else {
-    news = (
+    newsView = (
       <div className={classes.NewsContainer}>
-        {props.news.map(item => {
+        {news.map((item) => {
           return (
-          <div key={item._id} className={classes.News}>
-            <div className={classes.NewsHeader}>{item.title}</div>
-            <div className={classes.NewsDate}>
-              {formatDate(item.createdAt)}
+            <div key={item._id} className={classes.News}>
+              <div className={classes.NewsHeader}>{item.title}</div>
+              <div className={classes.NewsDate}>
+                {formatDate(item.createdAt)}
+              </div>
+              <div className={classes.NewsContent}>{item.text}</div>
             </div>
-            <div className={classes.NewsContent}>{item.text}</div>
-          </div>
-        )})}
+          );
+        })}
       </div>
     );
   }
@@ -79,18 +96,18 @@ const Home = props => {
     <div className={classes.Container}>
       <h1 className={classes.Greeting}>
         Hi
-        {!props.user
+        {!user
           ? ' stranger'
-          : isEmpty(props.user.username)
+          : isEmpty(user.username)
           ? ''
-          : ` ${props.user.username}`}
+          : ` ${user.username}`}
         !
       </h1>
 
       <div className={classes.Columns}>
         <div className={classes.CardsContainer}>
-          {props.isAuthenticated ? (
-            props.fetchingEncounterError == null ? (
+          {isAuthenticated ? (
+            fetchingEncounterError == null ? (
               <div className={classes.Card}>
                 <div className={classes.CardHeader}>Jump right in!</div>
                 <div className={classes.CardContent}>{jumpRightInContent}</div>
@@ -100,7 +117,10 @@ const Home = props => {
             <div className={classes.Card}>
               <div className={classes.CardHeader}>You are not logged in</div>
               <div className={classes.CardContent}>
-                <div>You'll have a lot of fun once you are logged in. Give it a try!</div>
+                <div>
+                  You'll have a lot of fun once you are logged in. Give it a
+                  try!
+                </div>
                 <br />
                 <Link to="/login">Log in</Link> or{' '}
                 <Link to="/register">Create a new account</Link>
@@ -119,7 +139,7 @@ const Home = props => {
             </div>
           </div>
 
-          {props.isAuthenticated ? (
+          {isAuthenticated ? (
             <div className={classes.Card}>
               <div className={classes.CardHeader}>Tell us what you think</div>
               <div className={classes.CardContent}>
@@ -134,25 +154,10 @@ const Home = props => {
           ) : null}
         </div>
 
-        {news}
+        {newsView}
       </div>
     </div>
   );
 };
 
-const mapStateToProps = state => {
-  return {
-    isAuthenticated: state.auth.token != null,
-    user: state.auth.user,
-
-    latestEncounter: state.encounter.latestEncounter,
-    fetchingLatestEncounter: state.encounter.fetching,
-    fetchingEncounterError: state.encounter.fetchingError,
-
-    news: state.news.news,
-    fetchingNews: state.news.fetching,
-    fetchingNewsError: state.news.error
-  };
-};
-
-export default connect(mapStateToProps)(Home);
+export default Home;
