@@ -3,13 +3,13 @@ import {
   createSlice,
   createAsyncThunk
 } from '@reduxjs/toolkit';
-import { encounterApi } from '../../api/encounterApi';
+import { encounterApi } from './encounterApi';
 import {
   createThunks,
   parseItemOperationError
-} from '../../common/store/listOperationThunks';
-import { firebaseObtainIdToken } from '../Firebase/firebaseMiddleware';
-import * as actions from '../../store/actions';
+} from '../../store/common/listOperationThunks';
+import { firebaseObtainIdToken } from '../../store/firebase/firebaseMiddleware';
+import { cleanUpAvatarUrls } from '../../store/common/commonSlice';
 
 const api = encounterApi();
 const { fetchItems, fetchItem, addItem } = createThunks('encounter', api);
@@ -102,7 +102,7 @@ const deleteEncounter = createAsyncThunk(
 
     const response = await api.deleteItem(encounterId, idToken);
     if (response.ok) {
-      thunkApi.dispatch(actions.cleanUpAvatarUrls(avatarUrlsToCheck));
+      thunkApi.dispatch(cleanUpAvatarUrls(avatarUrlsToCheck));
       return encounterId;
     } else {
       const error = await parseItemOperationError(response);

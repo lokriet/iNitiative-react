@@ -14,7 +14,7 @@ import Error from '../../UI/Errors/Error/Error';
 import classes from './EditEncounter.module.css';
 import { isEmpty } from '../../../util/helper-methods';
 import withAuthCheck from '../../../hoc/withAuthCheck';
-import * as actions from '../../../store/actions';
+import { cleanUpAvatarUrls } from '../../../store/common/commonSlice';
 
 import {
   resetEncounterOperation,
@@ -57,14 +57,14 @@ const EditEncounter = ({ isNew }) => {
       if (!isNew) {
         dispatch(resetEditedEncounter());
       }
-      dispatch(actions.cleanUpAvatarUrls(avatarUrlsToCheckRef.current));
+      dispatch(cleanUpAvatarUrls(avatarUrlsToCheckRef.current));
     };
   }, [dispatch, isNew, encounterId]);
 
   useEffect(() => {
     if (editedEncounter && !initialized) {
       const newSet = new Set(avatarUrlsToCheckRef.current);
-      editedEncounter.participants.forEach(item => {
+      editedEncounter.participants.forEach((item) => {
         if (!isEmpty(item.avatarUrl)) {
           newSet.add(item.avatarUrl);
         }
@@ -222,6 +222,5 @@ const EditEncounter = ({ isNew }) => {
 
   return view;
 };
-
 
 export default withAuthCheck(EditEncounter);

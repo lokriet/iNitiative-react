@@ -11,7 +11,6 @@ import classes from './EditParticipantTemplate.module.css';
 import useDropdownValues from '../../../hooks/useDropdownValues';
 import Avatar from '../../ImageUpload/Avatar/Avatar';
 import { useDispatch, useSelector } from 'react-redux';
-import * as actions from '../../../store/actions';
 import {
   resetTemplateOperation,
   fetchEditedTemplate,
@@ -27,6 +26,7 @@ import Spinner from '../../UI/Spinner/Spinner';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import FormikColorPicker from '../../UI/Color/ColorPicker/FormikColorPicker';
 import PropTypes from 'prop-types';
+import {cleanUpAvatarUrls} from '../../../store/common/commonSlice';
 
 const EditParticipantTemplate = ({ isNew }) => {
   const queryParams = useQueryParams();
@@ -53,7 +53,7 @@ const EditParticipantTemplate = ({ isNew }) => {
   useEffect(() => {
     return () => {
       dispatch(
-        actions.cleanUpAvatarUrls(Array.from(avatarUrlsToCheckRef.current))
+        cleanUpAvatarUrls(Array.from(avatarUrlsToCheckRef.current))
       );
     };
   }, [dispatch]);

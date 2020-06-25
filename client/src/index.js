@@ -4,7 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import createStore from './createStore';
+import createStore from './store/createStore';
 import Root from './Root';
 
 const store = createStore();

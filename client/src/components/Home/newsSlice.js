@@ -1,5 +1,5 @@
-import { createFetchItemsThunk } from '../../common/store/listOperationThunks';
-import createNewsApi from '../../api/newsApi';
+import { createFetchItemsThunk } from '../../store/common/listOperationThunks';
+import createNewsApi from './newsApi';
 import { createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 
 const newsApi = createNewsApi();

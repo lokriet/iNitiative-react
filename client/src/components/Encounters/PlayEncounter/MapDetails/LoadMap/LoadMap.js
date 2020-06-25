@@ -8,29 +8,32 @@ import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
 import classes from './LoadMap.module.css';
 import { isEmpty } from '../../../../../util/helper-methods';
 import Error from '../../../../UI/Errors/Error/Error';
-import {firebaseDeleteImage} from '../../../../Firebase/firebaseMiddleware';
+import { firebaseDeleteImage } from '../../../../../store/firebase/firebaseMiddleware';
 import { useDispatch } from 'react-redux';
 
-const LoadMap = ({ onNewMapLoaded}) => {
+const LoadMap = ({ onNewMapLoaded }) => {
   const [gridWidth, setGridWidth] = useState('');
   const [gridHeight, setGridHeight] = useState('');
   const [loadedMapInfo, setLoadedMapInfo] = useState(null);
   const [gridSizeError, setGridSizeError] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const handleMapUploaded = useCallback((mapUrl, mapSize) => {
-    if (loadedMapInfo) {
-      dispatch(firebaseDeleteImage(loadedMapInfo.mapUrl));
-    }
-    setLoadedMapInfo({
-      mapUrl,
-      mapWidth: mapSize ? mapSize.width : null,
-      mapHeight: mapSize ? mapSize.height : null
-    });
-  }, [loadedMapInfo, dispatch]);
+  const handleMapUploaded = useCallback(
+    (mapUrl, mapSize) => {
+      if (loadedMapInfo) {
+        dispatch(firebaseDeleteImage(loadedMapInfo.mapUrl));
+      }
+      setLoadedMapInfo({
+        mapUrl,
+        mapWidth: mapSize ? mapSize.width : null,
+        mapHeight: mapSize ? mapSize.height : null
+      });
+    },
+    [loadedMapInfo, dispatch]
+  );
 
   const handleConfirmNewMap = useCallback(
-    close => {
+    (close) => {
       setGridSizeError(false);
       if (loadedMapInfo) {
         if (
@@ -70,8 +73,8 @@ const LoadMap = ({ onNewMapLoaded}) => {
       }
       close();
     },
-    [loadedMapInfo, dispatch],
-  )
+    [loadedMapInfo, dispatch]
+  );
 
   return (
     <Popup
@@ -81,9 +84,9 @@ const LoadMap = ({ onNewMapLoaded}) => {
       closeOnEscape={false}
       closeOnDocumentClick={false}
       modal
-      contentStyle={{ width: 'auto', zIndex: "100" }}
+      contentStyle={{ width: 'auto', zIndex: '100' }}
     >
-      {close => (
+      {(close) => (
         <div className={classes.PopupContainer}>
           <div className={classes.PopupHeader}>Load new map</div>
           <div>
@@ -117,7 +120,7 @@ const LoadMap = ({ onNewMapLoaded}) => {
               min={1}
               max={1000}
               value={gridWidth}
-              onChange={event => setGridWidth(event.target.value)}
+              onChange={(event) => setGridWidth(event.target.value)}
             />
             <div> x </div>
             <label htmlFor="gridHeight">H:</label>
@@ -130,7 +133,7 @@ const LoadMap = ({ onNewMapLoaded}) => {
               min={1}
               max={1000}
               value={gridHeight}
-              onChange={event => setGridHeight(event.target.value)}
+              onChange={(event) => setGridHeight(event.target.value)}
             />
           </ItemsRow>
           {gridSizeError ? (

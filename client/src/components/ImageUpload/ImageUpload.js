@@ -6,7 +6,7 @@ import Error from '../UI/Errors/Error/Error';
 import classes from './ImageUpload.module.css';
 import ItemsRow from '../UI/ItemsRow/ItemsRow';
 import Popup from 'reactjs-popup';
-import {firebaseUploadImage} from '../Firebase/firebaseMiddleware';
+import {firebaseUploadImage} from '../../store/firebase/firebaseMiddleware';
 
 const ImageUpload = ({
   buttonClassName,

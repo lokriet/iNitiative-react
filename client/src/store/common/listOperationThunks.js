@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { firebaseObtainIdToken } from "../../components/Firebase/firebaseMiddleware";
+import { firebaseObtainIdToken } from "../firebase/firebaseMiddleware";
 import get from 'lodash/get';
 import ErrorType from "../../util/error";
 import constants from "../../util/constants";
@@ -29,7 +29,6 @@ export const parseItemOperationError = async (response) => {
     };
   }
 };
-
 
 export const createFetchItemsThunk = (slicePath, api, withToken=true) => createAsyncThunk(
   `${slicePath.replace('.', '/')}/fetchItems`,

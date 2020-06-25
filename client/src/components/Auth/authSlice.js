@@ -5,7 +5,7 @@ import {
   firebaseSignInWithCustomToken,
   firebaseSignOut,
   firebaseObtainIdToken
-} from '../Firebase/firebaseMiddleware';
+} from '../../store/firebase/firebaseMiddleware';
 
 const initialState = {
   error: null,

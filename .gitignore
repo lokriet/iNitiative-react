@@ -45,3 +45,4 @@ encounters.json
 templates.json
 /server/nodemon.json
 client/src/components/Firebase/firebaseConfig.js
+client/src/store/Firebase/firebaseConfig.js

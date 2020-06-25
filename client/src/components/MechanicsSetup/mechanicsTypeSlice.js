@@ -1,6 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import { createItemsSlice } from './itemsSlice';
-import { itemsApi } from '../../api/itemsApi';
+import { itemsApi } from './itemsApi';
 
 export const createMechanicsTypeSlice = (typeName) => {
   const homebrewSlice = createItemsSlice(

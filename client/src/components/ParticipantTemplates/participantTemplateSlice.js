@@ -7,11 +7,11 @@ import {
 import {
   createThunks,
   parseItemOperationError
-} from '../../common/store/listOperationThunks';
-import { participantTemplateApi } from '../../api/participantTemplateApi';
-import { firebaseObtainIdToken } from '../Firebase/firebaseMiddleware';
+} from '../../store/common/listOperationThunks';
+import { participantTemplateApi } from './participantTemplateApi';
+import { firebaseObtainIdToken } from '../../store/firebase/firebaseMiddleware';
 import { isEmpty } from '../../util/helper-methods';
-import * as actions from '../../store/actions';
+import { cleanUpAvatarUrls } from '../../store/common/commonSlice';
 
 const api = participantTemplateApi();
 const { fetchItems, fetchItem, addItem, updateItem } = createThunks(
@@ -44,7 +44,7 @@ export const deleteTemplate = createAsyncThunk(
     const response = await api.deleteItem(template._id, idToken);
     if (response.ok) {
       if (!isEmpty(template.avatarUrl)) {
-        thunkApi.dispatch(actions.cleanUpAvatarUrls([template.avatarUrl]));
+        thunkApi.dispatch(cleanUpAvatarUrls([template.avatarUrl]));
       }
       return template._id;
     } else {

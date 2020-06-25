@@ -14,7 +14,7 @@ import classes from './MapDetails.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { sum } from './Map/AreaEffects/aoe-utils';
-import { firebaseDeleteImage } from '../../../Firebase/firebaseMiddleware';
+import { firebaseDeleteImage } from '../../../../store/firebase/firebaseMiddleware';
 
 const MapDetails = () => {
   const saveError = useSelector(state => state.encounter.operationError);
