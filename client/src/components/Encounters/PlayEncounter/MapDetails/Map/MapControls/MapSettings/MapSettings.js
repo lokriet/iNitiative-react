@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 
 import classes from './MapSettings.module.css';
 import ItemsRow from '../../../../../../UI/ItemsRow/ItemsRow';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import InlineInput from '../../../../../../UI/Form/Input/InlineInput/InlineInput';
 import { isEmpty } from '../../../../../../../util/helper-methods';
+import { selectEditedEncounter } from '../../../../../encounterSlice';
 
-const MapSettings = ({ editedEncounter, onSettingsChanged }) => {
+const MapSettings = ({ onSettingsChanged }) => {
+  const editedEncounter = useSelector(selectEditedEncounter);
+
   const handleSettingsChanged = useCallback(
     (settingName, settingValue) => {
       onSettingsChanged({ [settingName]: settingValue });
@@ -119,10 +122,4 @@ MapSettings.propTypes = {
   onSettingsChanged: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(MapSettings);
+export default MapSettings;

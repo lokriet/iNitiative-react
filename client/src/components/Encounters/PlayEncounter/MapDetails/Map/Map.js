@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { isEmpty } from '../../../../../util/helper-methods';
 import StringIdGenerator from '../../../../../util/string-id-generator';
@@ -12,6 +12,7 @@ import classes from './Map.module.css';
 import AreaEffectEdit from './AreaEffects/AreaEffectEdit/AreaEffectEdit';
 import MapControls from './MapControls/MapControls';
 import AreaEffects from './AreaEffects/AreaEffects';
+import {selectEditedEncounter} from '../../../encounterSlice';
 
 const isOverMap = (mouseEvent, mapRect) => {
   return (
@@ -30,7 +31,6 @@ const getMapCoords = (mapRect, avatarRect) => {
 };
 
 const Map = ({
-  editedEncounter,
   onMapParticipantAdded,
   onMapParticipantChanged,
   onMapParticipantDeleted,
@@ -48,6 +48,8 @@ const Map = ({
   const [mapImageLoaded, setMapImageLoaded] = useState(false);
   const [dragFromCell, setDragFromCell] = useState(null);
   const participantsContainerRef = useRef();
+
+  const editedEncounter = useSelector(selectEditedEncounter);
 
   const hasGrid = useCallback(() => {
     return (
@@ -324,6 +326,7 @@ const Map = ({
 
                 {editedAreaEffect ? (
                   <AreaEffectEdit
+                    snapToGrid={editedEncounter.map.snapToGrid}
                     areaEffect={editedAreaEffect}
                     gridCellSize={gridCellSize}
                     mapImageSize={mapImageSize}
@@ -365,10 +368,4 @@ Map.propTypes = {
   onAreaEffectDeleted: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(Map);
+export default Map;

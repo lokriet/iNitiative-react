@@ -1,13 +1,17 @@
 import React, { Fragment } from 'react';
 import classes from './NavigationItems.module.css';
 import NavigationItem from './NavigationItem/NavigationItem';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Popup from 'reactjs-popup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { selectIsAuthenticated, selectIsAdmin } from '../../Auth/authSlice';
 
-const NavigationItems = props => {
-  const auth = props.isAuthenticated ? (
+const NavigationItems = () => {
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAdmin = useSelector(selectIsAdmin);
+
+  const auth = isAuthenticated ? (
     <NavigationItem link="/logout">Logout</NavigationItem>
   ) : (
     <Fragment>
@@ -21,10 +25,10 @@ const NavigationItems = props => {
       <NavigationItem link="/" exact>
         Home
       </NavigationItem>
-      {props.isAdmin ? (
+      {isAdmin ? (
         <NavigationItem link="/admin">Admin</NavigationItem>
       ) : null}
-      {props.isAuthenticated ? (
+      {isAuthenticated ? (
         <>
           <NavigationItem link="/homebrew">Homebrew</NavigationItem>
           <NavigationItem link="/templates">Characters</NavigationItem>
@@ -67,11 +71,4 @@ const NavigationItems = props => {
   );
 };
 
-const mapStateToProps = state => {
-  return {
-    isAuthenticated: state.auth.token !== null,
-    isAdmin: state.auth.user && state.auth.user.isAdmin
-  };
-};
-
-export default connect(mapStateToProps)(NavigationItems);
+export default NavigationItems;

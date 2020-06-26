@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import EditAreaEffectForm from './EditAreaEffectForm/EditAreaEffectForm';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { isEmpty } from '../../../../../../../util/helper-methods';
 import Color from '../../../../../../UI/Color/Color';
 import classes from './AreaEffectsSetup.module.css';
@@ -11,9 +11,9 @@ import IconButton from '../../../../../../UI/Form/Button/IconButton/IconButton';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import Popup from 'reactjs-popup';
 import Button from '../../../../../../UI/Form/Button/Button';
+import { selectEditedEncounter } from '../../../../../encounterSlice';
 
 const AreaEffectsSetup = ({
-  editedEncounter,
   editedAreaEffect,
   onAreaEffectChanged,
   onAreaEffectSaved,
@@ -22,6 +22,8 @@ const AreaEffectsSetup = ({
   const [showForm, setShowForm] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
+
+  const editedEncounter = useSelector(selectEditedEncounter);
 
   const handleAreaEffectChanged = useCallback(
     partialUpdate => {
@@ -159,10 +161,4 @@ AreaEffectsSetup.propTypes = {
   onAreaEffectDeleted: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(AreaEffectsSetup);
+export default AreaEffectsSetup;

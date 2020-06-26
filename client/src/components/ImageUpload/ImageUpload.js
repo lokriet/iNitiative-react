@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import ImageTools from '../../util/image-tools';
+import ImageTools from './image-tools';
 import { useSelector, useDispatch } from 'react-redux';
 import Error from '../UI/Errors/Error/Error';
 import classes from './ImageUpload.module.css';

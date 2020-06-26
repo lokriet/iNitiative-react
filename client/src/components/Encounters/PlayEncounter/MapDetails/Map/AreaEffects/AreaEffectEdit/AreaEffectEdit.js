@@ -6,14 +6,13 @@ import classes from './AreaEffectEdit.module.css';
 import rotateCursor from '../../../../../../../assets/images/rotate.png';
 import * as aoe from '../aoe-utils';
 import AreaEffect from '../AreaEffect/AreaEffect';
-import { connect } from 'react-redux';
 
 const AreaEffectEdit = ({
+  snapToGrid,
   areaEffect,
   gridCellSize,
   mapImageSize,
-  onChange,
-  editedEncounter
+  onChange
 }) => {
   const getShapeWidth = useCallback(() => {
     return (
@@ -31,7 +30,7 @@ const AreaEffectEdit = ({
 
   const snapPosToGrid = useCallback(
     pos => {
-      if (editedEncounter.map.snapToGrid) {
+      if (snapToGrid) {
         const newPos = {
           x:
             pos.x -
@@ -45,7 +44,7 @@ const AreaEffectEdit = ({
         return pos;
       }
     },
-    [editedEncounter, gridCellSize]
+    [snapToGrid, gridCellSize]
   );
 
   const getPos = useCallback(() => {
@@ -229,16 +228,11 @@ const AreaEffectEdit = ({
 };
 
 AreaEffectEdit.propTypes = {
+  snapToGrid: PropTypes.bool,
   areaEffect: PropTypes.object.isRequired,
   gridCellSize: PropTypes.object,
   mapImageSize: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(AreaEffectEdit);
+export default AreaEffectEdit;

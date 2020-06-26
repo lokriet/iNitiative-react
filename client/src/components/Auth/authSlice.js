@@ -238,7 +238,8 @@ const authSlice = createSlice({
   }
 });
 
-const selectIsAuthenticated = (state) => state.auth.isAuthenticated != null;
+const selectIsAuthenticated = (state) => state.auth.token != null;
+const selectIsAdmin = (state) => state.auth.user && state.auth.user.isAdmin;
 
 //actions
 export {
@@ -255,4 +256,4 @@ export const setAuthRedirectPath = authSlice.actions.setAuthRedirectPath;
 export default authSlice.reducer;
 
 //selectors
-export { selectIsAuthenticated };
+export { selectIsAuthenticated, selectIsAdmin };

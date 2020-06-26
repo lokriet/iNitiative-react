@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import classes from './AreaEffects.module.css';
 import AreaEffect from './AreaEffect/AreaEffect';
 
@@ -36,10 +35,4 @@ AreaEffects.propTypes = {
   areaEffects: PropTypes.array.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(AreaEffects);
+export default AreaEffects;

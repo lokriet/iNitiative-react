@@ -4,9 +4,10 @@ import classes from './MapControls.module.css';
 import TabButton from '../../../../../UI/Form/Button/TabButton/TabButton';
 import ItemsRow from '../../../../../UI/ItemsRow/ItemsRow';
 import AddMapParticipant from '../AddMapParticipant/AddMapParticipant';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import MapSettings from './MapSettings/MapSettings';
 import AreaEffectsSetup from '../AreaEffects/AreaEffectsSetup/AreaEffectsSetup';
+import { selectEditedEncounter } from '../../../../encounterSlice';
 
 const ControlsView = {
   Settings: 'settings',
@@ -15,7 +16,6 @@ const ControlsView = {
 };
 
 const MapControls = ({
-  editedEncounter,
   onNewParticipantDropped,
   onMapSettingsChanged,
 
@@ -25,6 +25,7 @@ const MapControls = ({
   onAreaEffectDeleted
 }) => {
   const [selectedView, setSelectedView] = useState(null);
+  const editedEncounter = useSelector(selectEditedEncounter);
 
   const onSwitchView = useCallback(
     view => {
@@ -107,10 +108,4 @@ MapControls.propTypes = {
   onAreaEffectDeleted: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(MapControls);
+export default MapControls;

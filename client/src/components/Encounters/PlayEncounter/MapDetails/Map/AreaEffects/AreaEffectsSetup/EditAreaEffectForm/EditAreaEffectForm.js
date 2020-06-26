@@ -6,9 +6,10 @@ import Button from '../../../../../../../UI/Form/Button/Button';
 import classes from './EditAreaEffectForm.module.css';
 import useDebounce from '../../../../../../../../hooks/useDebounce';
 import ItemsRow from '../../../../../../../UI/ItemsRow/ItemsRow';
+import { selectEditedEncounter } from '../../../../../../encounterSlice';
 
 import { AreaEffectType } from '../../aoe-utils';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const typeOptions = [
   { value: AreaEffectType.Rectangle, label: 'Rectangle' },
@@ -21,8 +22,7 @@ const EditAreaEffectForm = ({
   onEdit,
   onCancel,
   onSave,
-  areaEffect,
-  editedEncounter
+  areaEffect
 }) => {
   const [editedId, setEditedId] = useState(
     areaEffect ? areaEffect._id || areaEffect._tempId : null
@@ -42,15 +42,17 @@ const EditAreaEffectForm = ({
 
   const [color, setColor] = useState(areaEffect ? areaEffect.color : '#ff0000');
 
+  const editedEncounter = useSelector(selectEditedEncounter);
   const [followingParticipantId, setFollowingParticipantId] = useState(
     areaEffect ? areaEffect.followingParticipantId : null
   );
-  const participantsOptions = editedEncounter.participants.filter(participant =>
-    editedEncounter.map.participantCoordinates.some(
-      participantCoordinate =>
-        participantCoordinate.participantId.toString() ===
-        participant._id.toString()
-    )
+  const participantsOptions = editedEncounter.participants.filter(
+    (participant) =>
+      editedEncounter.map.participantCoordinates.some(
+        (participantCoordinate) =>
+          participantCoordinate.participantId.toString() ===
+          participant._id.toString()
+      )
   );
 
   const [pauseUpdates, setPauseUpdates] = useState(false);
@@ -109,7 +111,7 @@ const EditAreaEffectForm = ({
     }, 1000);
   }, [areaEffect, editedId]);
 
-  const handleRadiusChanged = useCallback(radius => {
+  const handleRadiusChanged = useCallback((radius) => {
     setWidth(radius);
     setHeight(radius);
   }, []);
@@ -129,7 +131,7 @@ const EditAreaEffectForm = ({
   }, [color, height, width, type, name, onAdd, areaEffect]);
 
   const handleTypeChanged = useCallback(
-    option => {
+    (option) => {
       const newType = option.value;
       setType(newType);
 
@@ -149,7 +151,7 @@ const EditAreaEffectForm = ({
   );
 
   const handleColorChanged = useCallback(
-    event => {
+    (event) => {
       setColor(event.target.value);
       if (areaEffect) {
         onEdit({ color: event.target.value });
@@ -159,7 +161,7 @@ const EditAreaEffectForm = ({
   );
 
   const handleFollowingParticipantIdChanged = useCallback(
-    selectedParticipant => {
+    (selectedParticipant) => {
       const newValue = selectedParticipant ? selectedParticipant._id : null;
       setFollowingParticipantId(newValue);
       if (areaEffect) {
@@ -177,7 +179,7 @@ const EditAreaEffectForm = ({
           name="name"
           hidingBorder
           value={name}
-          onChange={event => setName(event.target.value)}
+          onChange={(event) => setName(event.target.value)}
         />
 
         <label htmlFor="type">Type</label>
@@ -185,7 +187,7 @@ const EditAreaEffectForm = ({
           isObjectBased={false}
           name="type"
           options={typeOptions}
-          value={typeOptions.find(item => item.value === type)}
+          value={typeOptions.find((item) => item.value === type)}
           onChange={handleTypeChanged}
         />
 
@@ -206,7 +208,7 @@ const EditAreaEffectForm = ({
               name="width"
               hidingBorder
               value={width}
-              onChange={event => setWidth(event.target.value)}
+              onChange={(event) => setWidth(event.target.value)}
             />
 
             <label htmlFor="height">Height</label>
@@ -216,7 +218,7 @@ const EditAreaEffectForm = ({
               name="height"
               hidingBorder
               value={height}
-              onChange={event => setHeight(event.target.value)}
+              onChange={(event) => setHeight(event.target.value)}
             />
           </>
         ) : type === AreaEffectType.Circle ? (
@@ -228,7 +230,7 @@ const EditAreaEffectForm = ({
               name="radius"
               hidingBorder
               value={width}
-              onChange={event => handleRadiusChanged(event.target.value)}
+              onChange={(event) => handleRadiusChanged(event.target.value)}
             />
           </>
         ) : (
@@ -240,7 +242,7 @@ const EditAreaEffectForm = ({
               name="length"
               hidingBorder
               value={width}
-              onChange={event => handleRadiusChanged(event.target.value)}
+              onChange={(event) => handleRadiusChanged(event.target.value)}
             />
           </>
         )}
@@ -252,7 +254,7 @@ const EditAreaEffectForm = ({
           value={
             followingParticipantId
               ? participantsOptions.find(
-                  option =>
+                  (option) =>
                     option._id.toString() === followingParticipantId.toString()
                 )
               : null
@@ -284,10 +286,4 @@ EditAreaEffectForm.propTypes = {
   onSave: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-  return {
-    editedEncounter: state.encounter.editedEncounter
-  };
-};
-
-export default connect(mapStateToProps)(EditAreaEffectForm);
+export default EditAreaEffectForm;
