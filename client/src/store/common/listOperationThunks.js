@@ -4,11 +4,11 @@ import get from 'lodash/get';
 import ErrorType from "../../util/error";
 import constants from "../../util/constants";
 
-export const parseItemOperationError = async (response) => {
+export const parseItemOperationError = async (response, defaultMessage) => {
   if (!response) {
     return {
       type: ErrorType.INTERNAL_SERVER_ERROR,
-      message: 'Internal error occured. Please try again.'
+      message: defaultMessage || 'Internal error occured. Please try again.'
     };
   } else  if (response.status === 422) {
     const responseData = await response.json();
@@ -20,12 +20,12 @@ export const parseItemOperationError = async (response) => {
     const responseData = await response.json();
     return {
       type: ErrorType[response.status],
-      message: responseData.message
+      message: defaultMessage || responseData.message
     };
   } else {
     return {
       type: ErrorType.INTERNAL_SERVER_ERROR,
-      message: 'Internal error occured. Please try again.'
+      message: defaultMessage || 'Internal error occured. Please try again.'
     };
   }
 };

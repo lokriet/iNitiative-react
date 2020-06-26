@@ -1,10 +1,10 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useDispatch, connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
-import {setAuthRedirectPath, authInit, authenticate} from '../authSlice';
+import {  authInit, authenticate, selectIsAuthenticated } from '../authSlice';
 import ErrorType from '../../../util/error';
 
 import Button from '../../UI/Form/Button/Button';
@@ -13,13 +13,16 @@ import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 import classes from './Login.module.css';
 import Error from '../../UI/Errors/Error/Error';
 
-const Login = (props) => {
-  const [redirectPath] = useState(props.redirectPath);
+const Login = () => {
+  const { loading, error, redirectPath: storeRedirectPath } = useSelector((state) => state.auth);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  const [redirectPath] = useState(storeRedirectPath);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setAuthRedirectPath('/'));
-    dispatch(authInit());
+    dispatch(authInit({resetRedirectPath: true}));
   }, [dispatch]);
 
   const handleSubmit = useCallback(
@@ -38,10 +41,10 @@ const Login = (props) => {
 
   let form = null;
 
-  if (!props.isAuthenticated) {
+  if (!isAuthenticated) {
     let operationErrorMessage = null;
-    if (props.error && props.error.type !== ErrorType.VALIDATION_ERROR) {
-      operationErrorMessage = <Error>{props.error.message}</Error>;
+    if (error && error.type !== ErrorType.VALIDATION_ERROR) {
+      operationErrorMessage = <Error>{error.message}</Error>;
     }
 
     form = (
@@ -70,7 +73,7 @@ const Login = (props) => {
               type="text"
               placeholder="E-mail"
               autoComplete="username"
-              serverError={props.error}
+              serverError={error}
               component={FormikInput}
             />
 
@@ -79,7 +82,7 @@ const Login = (props) => {
               type="password"
               placeholder="Password"
               autoComplete="current-password"
-              serverError={props.error}
+              serverError={error}
               component={FormikInput}
             />
 
@@ -98,7 +101,7 @@ const Login = (props) => {
 
             {operationErrorMessage}
 
-            <Button type="submit" disabled={props.loading}>
+            <Button type="submit" disabled={loading}>
               Login
             </Button>
 
@@ -112,16 +115,7 @@ const Login = (props) => {
     );
   }
 
-  return props.isAuthenticated ? <Redirect to={redirectPath} /> : form;
+  return isAuthenticated ? <Redirect to={redirectPath} /> : form;
 };
 
-const mapStateToProps = (state) => {
-  return {
-    loading: state.auth.loading,
-    error: state.auth.error,
-    isAuthenticated: state.auth.token != null,
-    redirectPath: state.auth.redirectPath
-  };
-};
-
-export default connect(mapStateToProps)(Login);
+export default Login;

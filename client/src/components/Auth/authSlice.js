@@ -1,11 +1,179 @@
-import { createSlice, createAction } from '@reduxjs/toolkit';
-import constants from '../../util/constants';
-import ErrorType from '../../util/error';
+import {
+  createSlice,
+  createAction,
+  createAsyncThunk
+} from '@reduxjs/toolkit';
 import {
   firebaseSignInWithCustomToken,
   firebaseSignOut,
   firebaseObtainIdToken
 } from '../../store/firebase/firebaseMiddleware';
+import { createAuthApi } from './authApi';
+import { parseItemOperationError } from '../../store/common/listOperationThunks';
+
+const authApi = createAuthApi();
+
+const authenticationErrorMessage =
+  'Internal server error occured while authenticating. Please try again.';
+const authenticate = createAsyncThunk(
+  '/auth/authenticate',
+  async ({ email, password, rememberMe, username, isRegister }, thunkApi) => {
+    let response;
+    if (isRegister) {
+      response = await authApi.register(username, email, password);
+    } else {
+      response = await authApi.login(email, password);
+    }
+
+    if (response.ok) {
+      const responseData = await response.json();
+
+      if (rememberMe) {
+        localStorage.setItem('token', responseData.data.token);
+      } else {
+        localStorage.removeItem('token');
+      }
+
+      await thunkApi.dispatch(
+        firebaseSignInWithCustomToken(responseData.data.token)
+      );
+      return {
+        token: responseData.data.token,
+        user: responseData.data.user
+      };
+    } else {
+      const error = await parseItemOperationError(response, authenticationErrorMessage);
+      return thunkApi.rejectWithValue(error);
+    }
+  }
+);
+
+const resetStore = createAction('resetStore');
+const logout = createAsyncThunk('auth/logout', async (_, thunkApi) => {
+  localStorage.removeItem('token');
+  thunkApi.dispatch(firebaseSignOut());
+  thunkApi.dispatch(resetStore());
+  return true;
+});
+
+const authCheckInitialState = createAsyncThunk(
+  'auth/checkInitialState',
+  async (_, thunkApi) => {
+    const token = localStorage.getItem('token');
+
+    if (token === null) {
+      return true;
+    } else {
+      try {
+        await thunkApi.dispatch(firebaseSignInWithCustomToken(token));
+      } catch (error) {
+        localStorage.removeItem('token');
+        return true;
+      }
+
+      thunkApi.dispatch(autoLogin(token));
+      return false;
+    }
+  }
+);
+
+const autoLogin = createAsyncThunk(
+  'auth/autoLogin',
+  async (token, thunkApi) => {
+    await thunkApi.dispatch(firebaseObtainIdToken());
+    const idToken = thunkApi.getState().firebase.idToken;
+
+    const response = await authApi.fetchUserInfo(idToken);
+    if (response.ok) {
+      const responseData = await response.json();
+      return {
+        success: true,
+        token,
+        user: responseData
+      };
+    } else {
+      return {
+        success: false
+      };
+    }
+  }
+);
+
+const requestPasswordResetErrorMessage =
+  'Password reset request failed. Please check your internet connection and make sure you are using the correct email address';
+const requestPasswordResetThunk = createAsyncThunk(
+  'auth/requestPasswordReset',
+  async ({ email, onOperationDone }, thunkApi) => {
+    const response = await authApi.requestPasswordReset(email);
+
+    if (response.ok) {
+      onOperationDone(true);
+      return true;
+    } else {
+      const error = await parseItemOperationError(
+        response,
+        requestPasswordResetErrorMessage
+      );
+      onOperationDone(false);
+      return thunkApi.rejectWithValue(error);
+    }
+  }
+);
+const requestPasswordReset = (email, onOperationDone) =>
+  requestPasswordResetThunk({ email, onOperationDone });
+
+const resetPasswordErrorMessage =
+  'Password reset failed. Please check your internet connection and make sure you are using the latest requested link from your inbox';
+const resetPasswordThunk = createAsyncThunk(
+  'auth/resetPassword',
+  async ({ password, resetPasswordToken, onOperationDone }, thunkApi) => {
+    const response = await authApi.resetPassword(password, resetPasswordToken);
+    if (response.ok) {
+      onOperationDone(true);
+      return true;
+    } else {
+      const error = await parseItemOperationError(
+        response,
+        resetPasswordErrorMessage
+      );
+      onOperationDone(false);
+      return thunkApi.rejectWithValue(error);
+    }
+  }
+);
+const resetPassword = (password, resetPasswordToken, onOperationDone) =>
+  resetPasswordThunk({ password, resetPasswordToken, onOperationDone });
+
+const applyAuthInit = (state, action) => {
+  state.loading = false;
+  state.error = null;
+};
+
+const authSuccess = (state, action) => {
+  state.loading = false;
+  state.error = null;
+  state.token = action.payload.token;
+  state.user = action.payload.user;
+};
+
+const authCheckInitialStateDone = (state, action) => {
+  state.initialAuthCheckDone = true;
+};
+
+const authOperationStart = (state, action) => {
+  state.error = null;
+  state.loading = true;
+};
+
+const authOperationSuccess = (state, action) => {
+  state.error = null;
+  state.loading = false;
+};
+
+const authOperationFailure = (state, action) => {
+  state.error = action.payload;
+  state.loading = false;
+};
 
 const initialState = {
   error: null,
@@ -20,277 +188,71 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    authInit(state, action) {
-      state.loading = false;
-      state.error = null;
+    authInit: (state, action) => {
+      applyAuthInit(state, action);
+      if (action.payload.resetRedirectPath) {
+        state.redirectPath = '/'
+      }
     },
-
-    authStart(state, action) {
-      state.error = null;
-      state.loading = true;
-    },
-
-    authSuccess(state, action) {
-      state.loading = false;
-      state.error = null;
-      state.token = action.payload.token;
-      state.user = action.payload.user;
-    },
-
-    authFailure(state, action) {
-      state.token = null;
-      state.user = null;
-      state.error = action.payload;
-      state.loading = false;
-    },
-
-    logoutSuccess(state, action) {
-      state.token = null;
-      state.user = null;
-      state.error = null;
-      state.loading = false;
-    },
-
-    setAuthRedirectPath(state, action) {
+    setAuthRedirectPath: (state, action) => {
       state.redirectPath = action.payload;
-    },
-
-    authCheckInitialStateDone(state, action) {
-      state.initialAuthCheckDone = true;
-    },
-
-    authOperationStart(state, action) {
-      state.error = null;
-      state.loading = true;
-    },
-
-    authOperationSuccess(state, action) {
-      state.error = null;
-      state.loading = false;
-    },
-
-    authOperationFailure(state, action) {
+    }
+  },
+  extraReducers: {
+    [authenticate.pending]: applyAuthInit,
+    [authenticate.fulfilled]: authSuccess,
+    [authenticate.rejected]: (state, action) => {
+      state.token = null;
+      state.user = null;
       state.error = action.payload;
       state.loading = false;
-    }
+    },
+
+    [logout.fulfilled]: (state, action) => {
+      state.token = null;
+      state.user = null;
+      state.error = null;
+      state.loading = false;
+    },
+
+    [authCheckInitialState.fulfilled]: (state, action) => {
+      if (action.payload) {
+        authCheckInitialStateDone(state, action);
+      }
+    },
+
+    [autoLogin.fulfilled]: (state, action) => {
+      if (action.payload.success) {
+        authSuccess(state, action);
+      }
+      authCheckInitialStateDone(state, action);
+    },
+
+    [requestPasswordResetThunk.pending]: authOperationStart,
+    [requestPasswordResetThunk.fulfilled]: authOperationSuccess,
+    [requestPasswordResetThunk.rejected]: authOperationFailure,
+
+    [resetPasswordThunk.pending]: authOperationStart,
+    [resetPasswordThunk.fulfilled]: authOperationSuccess,
+    [resetPasswordThunk.rejected]: authOperationFailure
   }
 });
 
+const selectIsAuthenticated = (state) => state.auth.isAuthenticated != null;
+
+//actions
+export {
+  authCheckInitialState,
+  authenticate,
+  logout,
+  requestPasswordReset,
+  resetPassword
+};
+export const authInit = authSlice.actions.authInit;
+export const setAuthRedirectPath = authSlice.actions.setAuthRedirectPath;
+
+//reducer
 export default authSlice.reducer;
 
-export const { authInit, setAuthRedirectPath } = authSlice.actions;
-
-const internalErrorMessage =
-  'Internal server error occured while authenticating. Please try again.';
-
-export const authenticate = ({
-  email,
-  password,
-  isRegister,
-  rememberMe,
-  username
-}) => async (dispatch, getState) => {
-  dispatch(authSlice.actions.authInit());
-  try {
-    const url = isRegister
-      ? `${constants.serverUrl}/auth/signup`
-      : `${constants.serverUrl}/auth/signin`;
-
-    const body = {
-      email,
-      password
-    };
-    if (isRegister) {
-      body.username = username;
-    }
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    const responseData = await response.json();
-
-    if (response.status === 500 || response.status === 401) {
-      dispatch(
-        authSlice.actions.authFailure({
-          type: ErrorType[response.status],
-          message:
-            response.status === 401
-              ? responseData.message
-              : internalErrorMessage
-        })
-      );
-    } else if (response.status === 422) {
-      dispatch(
-        authSlice.actions.authFailed({
-          type: ErrorType[response.status],
-          message: responseData.message
-        })
-      );
-    } else if (response.ok) {
-      if (rememberMe) {
-        localStorage.setItem('token', responseData.data.token);
-      } else {
-        localStorage.removeItem('token');
-      }
-      await dispatch(firebaseSignInWithCustomToken(responseData.data.token));
-      dispatch(
-        authSlice.actions.authSuccess({
-          token: responseData.data.token,
-          user: responseData.data.user
-        })
-      );
-    }
-  } catch (error) {
-    console.log(error);
-    dispatch(
-      authSlice.actions.authFailure({
-        type: ErrorType.INTERNAL_CLIENT_ERROR,
-        message: internalErrorMessage
-      })
-    );
-  }
-};
-
-const resetStore = createAction('resetStore');
-
-export const logout = () => async (dispatch, getState) => {
-  localStorage.removeItem('token');
-  dispatch(firebaseSignOut());
-
-  dispatch(resetStore());
-
-  dispatch(authSlice.actions.logoutSuccess());
-};
-
-export const authCheckInitialState = () => async (dispatch, getState) => {
-  const token = localStorage.getItem('token');
-
-  if (token === null) {
-    dispatch(authSlice.actions.authCheckInitialStateDone());
-  } else {
-    try {
-      await dispatch(firebaseSignInWithCustomToken(token));
-    } catch (error) {
-      localStorage.removeItem('token');
-      dispatch(authSlice.actions.authCheckInitialStateDone());
-      return;
-    }
-
-    dispatch(autoLogin(token));
-  }
-};
-
-export const autoLogin = (token) => async (dispatch, getState) => {
-  try {
-    await dispatch(firebaseObtainIdToken());
-    const firebaseToken = getState().firebase.idToken;
-    // console.log('got firebase token', firebaseToken);
-    const response = await fetch(`${constants.serverUrl}/users/userinfo`, {
-      headers: {
-        Authorization: `Bearer ${firebaseToken}`
-      }
-    });
-
-    const responseData = await response.json();
-    dispatch(
-      authSlice.actions.authSuccess({
-        token,
-        user: responseData
-      })
-    );
-  } catch (error) {
-    // meow!
-  } finally {
-    dispatch(authSlice.actions.authCheckInitialStateDone());
-  }
-};
-
-export const requestPasswordReset = (email, onOperationDone) => async (
-  dispatch
-) => {
-  const errorMessage =
-    'Password reset request failed. Please check your internet connection and make sure you are using the correct email address';
-  try {
-    dispatch(authSlice.actions.authOperationStart());
-    const response = await fetch(
-      `${constants.serverUrl}/auth/sendPasswordResetEmail`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email
-        })
-      }
-    );
-    if (response.ok) {
-      dispatch(authSlice.actions.authOperationSuccess());
-      onOperationDone(true);
-    } else {
-      dispatch(
-        authSlice.actions.authOperationFailed({
-          type: ErrorType[response.status],
-          message: errorMessage
-        })
-      );
-      onOperationDone(false);
-    }
-  } catch (error) {
-    dispatch(
-      authSlice.actions.authOperationFailed({
-        type: ErrorType.INTERNAL_CLIENT_ERROR,
-        message: errorMessage
-      })
-    );
-    onOperationDone(false);
-  }
-};
-
-export const resetPassword = (
-  password,
-  resetPasswordToken,
-  onOperationDone
-) => async (dispatch) => {
-  const errorMessage =
-    'Password reset failed. Please check your internet connection and make sure you are using the latest requested link from your inbox';
-
-  try {
-    dispatch(authSlice.actions.authOperationStart());
-    const response = await fetch(`${constants.serverUrl}/auth/resetPassword`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        password: password,
-        resetPasswordToken: resetPasswordToken
-      })
-    });
-    if (response.ok) {
-      dispatch(authSlice.actions.authOperationSuccess());
-      onOperationDone(true);
-    } else {
-      dispatch(
-        authSlice.actions.authOperationFailed({
-          type: ErrorType[response.status],
-          message: errorMessage
-        })
-      );
-      onOperationDone(false);
-    }
-  } catch (error) {
-    dispatch(
-      authSlice.actions.authOperationFailed({
-        type: ErrorType.INTERNAL_CLIENT_ERROR,
-        message: errorMessage
-      })
-    );
-    onOperationDone(false);
-  }
-};
+//selectors
+export { selectIsAuthenticated };

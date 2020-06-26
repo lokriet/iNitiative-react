@@ -1,33 +1,33 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classes from './PasswordReset.module.css';
 import { useParams, Link } from 'react-router-dom';
-import { useDispatch, connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import {authInit, resetPassword} from '../authSlice';
+import { authInit, resetPassword } from '../authSlice';
 import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 import Button from '../../UI/Form/Button/Button';
 import Error from '../../UI/Errors/Error/Error';
 
-const PasswordReset = (props) => {
+const PasswordReset = () => {
   const { resetPasswordToken } = useParams();
+
   const [requestSent, setRequestSent] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+
+  const { error, loading } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(authInit());
+    dispatch(authInit({ resetRedirectPath: false }));
   }, [dispatch]);
 
   const handleSubmit = useCallback(
     (formValues) => {
       setRequestSent(true);
       dispatch(
-        resetPassword(
-          formValues.password,
-          resetPasswordToken,
-          setResetSuccess
-        )
+        resetPassword(formValues.password, resetPasswordToken, setResetSuccess)
       );
     },
     [dispatch, resetPasswordToken]
@@ -68,7 +68,7 @@ const PasswordReset = (props) => {
               type="password"
               placeholder="New password"
               autoComplete="new-password"
-              serverError={props.error}
+              serverError={error}
               component={FormikInput}
               className={classes.Input}
             />
@@ -78,7 +78,7 @@ const PasswordReset = (props) => {
               type="password"
               autoComplete="new-password"
               placeholder="Confirm password"
-              serverError={props.error}
+              serverError={error}
               component={FormikInput}
               className={classes.Input}
             />
@@ -87,19 +87,19 @@ const PasswordReset = (props) => {
               <Link to="/login">
                 <Button
                   type="button"
-                  disabled={props.loading}
+                  disabled={loading}
                   className={classes.SpacedButton}
                 >
                   Cancel
                 </Button>
               </Link>
 
-              <Button type="submit" disabled={props.loading}>
+              <Button type="submit" disabled={loading}>
                 Change password
               </Button>
             </div>
 
-            {props.error ? <Error>{props.error.message}</Error> : null}
+            {error ? <Error>{error.message}</Error> : null}
           </Form>
         </Formik>
       </>
@@ -108,13 +108,4 @@ const PasswordReset = (props) => {
   return <div className={classes.Container}>{view}</div>;
 };
 
-PasswordReset.propTypes = {};
-
-const mapStateToProps = (state) => {
-  return {
-    error: state.auth.error,
-    loading: state.auth.loading
-  };
-};
-
-export default connect(mapStateToProps)(PasswordReset);
+export default PasswordReset;

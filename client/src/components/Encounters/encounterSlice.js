@@ -336,6 +336,8 @@ const selectEditedEncounter = (state) =>
 const selectLatestEncounter = (state) =>
   entitySelectors.selectById(state.encounter, state.encounter.latestItemId);
 
+const selectAll = (state) => entitySelectors.selectAll(state.encounter);
+
 // reducer
 export default encounterSlice.reducer;
 
@@ -354,5 +356,4 @@ export const resetEditedEncounter = encounterSlice.actions.resetEditedEncounter;
 export const resetLatestEncounter = encounterSlice.actions.resetLatestEncounter;
 
 // selectors
-export { selectEditedEncounter, selectLatestEncounter };
-export const selectAll = (state) => entitySelectors.selectAll(state.encounter);
+export { selectEditedEncounter, selectLatestEncounter, selectAll };

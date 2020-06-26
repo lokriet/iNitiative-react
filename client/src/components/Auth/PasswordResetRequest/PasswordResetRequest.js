@@ -1,30 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classes from './PasswordResetRequest.module.css';
-import { useLocation, Link } from 'react-router-dom';
-import { connect, useDispatch } from 'react-redux';
-import {authInit, requestPasswordReset} from '../authSlice';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { authInit, requestPasswordReset } from '../authSlice';
 import { Formik, Form, Field } from 'formik';
 import Error from '../../UI/Errors/Error/Error';
 import * as Yup from 'yup';
 import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 import Button from '../../UI/Form/Button/Button';
+import useQueryParams from '../../../hooks/useQueryParams';
 
-const PasswordResetRequest = (props) => {
-  const [query] = useState(new URLSearchParams(useLocation().search));
+const PasswordResetRequest = () => {
+  const [queryParams] = useQueryParams();
   const [requestSent, setRequestSent] = useState(false);
   const [requestSuccess, setRequestSuccess] = useState(false);
+
+  const { error, loading } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(authInit());
+    dispatch(authInit({ resetRedirectPath: false }));
   }, [dispatch]);
 
   const handleSubmit = useCallback(
     (formValues) => {
       setRequestSent(true);
-      dispatch(
-        requestPasswordReset(formValues.email, setRequestSuccess)
-      );
+      dispatch(requestPasswordReset(formValues.email, setRequestSuccess));
     },
     [dispatch, setRequestSuccess]
   );
@@ -38,7 +40,9 @@ const PasswordResetRequest = (props) => {
           Please check your inbox for the instructions about how to complete the
           process.
         </p>
-        <Link to="/login"><Button className={classes.Button}>Return to login page</Button></Link>
+        <Link to="/login">
+          <Button className={classes.Button}>Return to login page</Button>
+        </Link>
       </>
     );
   } else {
@@ -52,7 +56,7 @@ const PasswordResetRequest = (props) => {
         </p>
         <Formik
           initialValues={{
-            email: query.get('email')
+            email: queryParams.get('email')
           }}
           validationSchema={Yup.object({
             email: Yup.string()
@@ -71,17 +75,21 @@ const PasswordResetRequest = (props) => {
               className={classes.EmailInput}
             />
 
-            <Button type="submit" disabled={props.loading} className={classes.Button}>
+            <Button type="submit" disabled={loading} className={classes.Button}>
               Reset password
             </Button>
 
             <Link to="/login">
-              <Button type="button" disabled={props.loading}  className={classes.Button} >
+              <Button
+                type="button"
+                disabled={loading}
+                className={classes.Button}
+              >
                 Cancel
               </Button>
             </Link>
 
-            {props.error ? <Error>{props.error.message}</Error> : null}
+            {error ? <Error>{error.message}</Error> : null}
           </Form>
         </Formik>
       </div>
@@ -91,13 +99,4 @@ const PasswordResetRequest = (props) => {
   return <div className={classes.Container}>{view}</div>;
 };
 
-PasswordResetRequest.propTypes = {};
-
-const mapStateToProps = (state) => {
-  return {
-    error: state.auth.error,
-    loading: state.auth.loading
-  };
-};
-
-export default connect(mapStateToProps)(PasswordResetRequest);
+export default PasswordResetRequest;

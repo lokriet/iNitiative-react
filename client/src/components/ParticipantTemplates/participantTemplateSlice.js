@@ -48,9 +48,7 @@ export const deleteTemplate = createAsyncThunk(
       }
       return template._id;
     } else {
-      console.log('delete item failed');
       const error = await parseItemOperationError(response);
-      console.log(error);
       return thunkApi.rejectWithValue({
         itemId: template._id,
         error

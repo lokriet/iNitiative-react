@@ -1,10 +1,10 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useDispatch, connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 
-import { setAuthRedirectPath, authInit, authenticate } from '../authSlice';
+import { authInit, authenticate, selectIsAuthenticated } from '../authSlice';
 import ErrorType from '../../../util/error';
 
 import Button from '../../UI/Form/Button/Button';
@@ -12,15 +12,16 @@ import FormikInput from '../../UI/Form/Input/FormikInput/FormikInput';
 
 import classes from './Register.module.css';
 
-const Register = (props) => {
-  const [redirectPath, setRedirectPath] = useState('/');
+const Register = () => {
+  const {loading, error, redirectPath: storeRedirectPath} = useSelector(state => state.auth);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const [redirectPath] = useState(storeRedirectPath);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setRedirectPath(props.redirectPath);
-    dispatch(setAuthRedirectPath('/'));
-    dispatch(authInit());
-  }, [props.redirectPath, dispatch]);
+    dispatch(authInit({resetRedirectPath: true}));
+  }, [dispatch]);
 
   const handleSubmit = useCallback(
     (formValues) => {
@@ -39,10 +40,10 @@ const Register = (props) => {
 
   let form = null;
 
-  if (!props.isAuthenticated) {
+  if (!isAuthenticated) {
     let operationErrorMessage = null;
-    if (props.error && props.error.type !== ErrorType.VALIDATION_ERROR) {
-      operationErrorMessage = <div>{props.error.message}</div>;
+    if (error && error.type !== ErrorType.VALIDATION_ERROR) {
+      operationErrorMessage = <div>{error.message}</div>;
     }
 
     form = (
@@ -75,7 +76,7 @@ const Register = (props) => {
             name="username"
             type="text"
             placeholder="Username"
-            serverError={props.error}
+            serverError={error}
             component={FormikInput}
           />
 
@@ -84,7 +85,7 @@ const Register = (props) => {
             type="text"
             placeholder="E-mail"
             autoComplete="username"
-            serverError={props.error}
+            serverError={error}
             component={FormikInput}
           />
 
@@ -93,7 +94,7 @@ const Register = (props) => {
             type="password"
             placeholder="Password"
             autoComplete="new-password"
-            serverError={props.error}
+            serverError={error}
             component={FormikInput}
           />
 
@@ -112,7 +113,7 @@ const Register = (props) => {
 
           {operationErrorMessage}
 
-          <Button type="submit" disabled={props.loading}>
+          <Button type="submit" disabled={loading}>
             Register
           </Button>
 
@@ -125,16 +126,7 @@ const Register = (props) => {
     );
   }
 
-  return props.isAuthenticated ? <Redirect to={redirectPath} /> : form;
+  return isAuthenticated ? <Redirect to={redirectPath} /> : form;
 };
 
-const mapStateToProps = (state) => {
-  return {
-    loading: state.auth.loading,
-    error: state.auth.error,
-    isAuthenticated: state.auth.token != null,
-    redirectPath: state.auth.redirectPath
-  };
-};
-
-export default connect(mapStateToProps)(Register);
+export default Register;
