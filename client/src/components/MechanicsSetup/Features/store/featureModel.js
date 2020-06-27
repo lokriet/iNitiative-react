@@ -9,3 +9,5 @@ Feature.fields = {
   description: attr(),
   type: attr()
 };
+
+export default Feature;

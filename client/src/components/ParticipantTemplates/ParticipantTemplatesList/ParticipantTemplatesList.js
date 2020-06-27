@@ -8,7 +8,7 @@ import {
   deleteTemplate,
   resetTemplateOperation,
   selectParticipantTemplatesByType
-} from '../participantTemplateSlice';
+} from '../store/participantTemplateSlice';
 
 import ParticipantTemplateRow from './ParticipantTemplateRow/ParticipantTemplateRow';
 import ItemsRow from '../../UI/ItemsRow/ItemsRow';

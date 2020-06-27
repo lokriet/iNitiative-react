@@ -7,3 +7,5 @@ DamageType.fields = {
   _id: attr(),
   name: attr()
 };
+
+export default DamageType;

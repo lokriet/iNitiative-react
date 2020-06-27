@@ -3,9 +3,9 @@ import ImageUpload from '../ImageUpload';
 import defaultMonsterImg from '../../../assets/images/bat.svg';
 import defaultPlayerImg from '../../../assets/images/hero.svg';
 import classes from './Avatar.module.css';
-import { ParticipantType } from '../../ParticipantTemplates/ParticipantTemplates';
 import IconButton from '../../UI/Form/Button/IconButton/IconButton';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ParticipantType } from '../../ParticipantTemplates/store/participantTemplateModel';
 
 const Avatar = ({
   field, // { name, value, onChange, onBlur }

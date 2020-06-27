@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {fetchTemplates, selectParticipantTemplatesByType} from '../../../ParticipantTemplates/participantTemplateSlice';
+import {fetchTemplates, selectParticipantTemplatesByType} from '../../../ParticipantTemplates/store/participantTemplateSlice';
 
-import { ParticipantType } from '../../../ParticipantTemplates/ParticipantTemplates';
 import ItemsRow from '../../../UI/ItemsRow/ItemsRow';
 import TemplatesPickList from './TemplatesPickList/TemplatesPickList';
 import Spinner from '../../../UI/Spinner/Spinner';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 
 import classes from './TemplatesPicker.module.css';
+import { ParticipantType } from '../../../ParticipantTemplates/store/participantTemplateModel';
 
 const TemplatesPicker = ({onAdd}) => {
   const [templatesType, setTemplatesType] = useState(ParticipantType.Player);

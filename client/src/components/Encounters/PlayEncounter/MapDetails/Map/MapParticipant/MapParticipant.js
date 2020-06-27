@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Draggable from 'react-draggable';
 import classes from './MapParticipant.module.css';
-import { ParticipantType } from '../../../../../ParticipantTemplates/ParticipantTemplates';
 import List from '../../../../../UI/Table/List/List';
 import MapAvatar from '../MapAvatar/MapAvatar';
+import { ParticipantType } from '../../../../../ParticipantTemplates/store/participantTemplateModel';
 
 const MapParticipant = ({
   participant,

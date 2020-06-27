@@ -7,11 +7,7 @@ import withAuthCheck from '../../hoc/withAuthCheck';
 import TabbedNavigation from '../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
 import ParticipantTemplatesList from './ParticipantTemplatesList/ParticipantTemplatesList';
-
-export const ParticipantType = {
-  Player: 'player',
-  Monster: 'monster'
-};
+import { ParticipantType } from './store/participantTemplateModel';
 
 const ParticipantTemplates = () => {
   const { path, url } = useRouteMatch();

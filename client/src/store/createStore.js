@@ -2,7 +2,7 @@ import authReducer from '../components/Auth/authSlice';
 import damageTypeReducer from '../components/MechanicsSetup/DamageTypes/store/damageTypeSlice';
 import conditionReducer from '../components/MechanicsSetup/Conditions/store/conditionSlice';
 import featureReducer from '../components/MechanicsSetup/Features/store/featureSlice';
-import participantTemplateReducer from '../components/ParticipantTemplates/participantTemplateSlice';
+import participantTemplateReducer from '../components/ParticipantTemplates/store/participantTemplateSlice';
 import encounterReducer from '../components/Encounters/store/encounterSlice';
 import newsReducer from '../components/Home/newsSlice';
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';

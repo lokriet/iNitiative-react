@@ -8,3 +8,5 @@ Condition.fields = {
   name: attr(),
   description: attr()
 };
+
+export default Condition;

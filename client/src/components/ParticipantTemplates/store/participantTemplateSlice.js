@@ -7,11 +7,11 @@ import {
 import {
   createThunks,
   parseItemOperationError
-} from '../../store/common/listOperationThunks';
+} from '../../../store/common/listOperationThunks';
 import { participantTemplateApi } from './participantTemplateApi';
-import { firebaseObtainIdToken } from '../../store/firebase/firebaseMiddleware';
-import { isEmpty } from '../../util/helper-methods';
-import { cleanUpAvatarUrls } from '../../store/common/commonSlice';
+import { firebaseObtainIdToken } from '../../../store/firebase/firebaseMiddleware';
+import { isEmpty } from '../../../util/helper-methods';
+import { cleanUpAvatarUrls } from '../../../store/common/commonSlice';
 
 const api = participantTemplateApi();
 const { fetchItems, fetchItem, addItem, updateItem } = createThunks(

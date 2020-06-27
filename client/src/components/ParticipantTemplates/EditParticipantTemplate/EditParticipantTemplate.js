@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import * as Yup from 'yup';
 import useQueryParams from '../../../hooks/useQueryParams';
 import withAuthCheck from '../../../hoc/withAuthCheck';
-import { ParticipantType } from '../ParticipantTemplates';
 import { Formik, Field, Form } from 'formik';
 import Input from '../../UI/Form/Input/FormikInput/FormikInput';
 import Select from '../../UI/Form/Select/FormikSelect/FormikSelect';
@@ -18,7 +17,7 @@ import {
   updateTemplate,
   addTemplate,
   selectEditedParticipantTemplate
-} from '../participantTemplateSlice';
+} from '../store/participantTemplateSlice';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import ServerError from '../../UI/Errors/ServerError/ServerError';
 import Button from '../../UI/Form/Button/Button';
@@ -27,6 +26,7 @@ import ItemsRow from '../../UI/ItemsRow/ItemsRow';
 import FormikColorPicker from '../../UI/Color/ColorPicker/FormikColorPicker';
 import PropTypes from 'prop-types';
 import {cleanUpAvatarUrls} from '../../../store/common/commonSlice';
+import { ParticipantType } from '../store/participantTemplateModel';
 
 const EditParticipantTemplate = ({ isNew }) => {
   const queryParams = useQueryParams();
