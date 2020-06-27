@@ -26,21 +26,12 @@ ParticipantTemplate.fields = {
   flySpeed: attr(),
   mapSize: attr(),
   comment: attr(),
-  damageTypeImmunities: many({
-    to: DamageType
-  }),
-  conditionImmunities: many({
-    to: Condition
-  }),
-  vulnerabilities: many({
-    to: DamageType
-  }),
-  resistances: many({
-    to: DamageType
-  }),
-  features: many({
-    to: Feature
-  })
+
+  damageTypeImmunities: many(DamageType),
+  conditionImmunities: many(Condition),
+  vulnerabilities: many(DamageType),
+  resistances: many(DamageType),
+  features: many(Feature)
 };
 
 export default ParticipantTemplate;
