@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Draggable from 'react-draggable';
 import classes from './MapParticipant.module.css';
@@ -20,6 +20,7 @@ const MapParticipant = ({
   const [height, setHeight] = useState(`${participant.mapSize * 2}rem`);
 
   const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(isDragging);
 
   const [combinedInfoPosition, setCombinedInfoPosition] = useState({
     x: participantCoordinates.infoX + participantCoordinates.mapX,
@@ -32,7 +33,7 @@ const MapParticipant = ({
   });
 
   useEffect(() => {
-    if (!isDragging) {
+    if (!isDraggingRef.current) {
       setPosition({
         x: participantCoordinates.mapX,
         y: participantCoordinates.mapY
@@ -44,7 +45,6 @@ const MapParticipant = ({
       });
     }
   }, [
-    isDragging,
     participantCoordinates
   ]);
 
@@ -92,6 +92,7 @@ const MapParticipant = ({
         x: participantCoordinates.infoX + position.x,
         y: participantCoordinates.infoY + position.y
       });
+      setPosition(position.x, position.y);
       onDrop(mouseEvent, position);
     },
     [onDrop, participantCoordinates.infoX, participantCoordinates.infoY]
