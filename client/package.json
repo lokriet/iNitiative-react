@@ -25,6 +25,7 @@
     "react-transition-group": "^4.4.1",
     "reactjs-popup": "^1.5.0",
     "redux": "^4.0.5",
+    "redux-orm": "^0.16.1",
     "redux-thunk": "^2.3.0",
     "yup": "^0.28.5"
   },
