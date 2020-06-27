@@ -13,7 +13,7 @@ import IconButton from '../../../UI/Form/Button/IconButton/IconButton';
 
 import classes from './AddFeature.module.css';
 import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
-import { selectors } from '../featureSlice';
+import { selectors } from '../store/featureSlice';
 
 const AddFeature = ({
   serverError,

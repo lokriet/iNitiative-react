@@ -23,7 +23,7 @@ import {
   deleteFeature,
   removeFeatureError,
   selectors
-} from './featureSlice';
+} from './store/featureSlice';
 
 const Features = ({ isHomebrew }) => {
   const [saveCallbacks, setSaveCallbacks] = useState({});

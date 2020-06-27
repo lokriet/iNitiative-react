@@ -20,10 +20,9 @@ import {
   addCondition,
   updateCondition,
   removeConditionError,
-  deleteCondition
-} from './conditionSlice';
-
-import { selectors } from './conditionSlice';
+  deleteCondition,
+  selectors
+} from './store/conditionSlice';
 
 const Conditions = ({ isHomebrew }) => {
   const [saveCallbacks, setSaveCallbacks] = useState({});

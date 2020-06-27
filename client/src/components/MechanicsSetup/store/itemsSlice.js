@@ -3,7 +3,7 @@ import {
   createEntityAdapter,
   createAction
 } from '@reduxjs/toolkit';
-import { createThunks } from '../../store/common/listOperationThunks';
+import { createThunks } from '../../../store/common/listOperationThunks';
 
 export const createItemsSlice = (sliceName, slicePath, api) => {
   const entityAdapter = createEntityAdapter({

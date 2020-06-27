@@ -16,7 +16,7 @@ import {
   fetchDamageTypes,
   removeDamageTypeError,
   selectors
-} from './damageTypeSlice';
+} from './store/damageTypeSlice';
 
 const DamageTypes = ({ isHomebrew }) => {
   const [deleting, setDeleting] = useState(false);

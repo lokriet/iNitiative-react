@@ -19,7 +19,7 @@ import InlineSelect from '../../../UI/Form/Select/InlineSelect/InlineSelect';
 
 import classes from './Feature.module.css';
 import { useSelector } from 'react-redux';
-import { selectors } from '../featureSlice';
+import { selectors } from '../store/featureSlice';
 
 const Feature = ({
   feature,

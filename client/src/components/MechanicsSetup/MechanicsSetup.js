@@ -20,7 +20,6 @@ const MechanicsSetup = ({isHomebrew}) => {
   } else if (!isHomebrew && isAuthenticated && !isAdmin) {
     view = <Redirect to="/" />;
   } else {
-    console.log(':(')
     view = (
       <Fragment>
         <TabbedNavigation>

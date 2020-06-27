@@ -1,4 +1,4 @@
-import { createMechanicsTypeSlice } from '../mechanicsTypeSlice';
+import { createMechanicsTypeSlice } from '../../store/mechanicsTypeSlice';
 
 const { reducer, actions, selectors } = createMechanicsTypeSlice('condition');
 

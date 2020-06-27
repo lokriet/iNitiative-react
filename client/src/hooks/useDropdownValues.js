@@ -3,17 +3,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   selectors as damageTypeSelectors,
   fetchDamageTypes
-} from '../components/MechanicsSetup/DamageTypes/damageTypeSlice';
+} from '../components/MechanicsSetup/DamageTypes/store/damageTypeSlice';
 
 import {
   selectors as conditionSelectors,
   fetchConditions
-} from '../components/MechanicsSetup/Conditions/conditionSlice';
+} from '../components/MechanicsSetup/Conditions/store/conditionSlice';
 
 import {
   selectors as featureSelectors,
   fetchFeatures
-} from '../components/MechanicsSetup/Features/featureSlice';
+} from '../components/MechanicsSetup/Features/store/featureSlice';
 
 const byName = (a, b) =>
   a.name.toLowerCase().localeCompare(b.name.toLowerCase());

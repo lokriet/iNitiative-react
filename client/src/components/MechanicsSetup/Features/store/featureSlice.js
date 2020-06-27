@@ -2,7 +2,7 @@ import union from 'lodash/union';
 import uniq from 'lodash/uniq';
 import { createSelector } from '@reduxjs/toolkit';
 
-import { createMechanicsTypeSlice } from '../mechanicsTypeSlice';
+import { createMechanicsTypeSlice } from '../../store/mechanicsTypeSlice';
 
 const {
   reducer,
