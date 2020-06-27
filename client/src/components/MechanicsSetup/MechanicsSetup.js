@@ -6,16 +6,21 @@ import DamageTypes from './DamageTypes/DamageTypes';
 import Conditions from './Conditions/Conditions';
 import Features from './Features/Features';
 import withAuthCheck from '../../hoc/withAuthCheck';
+import { useSelector } from 'react-redux';
+import { selectIsAuthenticated, selectIsAdmin } from '../Auth/authSlice';
 
-const MechanicsSetup = (props) => {
+const MechanicsSetup = ({isHomebrew}) => {
   let { path, url } = useRouteMatch();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAdmin = useSelector(selectIsAdmin);
 
   let view = null;
-  if (!props.isAuthenticated) {
+  if (!isAuthenticated) {
     view = null;
-  } else if (!props.isHomebrew && props.isAuthenticated && !props.isAdmin) {
+  } else if (!isHomebrew && isAuthenticated && !isAdmin) {
     view = <Redirect to="/" />;
   } else {
+    console.log(':(')
     view = (
       <Fragment>
         <TabbedNavigation>
@@ -35,13 +40,13 @@ const MechanicsSetup = (props) => {
             <Redirect to={`${url}/damage-types`} />
           </Route>
           <Route path={`${path}/damage-types`}>
-            <DamageTypes isHomebrew={props.isHomebrew} />
+            <DamageTypes isHomebrew={isHomebrew} />
           </Route>
           <Route path={`${path}/conditions`}>
-            <Conditions isHomebrew={props.isHomebrew} />
+            <Conditions isHomebrew={isHomebrew} />
           </Route>
           <Route path={`${path}/features`}>
-            <Features isHomebrew={props.isHomebrew} />
+            <Features isHomebrew={isHomebrew} />
           </Route>
           <Route path="*">
             <Redirect to="/404" />
