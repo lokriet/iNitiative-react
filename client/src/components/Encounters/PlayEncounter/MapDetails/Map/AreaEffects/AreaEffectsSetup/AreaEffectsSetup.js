@@ -11,7 +11,7 @@ import IconButton from '../../../../../../UI/Form/Button/IconButton/IconButton';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import Popup from 'reactjs-popup';
 import Button from '../../../../../../UI/Form/Button/Button';
-import { selectEditedEncounter } from '../../../../../encounterSlice';
+import { selectEditedEncounter } from '../../../../../store/encounterSlice';
 
 const AreaEffectsSetup = ({
   editedAreaEffect,

@@ -12,7 +12,7 @@ import classes from './Map.module.css';
 import AreaEffectEdit from './AreaEffects/AreaEffectEdit/AreaEffectEdit';
 import MapControls from './MapControls/MapControls';
 import AreaEffects from './AreaEffects/AreaEffects';
-import {selectEditedEncounter} from '../../../encounterSlice';
+import {selectEditedEncounter} from '../../../store/encounterSlice';
 
 const isOverMap = (mouseEvent, mapRect) => {
   return (

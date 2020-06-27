@@ -8,7 +8,7 @@ import {
   fetchLatestEncounter,
   resetLatestEncounter,
   selectLatestEncounter
-} from '../Encounters/encounterSlice';
+} from '../Encounters/store/encounterSlice';
 import { selectAllNews, fetchNews } from './newsSlice';
 
 const Home = () => {

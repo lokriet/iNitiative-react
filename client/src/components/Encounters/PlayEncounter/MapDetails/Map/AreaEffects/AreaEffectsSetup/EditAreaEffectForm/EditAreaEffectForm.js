@@ -6,7 +6,7 @@ import Button from '../../../../../../../UI/Form/Button/Button';
 import classes from './EditAreaEffectForm.module.css';
 import useDebounce from '../../../../../../../../hooks/useDebounce';
 import ItemsRow from '../../../../../../../UI/ItemsRow/ItemsRow';
-import { selectEditedEncounter } from '../../../../../../encounterSlice';
+import { selectEditedEncounter } from '../../../../../../store/encounterSlice';
 
 import { AreaEffectType } from '../../aoe-utils';
 import { useSelector } from 'react-redux';

@@ -1,5 +1,5 @@
-import constants from '../../util/constants';
-import { createApi } from '../../store/api/createApi';
+import constants from '../../../util/constants';
+import { createApi } from '../../../store/api/createApi';
 
 export const encounterApi = () =>
   createApi({

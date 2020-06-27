@@ -23,7 +23,7 @@ import {
   updateEncounter,
   addEncounter,
   selectEditedEncounter
-} from '../encounterSlice';
+} from '../store/encounterSlice';
 
 const EditEncounter = ({ isNew }) => {
   const dispatch = useDispatch();

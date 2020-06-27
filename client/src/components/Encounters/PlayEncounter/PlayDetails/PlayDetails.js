@@ -10,7 +10,7 @@ import {
   updateEncounterParticipant,
   updateEncounter,
   selectEditedEncounter
-} from '../../encounterSlice';
+} from '../../store/encounterSlice';
 
 import Spinner from '../../../UI/Spinner/Spinner';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';

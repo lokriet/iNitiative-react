@@ -3,7 +3,7 @@ import { useDispatch,  useSelector } from 'react-redux';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import withAuthCheck from '../../../hoc/withAuthCheck';
-import {fetchEncounters, deleteEncounter, resetEncounterOperation, selectAll} from '../encounterSlice';
+import {fetchEncounters, deleteEncounter, resetEncounterOperation, selectAll} from '../store/encounterSlice';
 
 import { useHistory } from 'react-router-dom';
 import EncounterRow from './EncounterRow/EncounterRow';

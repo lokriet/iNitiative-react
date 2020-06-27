@@ -6,7 +6,6 @@ import classes from './Summon.module.css';
 import ItemsRow from '../../../../UI/ItemsRow/ItemsRow';
 
 import { useDispatch, useSelector } from 'react-redux';
-// import * as actions from '../../../../../store/actions';
 import Error from '../../../../UI/Errors/Error/Error';
 import ServerError from '../../../../UI/Errors/ServerError/ServerError';
 import {
@@ -14,7 +13,7 @@ import {
   resetEncounterOperation,
   updateEncounter,
   selectEditedEncounter
-} from '../../../encounterSlice';
+} from '../../../store/encounterSlice';
 
 const emptyFunc = () => {};
 const Summon = () => {

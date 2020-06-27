@@ -7,7 +7,7 @@ import AddMapParticipant from '../AddMapParticipant/AddMapParticipant';
 import { useSelector } from 'react-redux';
 import MapSettings from './MapSettings/MapSettings';
 import AreaEffectsSetup from '../AreaEffects/AreaEffectsSetup/AreaEffectsSetup';
-import { selectEditedEncounter } from '../../../../encounterSlice';
+import { selectEditedEncounter } from '../../../../store/encounterSlice';
 
 const ControlsView = {
   Settings: 'settings',

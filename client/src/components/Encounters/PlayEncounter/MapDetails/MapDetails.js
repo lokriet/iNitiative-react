@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../UI/Spinner/Spinner';
 import ServerError from '../../../UI/Errors/ServerError/ServerError';
 import Popup from 'reactjs-popup';
-import { EditedEncounterAction, updateEncounter, selectEditedEncounter } from '../../encounterSlice';
+import { EditedEncounterAction, updateEncounter, selectEditedEncounter } from '../../store/encounterSlice';
 import { isEmpty } from '../../../../util/helper-methods';
 import Map from './Map/Map';
 import classes from './MapDetails.module.css';

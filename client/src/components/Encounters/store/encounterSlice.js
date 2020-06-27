@@ -7,9 +7,9 @@ import { encounterApi } from './encounterApi';
 import {
   createThunks,
   parseItemOperationError
-} from '../../store/common/listOperationThunks';
-import { firebaseObtainIdToken } from '../../store/firebase/firebaseMiddleware';
-import { cleanUpAvatarUrls } from '../../store/common/commonSlice';
+} from '../../../store/common/listOperationThunks';
+import { firebaseObtainIdToken } from '../../../store/firebase/firebaseMiddleware';
+import { cleanUpAvatarUrls } from '../../../store/common/commonSlice';
 
 const api = encounterApi();
 const { fetchItems, fetchItem, addItem } = createThunks('encounter', api);
@@ -227,7 +227,6 @@ const encounterSlice = createSlice({
 
     [fetchItem.pending]: startFetching,
     [fetchItem.fulfilled]: (state, action) => {
-      console.log(action);
       state.fetching = false;
       state.fetchingError = null;
       state.editedItemId = action.payload._id;

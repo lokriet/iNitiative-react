@@ -6,7 +6,7 @@ import ItemsRow from '../../../../../../UI/ItemsRow/ItemsRow';
 import { useSelector } from 'react-redux';
 import InlineInput from '../../../../../../UI/Form/Input/InlineInput/InlineInput';
 import { isEmpty } from '../../../../../../../util/helper-methods';
-import { selectEditedEncounter } from '../../../../../encounterSlice';
+import { selectEditedEncounter } from '../../../../../store/encounterSlice';
 
 const MapSettings = ({ onSettingsChanged }) => {
   const editedEncounter = useSelector(selectEditedEncounter);

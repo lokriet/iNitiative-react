@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 
-// import * as actions from '../../../store/actions';
 import withAuthCheck from '../../../hoc/withAuthCheck';
 import { useDispatch } from 'react-redux';
 import {
@@ -15,7 +14,7 @@ import PlayDetails from './PlayDetails/PlayDetails';
 import TabbedNavigation from '../../Navigation/TabbedNavigation/TabbedNavigation';
 import TabbedNavigationItem from '../../Navigation/TabbedNavigation/TabbedNavigationItem/TabbedNavigationItem';
 import MapDetails from './MapDetails/MapDetails';
-import {fetchEditedEncounter, resetEditedEncounter} from '../encounterSlice';
+import {fetchEditedEncounter, resetEditedEncounter} from '../store/encounterSlice';
 
 const PlayEncounter = () => {
   const dispatch = useDispatch();
