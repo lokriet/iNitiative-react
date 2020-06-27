@@ -5,7 +5,9 @@ import Feature from '../../MechanicsSetup/Features/store/featureModel';
 
 export class EncounterParticipant extends Model {}
 EncounterParticipant.modelName = 'EncounterParticipant';
-EncounterParticipant.idAttribute = '_id';
+EncounterParticipant.options = {
+  idAttribute: '_id'
+};
 EncounterParticipant.fields = {
   _id: attr(),
   type: attr(),
@@ -41,7 +43,9 @@ EncounterParticipant.fields = {
 
 export class ParticipantCoordinate extends Model {}
 ParticipantCoordinate.modelName = 'ParticipantCoordinate';
-ParticipantCoordinate.idAttribute = '_id';
+ParticipantCoordinate.options = {
+  idAttribute: '_id'
+};
 ParticipantCoordinate.fields = {
   _id: attr(),
   mapX: attr(),
@@ -59,7 +63,9 @@ ParticipantCoordinate.fields = {
 
 export class AreaEffect extends Model {}
 AreaEffect.modelName = 'AreaEffect';
-AreaEffect.idAttribute = '_id';
+AreaEffect.options = {
+  idAttribute: '_id'
+};
 AreaEffect.fields = {
   _id: attr(),
   name: attr(),
@@ -79,7 +85,9 @@ AreaEffect.fields = {
 
 export class EncounterMap extends Model {}
 EncounterMap.modelName = 'EncounterMap';
-EncounterMap.idAttribute = '_id';
+EncounterMap.options = {
+  idAttribute: '_id'
+};
 EncounterMap.fields = {
   _id: attr(),
   mapUrl: attr(),
@@ -98,7 +106,9 @@ EncounterMap.fields = {
 
 export class Encounter extends Model {}
 Encounter.modelName = 'Encounter';
-Encounter.idAttribute = '_id';
+Encounter.options = {
+  idAttribute: '_id'
+};
 Encounter.fields = {
   _id: attr(),
   name: attr(),

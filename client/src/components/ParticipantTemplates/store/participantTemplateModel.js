@@ -10,7 +10,9 @@ export const ParticipantType = {
 
 class ParticipantTemplate extends Model {}
 ParticipantTemplate.modelName = 'ParticipantTemplate';
-ParticipantTemplate.idAttribute = '_id';
+ParticipantTemplate.options = {
+  idAttribute: '_id'
+};
 ParticipantTemplate.fields = {
   _id: attr(),
   type: attr(),
