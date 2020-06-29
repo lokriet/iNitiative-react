@@ -1,15 +1,13 @@
-import { Model, attr } from 'redux-orm';
+import { attr } from 'redux-orm';
+import { CommonModel } from '../../../../store/orm/commonModel';
 
-class Condition extends Model {}
+class Condition extends CommonModel() {}
 Condition.modelName = 'Condition';
-Condition.options = {
-  idAttribute: '_id'
-};
 Condition.fields = {
   _id: attr(),
   name: attr(),
-  description: attr()
+  description: attr(),
+  isHomebrew: attr()
 };
-
 
 export default Condition;

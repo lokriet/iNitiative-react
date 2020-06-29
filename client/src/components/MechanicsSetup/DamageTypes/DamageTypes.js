@@ -23,10 +23,9 @@ const DamageTypes = ({ isHomebrew }) => {
   const [deletingDamageType, setDeletingDamageType] = useState(null);
 
   const dispatch = useDispatch();
-  const allDamageTypes = useSelector((state) =>
-    isHomebrew
-      ? selectors.homebrew.selectAll(state.damageType.homebrew)
-      : selectors.shared.selectAll(state.damageType.shared)
+  const allDamageTypes = useSelector(isHomebrew
+      ? selectors.selectHomebrew
+      : selectors.selectShared
   );
   const fetching = useSelector((state) =>
     isHomebrew

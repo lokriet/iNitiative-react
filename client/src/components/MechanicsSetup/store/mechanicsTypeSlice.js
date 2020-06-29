@@ -1,24 +1,19 @@
-import { combineReducers } from '@reduxjs/toolkit';
 import { createItemsSlice } from './itemsSlice';
-import { itemsApi } from './itemsApi';
+import { combineReducers } from 'redux';
+import { createSelector } from 'redux-orm';
+import getOrm from '../../../store/orm/orm';
+import { capitalize } from '../../../util/helper-methods';
 
-export const createMechanicsTypeSlice = (typeName) => {
-  const homebrewSlice = createItemsSlice(
-    'homebrew',
-    `${typeName}.homebrew`,
-    itemsApi(typeName, true)
-  );
-  const sharedSlice = createItemsSlice(
-    'shared',
-    `${typeName}.shared`,
-    itemsApi(typeName, false)
-  );
+export const createMechanicsTypeSlice = (typeName, ModelClass) => {
+  const homebrewSlice = createItemsSlice(typeName, ModelClass, true);
+  const sharedSlice = createItemsSlice(typeName, ModelClass, false);
 
   const reducer = combineReducers({
     homebrew: homebrewSlice.reducer,
     shared: sharedSlice.reducer
   });
 
+  // async actions
   const fetchItems = (isHomebrew) =>
     isHomebrew
       ? homebrewSlice.actions.fetchItems()
@@ -45,17 +40,39 @@ export const createMechanicsTypeSlice = (typeName) => {
       : dispatch(sharedSlice.actions.removeItemError(itemId));
   };
 
-  const selectors = {
-    homebrew: homebrewSlice.selector,
-    shared: sharedSlice.selector
-  };
-
   const actions = {
     removeItemError,
     deleteItem,
     updateItem,
     addItem,
     fetchItems
+  };
+
+  // selectors
+  const orm = getOrm();
+  const modelName = capitalize(typeName);
+  const selectAll = createSelector(orm, (session) =>
+    session[modelName].orderBy((item) => item.name.toLowerCase()).toRefArray()
+  );
+
+  const selectHomebrew = createSelector(orm, (session) =>
+    session[modelName]
+      .filter((damageType) => damageType.isHomebrew)
+      .orderBy((item) => item.name.toLowerCase())
+      .toRefArray()
+  );
+
+  const selectShared = createSelector(orm, (session) =>
+    session[modelName]
+      .filter((damageType) => !damageType.isHomebrew)
+      .orderBy((item) => item.name.toLowerCase())
+      .toRefArray()
+  );
+
+  const selectors = {
+    selectAll,
+    selectHomebrew,
+    selectShared
   };
 
   return { selectors, actions, reducer };

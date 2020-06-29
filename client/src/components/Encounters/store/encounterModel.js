@@ -1,7 +1,42 @@
-import { Model, attr, many, oneToOne } from 'redux-orm';
+import { Model, attr, many, oneToOne, fk } from 'redux-orm';
 import DamageType from '../../MechanicsSetup/DamageTypes/store/damageTypeModel';
 import Condition from '../../MechanicsSetup/Conditions/store/conditionModel';
 import Feature from '../../MechanicsSetup/Features/store/featureModel';
+
+export class EncounterMap extends Model {}
+EncounterMap.modelName = 'EncounterMap';
+EncounterMap.options = {
+  idAttribute: '_id'
+};
+EncounterMap.fields = {
+  _id: attr(),
+  mapUrl: attr(),
+  mapWidth: attr(),
+  mapHeight: attr(),
+  gridWidth: attr(),
+  gridHeight: attr(),
+  gridColor: attr(),
+  showGrid: attr(),
+  showInfo: attr(),
+  showDead: attr(),
+  snapToGrid: attr()
+
+  // participantCoordinates: many(ParticipantCoordinate)
+};
+
+export class Encounter extends Model {}
+Encounter.modelName = 'Encounter';
+Encounter.options = {
+  idAttribute: '_id'
+};
+Encounter.fields = {
+  _id: attr(),
+  name: attr(),
+  activeParticipantId: attr(),
+
+  // participants: many(EncounterParticipant),
+  map: oneToOne(EncounterMap, 'encounter')
+};
 
 export class EncounterParticipant extends Model {}
 EncounterParticipant.modelName = 'EncounterParticipant';
@@ -33,12 +68,36 @@ EncounterParticipant.fields = {
   advantages: attr(),
   comment: attr(),
 
-  damageTypeImmunities: many(DamageType),
-  conditionImmunities: many(Condition),
-  vulnerabilities: many(DamageType),
-  resistances: many(DamageType),
-  features: many(Feature),
-  conditions: many(Condition)
+  encounter: fk(Encounter, 'participants'),
+  damageTypeImmunities: many(DamageType, 'dtImmunityParticipants'),
+  conditionImmunities: many(Condition, 'conditionImmunityParticipants'),
+  vulnerabilities: many(DamageType, 'vulnerabilityParticipants'),
+  resistances: many(DamageType, 'resistanceParticipants'),
+  features: many(Feature, 'featureParticipants'),
+  conditions: many(Condition, 'conditionParticipants')
+};
+
+export class AreaEffect extends Model {}
+AreaEffect.modelName = 'AreaEffect';
+AreaEffect.options = {
+  idAttribute: '_id'
+};
+AreaEffect.fields = {
+  _id: attr(),
+  name: attr(),
+  type: attr(),
+  color: attr(),
+  gridWidth: attr(),
+  gridHeight: attr(),
+  angle: attr(),
+  positionX: attr(),
+  positionY: attr(),
+
+  followingParticipantId: fk({
+    to: EncounterParticipant,
+    as: 'followingParticipant',
+    relatedName: 'followingAreaEffects'
+  })
 };
 
 export class ParticipantCoordinate extends Model {}
@@ -58,62 +117,6 @@ ParticipantCoordinate.fields = {
   participantId: oneToOne({
     to: EncounterParticipant,
     as: 'participant'
-  })
-};
-
-export class AreaEffect extends Model {}
-AreaEffect.modelName = 'AreaEffect';
-AreaEffect.options = {
-  idAttribute: '_id'
-};
-AreaEffect.fields = {
-  _id: attr(),
-  name: attr(),
-  type: attr(),
-  color: attr(),
-  gridWidth: attr(),
-  gridHeight: attr(),
-  angle: attr(),
-  positionX: attr(),
-  positionY: attr(),
-
-  followingParticipantId: oneToOne({
-    to: EncounterParticipant,
-    as: 'followingParticipant'
-  })
-};
-
-export class EncounterMap extends Model {}
-EncounterMap.modelName = 'EncounterMap';
-EncounterMap.options = {
-  idAttribute: '_id'
-};
-EncounterMap.fields = {
-  _id: attr(),
-  mapUrl: attr(),
-  mapWidth: attr(),
-  mapHeight: attr(),
-  gridWidth: attr(),
-  gridHeight: attr(),
-  gridColor: attr(),
-  showGrid: attr(),
-  showInfo: attr(),
-  showDead: attr(),
-  snapToGrid: attr(),
-  
-  participantCoordinages: many(ParticipantCoordinate)
-};
-
-export class Encounter extends Model {}
-Encounter.modelName = 'Encounter';
-Encounter.options = {
-  idAttribute: '_id'
-};
-Encounter.fields = {
-  _id: attr(),
-  name: attr(),
-  activeParticipantId: attr(),
-
-  participants: many(EncounterParticipant),
-  map: oneToOne(EncounterMap)
+  }),
+  map: fk(EncounterMap, 'participantCoordinates')
 };

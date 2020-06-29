@@ -1,14 +1,16 @@
 import union from 'lodash/union';
 import uniq from 'lodash/uniq';
-import { createSelector } from '@reduxjs/toolkit';
+import { createSelector } from 'redux-orm';
 
 import { createMechanicsTypeSlice } from '../../store/mechanicsTypeSlice';
+import Feature from './featureModel';
+import getOrm from '../../../../store/orm/orm';
 
 const {
   reducer,
   actions,
   selectors: featureSelectors
-} = createMechanicsTypeSlice('feature');
+} = createMechanicsTypeSlice('feature', Feature);
 
 export default reducer;
 
@@ -20,25 +22,21 @@ export const removeFeatureError = actions.removeItemError;
 
 const byLocale = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase());
 
-const homebrewFeaturesSelector = (state) =>
-  featureSelectors.homebrew.selectAll(state.feature.homebrew);
-const sharedFeaturesSelector = (state) =>
-  featureSelectors.shared.selectAll(state.feature.shared);
-
-const selectHomebrewFeatureTypes = createSelector(
-  [homebrewFeaturesSelector],
+const orm = getOrm();
+const selectHomebrewFeatureTypes = createSelector(orm.Feature,
+  featureSelectors.selectHomebrew,
   (homebrewFeatures) =>
     uniq(homebrewFeatures.map((feature) => feature.type)).sort(byLocale)
 );
 
-const selectSharedFeatureTypes = createSelector(
-  [sharedFeaturesSelector],
+const selectSharedFeatureTypes = createSelector(orm.Feature,
+  featureSelectors.selectShared,
   (sharedFeatures) =>
     uniq(sharedFeatures.map((feature) => feature.type)).sort(byLocale)
 );
 
-const selectAllFeatureTypes = createSelector(
-  [homebrewFeaturesSelector, sharedFeaturesSelector],
+const selectAllFeatureTypes = createSelector(orm.Feature,
+  featureSelectors.selectAll,
   (homebrewFeatures, sharedFeatures) =>
     union(
       homebrewFeatures.map((feature) => feature.type),
@@ -47,11 +45,8 @@ const selectAllFeatureTypes = createSelector(
 );
 
 export const selectors = {
-  common: {
-    selectAllFeatureTypes,
-    selectSharedFeatureTypes,
-    selectHomebrewFeatureTypes
-  },
-  homebrew: featureSelectors.homebrew,
-  shared: featureSelectors.shared
+  ...featureSelectors,
+  selectAllFeatureTypes,
+  selectSharedFeatureTypes,
+  selectHomebrewFeatureTypes
 };

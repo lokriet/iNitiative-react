@@ -1,18 +1,37 @@
-import {
-  createSlice,
-  createEntityAdapter,
-  createAction
-} from '@reduxjs/toolkit';
+import { itemsApi } from './itemsApi';
 import { createThunks } from '../../../store/common/listOperationThunks';
+import { createSlice} from '@reduxjs/toolkit';
 
-export const createItemsSlice = (sliceName, slicePath, api) => {
-  const entityAdapter = createEntityAdapter({
-    selectId: (item) => item._id,
-    sortComparer: (a, b) => a.name.localeCompare(b.name)
+export const createItemsSlice = (itemsTypeName, ItemsModelClass, isHomebrew) => {
+  const api = itemsApi(itemsTypeName, isHomebrew);
+
+  // thunks
+  const { fetchItems, addItem, updateItem, deleteItem } = createThunks(
+    `${itemsTypeName}.${isHomebrew ? 'homebrew' : 'shared'}`,
+    api
+  );
+
+  // orm data reducers
+  ItemsModelClass.addReducers({
+    [fetchItems.fulfilled.type]: (action, ModelClass, session) => {
+      ModelClass.filter({ isHomebrew }).delete();
+      action.payload.forEach((loadedItem) => ModelClass.upsert(loadedItem));
+    },
+    
+    [addItem.fulfilled.type]: (action, ModelClass, session) => {
+      ModelClass.create(action.payload);
+    },
+
+    [updateItem.fulfilled.type]: (action, ModelClass, session) => {
+      ModelClass.withId(action.payload._id).update(action.payload);
+    },
+
+    [deleteItem.fulfilled.type]: (action, ModelClass, session) => {
+      ModelClass.withId(action.payload).delete();
+    }
   });
 
-  const {fetchItems, addItem, updateItem, deleteItem} = createThunks(slicePath, api);
-
+  // ui state reducers
   const removeErrorById = (errors, itemId) => {
     let newErrors = errors;
     const errorId = itemId || 'ADD';
@@ -27,23 +46,22 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
     return newErrors;
   };
 
-  const initialState = entityAdapter.getInitialState({
+  const initialState = {
     fetching: false,
     error: null,
     errorsById: {},
     lastFetchTime: null
-  });
-
-  const removeItemError = createAction(`${slicePath.replace('.', '/')}/removeItemError`);
+  };
 
   const itemsSlice = createSlice({
-    name: sliceName,
+    name: itemsTypeName,
     initialState,
-    extraReducers: {
-      [removeItemError]: (state, action) => {
+    reducers: {
+      removeItemError: (state, action) => {
         state.errorsById = removeErrorById(state.errorsById, action.payload);
-      },
-
+      }
+    },
+    extraReducers: {
       [fetchItems.pending]: (state, action) => {
         state.fetching = true;
       },
@@ -53,7 +71,6 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
         state.error = null;
         state.errorsById = {};
         state.lastFetchTime = new Date().getTime();
-        entityAdapter.setAll(state, action);
       },
 
       [fetchItems.rejected]: (state, action) => {
@@ -63,7 +80,6 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
 
       [addItem.fulfilled]: (state, action) => {
         state.errorsById = removeErrorById(state.errorsById, null);
-        entityAdapter.addOne(state, action.payload);
       },
 
       [addItem.rejected]: (state, action) => {
@@ -71,8 +87,10 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
       },
 
       [updateItem.fulfilled]: (state, action) => {
-        state.errorsById = removeErrorById(state.errorsById, action.payload._id);
-        entityAdapter.updateOne(state, {id: action.payload._id, changes: {...action.payload}});
+        state.errorsById = removeErrorById(
+          state.errorsById,
+          action.payload._id
+        );
       },
 
       [updateItem.rejected]: (state, action) => {
@@ -81,24 +99,26 @@ export const createItemsSlice = (sliceName, slicePath, api) => {
 
       [deleteItem.fulfilled]: (state, action) => {
         state.errorsById = removeErrorById(state.errorsById, action.payload);
-        entityAdapter.removeOne(state, action.payload);
       },
 
       [deleteItem.rejected]: (state, action) => {
         state.errorsById[action.payload.itemId] = action.payload.error;
       },
 
-      'resetStore': (state, action) => initialState
+      resetStore: (state, action) => initialState
     }
   });
 
-  const reducer = itemsSlice.reducer;
   const sliceActions = {
-    removeItemError,
+    removeItemError: itemsSlice.actions.removeItemError,
     fetchItems,
     addItem,
     updateItem,
     deleteItem
   };
-  return { actions: sliceActions, reducer, selector: entityAdapter.getSelectors() };
+
+  return {
+    actions: sliceActions,
+    reducer: itemsSlice.reducer
+  };
 };

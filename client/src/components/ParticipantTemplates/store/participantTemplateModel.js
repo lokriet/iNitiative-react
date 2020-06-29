@@ -29,11 +29,11 @@ ParticipantTemplate.fields = {
   mapSize: attr(),
   comment: attr(),
 
-  damageTypeImmunities: many(DamageType),
-  conditionImmunities: many(Condition),
-  vulnerabilities: many(DamageType),
-  resistances: many(DamageType),
-  features: many(Feature)
+  damageTypeImmunities: many(DamageType, 'dtImmunityParticipantTemplates'),
+  conditionImmunities: many(Condition, 'conditionImmunityParticipantTemplates'),
+  vulnerabilities: many(DamageType, 'vulnerabilityParticipantTemplates'),
+  resistances: many(DamageType,'resistanceParticipantTemplates'),
+  features: many(Feature, 'featureParticipantTemplates')
 };
 
 export default ParticipantTemplate;

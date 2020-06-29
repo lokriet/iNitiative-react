@@ -1,13 +1,12 @@
-import { Model, attr } from 'redux-orm';
+import { attr } from 'redux-orm';
+import { CommonModel } from '../../../../store/orm/commonModel';
 
-class DamageType extends Model {}
+class DamageType extends CommonModel() {}
 DamageType.modelName = 'DamageType';
-DamageType.options = {
-  idAttribute: '_id'
-};
 DamageType.fields = {
   _id: attr(),
-  name: attr()
+  name: attr(),
+  isHomebrew: attr()
 };
 
 export default DamageType;

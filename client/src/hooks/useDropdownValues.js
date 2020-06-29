@@ -47,7 +47,7 @@ const useDropdownValues = () => {
     featureSelectors.homebrew.selectAll(state.feature.homebrew)
   );
 
-  const featureTypes = useSelector(featureSelectors.common.selectAllFeatureTypes);
+  const featureTypes = useSelector(featureSelectors.selectAllFeatureTypes);
 
   useEffect(() => {
     Promise.all([

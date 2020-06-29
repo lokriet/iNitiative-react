@@ -1,6 +1,7 @@
 import { createMechanicsTypeSlice } from '../../store/mechanicsTypeSlice';
+import Condition from './conditionModel';
 
-const { reducer, actions, selectors } = createMechanicsTypeSlice('condition');
+const { reducer, actions, selectors } = createMechanicsTypeSlice('condition', Condition);
 
 export default reducer;
 

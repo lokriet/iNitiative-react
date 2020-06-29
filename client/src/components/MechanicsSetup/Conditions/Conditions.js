@@ -31,10 +31,9 @@ const Conditions = ({ isHomebrew }) => {
   const [deleting, setDeleting] = useState(false);
   const [deletingCondition, setDeletingCondition] = useState(null);
 
-  const allConditions = useSelector((state) =>
-    isHomebrew
-      ? selectors.homebrew.selectAll(state.condition.homebrew)
-      : selectors.shared.selectAll(state.condition.shared)
+  const allConditions = useSelector(isHomebrew
+      ? selectors.selectHomebrew
+      : selectors.selectShared
   );
 
   const fetchingError = useSelector((state) => isHomebrew ? state.condition.homebrew.error : state.condition.shared.error);

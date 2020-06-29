@@ -33,15 +33,11 @@ const Features = ({ isHomebrew }) => {
   const [deletingFeature, setDeletingFeature] = useState(null);
 
   const dispatch = useDispatch();
-  const allFeatures = useSelector((state) =>
-    isHomebrew
-      ? selectors.homebrew.selectAll(state.feature.homebrew)
-      : selectors.shared.selectAll(state.feature.shared)
+  const allFeatures = useSelector(
+    isHomebrew ? selectors.selectHomebrew : selectors.selectShared
   );
   const fetching = useSelector((state) =>
-    isHomebrew
-      ? state.feature.homebrew.fetching
-      : state.feature.shared.fetching
+    isHomebrew ? state.feature.homebrew.fetching : state.feature.shared.fetching
   );
   const fetchingError = useSelector((state) =>
     isHomebrew ? state.feature.homebrew.error : state.feature.shared.error
@@ -55,6 +51,10 @@ const Features = ({ isHomebrew }) => {
 
   useEffect(() => {
     dispatch(fetchFeatures(isHomebrew));
+    if (isHomebrew) {
+      // this is to get all the feature types for the dropdowns
+      dispatch(fetchFeatures(!isHomebrew)); 
+    }
   }, [dispatch, isHomebrew]);
 
   const validateName = useCallback(
@@ -224,6 +224,5 @@ const Features = ({ isHomebrew }) => {
 Features.propTypes = {
   isHomebrew: PropTypes.bool
 };
-
 
 export default Features;

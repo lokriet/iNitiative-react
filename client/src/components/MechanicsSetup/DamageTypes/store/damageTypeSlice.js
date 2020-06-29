@@ -1,6 +1,7 @@
 import { createMechanicsTypeSlice } from '../../store/mechanicsTypeSlice';
+import DamageType from './damageTypeModel';
 
-const { reducer, actions, selectors } = createMechanicsTypeSlice('damageType');
+const { reducer, actions, selectors } = createMechanicsTypeSlice('damageType', DamageType);
 
 export default reducer;
 
@@ -10,4 +11,4 @@ export const updateDamageType = actions.updateItem;
 export const deleteDamageType = actions.deleteItem;
 export const removeDamageTypeError = actions.removeItemError;
 
-export {selectors};
+export { selectors };
