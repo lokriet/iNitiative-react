@@ -43,6 +43,18 @@ class Condition extends Component {
     this.props.onRegisterSaveCallback(this.props.condition._id, this.handleSave);
   }
 
+  componentDidUpdate() {
+    // on condition update in orm udpate input field values if not currently editing
+    if (!this.state.showSaveButtons) {
+      if (this.state.descriptionValue !== this.props.condition.description) {
+        this.setState({descriptionValue: this.props.condition.description});
+      }
+      if (this.state.nameValue !== this.props.condition.name) {
+        this.setState({name: this.props.condition.name});
+      }
+    } 
+  }
+
   componentWillUnmount() {
     this.props.onUnregisterSaveCallback(this.props.condition._id);
   }

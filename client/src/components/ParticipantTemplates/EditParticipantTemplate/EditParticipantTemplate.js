@@ -75,7 +75,7 @@ const EditParticipantTemplate = ({ isNew }) => {
     (values, setSubmitting) => {
       editMode
         ? dispatch(updateTemplate(templateId, values, setSubmitting))
-        : dispatch(addTemplate(null, values, setSubmitting));
+        : dispatch(addTemplate(values, setSubmitting));
     },
     [dispatch, editMode, templateId]
   );

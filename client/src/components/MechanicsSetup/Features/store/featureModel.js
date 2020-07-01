@@ -8,7 +8,8 @@ Feature.fields = {
   name: attr(),
   description: attr(),
   type: attr(),
-  isHomebrew: attr()
+  isHomebrew: attr(),
+  creator: attr()
 };
 
 export default Feature;

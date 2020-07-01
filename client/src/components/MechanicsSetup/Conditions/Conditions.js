@@ -140,7 +140,6 @@ const Conditions = ({ isHomebrew }) => {
     setFilteredConditions(filteredItems);
   }, []);
 
-  
   let view;
   if (fetching) {
     view = <Spinner />;

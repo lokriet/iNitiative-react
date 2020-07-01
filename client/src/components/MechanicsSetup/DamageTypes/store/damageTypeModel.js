@@ -6,7 +6,8 @@ DamageType.modelName = 'DamageType';
 DamageType.fields = {
   _id: attr(),
   name: attr(),
-  isHomebrew: attr()
+  isHomebrew: attr(),
+  creator: attr()
 };
 
 export default DamageType;

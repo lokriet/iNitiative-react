@@ -7,7 +7,8 @@ Condition.fields = {
   _id: attr(),
   name: attr(),
   description: attr(),
-  isHomebrew: attr()
+  isHomebrew: attr(),
+  creator: attr()
 };
 
 export default Condition;

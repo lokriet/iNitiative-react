@@ -1,4 +1,4 @@
-import union from 'lodash/union';
+// import union from 'lodash/union';
 import uniq from 'lodash/uniq';
 import { createSelector } from 'redux-orm';
 
@@ -23,30 +23,34 @@ export const removeFeatureError = actions.removeItemError;
 const byLocale = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase());
 
 const orm = getOrm();
-const selectHomebrewFeatureTypes = createSelector(orm.Feature,
-  featureSelectors.selectHomebrew,
-  (homebrewFeatures) =>
-    uniq(homebrewFeatures.map((feature) => feature.type)).sort(byLocale)
-);
 
-const selectSharedFeatureTypes = createSelector(orm.Feature,
-  featureSelectors.selectShared,
-  (sharedFeatures) =>
-    uniq(sharedFeatures.map((feature) => feature.type)).sort(byLocale)
-);
+const selectSharedFeatureTypes = createSelector(orm, ({ Feature }) => {
+  const featureTypes = Feature.all()
+    .filter({ isHomebrew: false })
+    .toModelArray()
+    .map((feature) => feature.type);
+  return uniq(featureTypes).sort(byLocale);
+});
 
-const selectAllFeatureTypes = createSelector(orm.Feature,
-  featureSelectors.selectAll,
-  (homebrewFeatures, sharedFeatures) =>
-    union(
-      homebrewFeatures.map((feature) => feature.type),
-      sharedFeatures.map((feature) => feature.type)
-    ).sort(byLocale)
+const selectAllFeatureTypes = createSelector(
+  orm,
+  (_, includeEmpty) => includeEmpty,
+  ({ Feature }, includeEmpty) => {
+    let featureTypes = Feature.all()
+      .toModelArray()
+      .map((feature) => feature.type);
+    if (!includeEmpty) {
+      featureTypes = featureTypes.filter(
+        (type) => type !== null && type !== ''
+      );
+    }
+    const result = uniq(featureTypes).sort(byLocale);
+    return result;
+  }
 );
 
 export const selectors = {
   ...featureSelectors,
   selectAllFeatureTypes,
-  selectSharedFeatureTypes,
-  selectHomebrewFeatureTypes
+  selectSharedFeatureTypes
 };

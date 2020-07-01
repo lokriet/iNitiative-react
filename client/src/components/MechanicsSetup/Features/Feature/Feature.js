@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   faTimes,
@@ -34,20 +34,41 @@ const Feature = ({
   isHomebrew
 }) => {
   const [nameValue, setNameValue] = useState(feature.name);
+  const nameValueRef = useRef(nameValue);
   const [descriptionValue, setDescriptionValue] = useState(feature.description);
+  const descriptionValueRef = useRef(descriptionValue);
   const [typeValue, setTypeValue] = useState(
     !feature.type || feature.type.length === 0
       ? null
       : { label: feature.type, value: feature.type }
   );
+  const typeValueRef = useRef(typeValue);
   const [nameError, setNameError] = useState(null);
   const [showSavedBadge, setShowSavedBadge] = useState(false);
   const [showSaveButtons, setShowSaveButtons] = useState(false);
+  const showSaveButtonsRef = useRef(showSaveButtons);
 
-  const featureTypes = useSelector(isHomebrew
-      ? selectors.selectAllFeatureTypes
-      : selectors.selectSharedFeatureTypes
+  const featureTypes = useSelector(state => isHomebrew
+      ? selectors.selectAllFeatureTypes(state, false)
+      : selectors.selectSharedFeatureTypes(state)
   );
+
+  useEffect(() => {
+    // on feature update in orm udpate input field values if not currently editing
+    if (!showSaveButtonsRef.current) {
+      if (feature.type !== typeValueRef.current?.value) {
+        setTypeValue({label: feature.type, value: feature.type});
+      }
+
+      if (feature.name !== nameValueRef.current) {
+        setNameValue(feature.name);
+      }
+
+      if (feature.description !== descriptionValueRef.current) {
+        setDescriptionValue(feature.description);
+      }
+    }
+  }, [feature]);
 
   const handleHaveUnsavedChanges = useCallback(
     (haveUnsavedChanges) => {

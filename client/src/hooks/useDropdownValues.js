@@ -15,9 +15,6 @@ import {
   fetchFeatures
 } from '../components/MechanicsSetup/Features/store/featureSlice';
 
-const byName = (a, b) =>
-  a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-
 const useDropdownValues = () => {
   const dispatch = useDispatch();
 
@@ -26,28 +23,14 @@ const useDropdownValues = () => {
   const [conditions, setConditions] = useState([]);
   const [damageTypes, setDamageTypes] = useState([]);
 
-  const sharedDamageTypes = useSelector((state) =>
-    damageTypeSelectors.shared.selectAll(state.damageType.shared)
-  );
-  const homebrewDamageTypes = useSelector((state) =>
-    damageTypeSelectors.homebrew.selectAll(state.damageType.homebrew)
-  );
+  const allDamageTypes = useSelector(damageTypeSelectors.selectShared);
+  const allConditions = useSelector(conditionSelectors.selectAll);
+  const allFeatures = useSelector(featureSelectors.selectAll);
+  const featureTypes = useSelector(state => featureSelectors.selectAllFeatureTypes(state, true));
 
-  const sharedConditions = useSelector((state) =>
-    conditionSelectors.shared.selectAll(state.condition.shared)
-  );
-  const homebrewConditions = useSelector((state) =>
-    conditionSelectors.homebrew.selectAll(state.condition.homebrew)
-  );
-
-  const sharedFeatures = useSelector((state) =>
-    featureSelectors.shared.selectAll(state.feature.shared)
-  );
-  const homebrewFeatures = useSelector((state) =>
-    featureSelectors.homebrew.selectAll(state.feature.homebrew)
-  );
-
-  const featureTypes = useSelector(featureSelectors.selectAllFeatureTypes);
+  const damageTypesInitialized = useSelector(damageTypeSelectors.selectIsAllInitialized);
+  const featuresInitialized = useSelector(featureSelectors.selectIsAllInitialized);
+  const conditionsInitialized = useSelector(conditionSelectors.selectIsAllInitialized);
 
   useEffect(() => {
     Promise.all([
@@ -61,32 +44,33 @@ const useDropdownValues = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const newConditions = [...sharedConditions, ...homebrewConditions].sort(byName);
-    const newDamageTypes = [...sharedDamageTypes, ...homebrewDamageTypes].sort(byName);
-    setDamageTypes(newDamageTypes);
-    setConditions(newConditions);
-    setImmunities([
-        { label: 'Damage Types', options: newDamageTypes },
-        { label: 'Conditions', options: newConditions }
-      ]);
-  }, [sharedConditions, homebrewConditions, sharedDamageTypes, homebrewDamageTypes]);
+    if (conditionsInitialized && damageTypesInitialized) {
+      setDamageTypes(allDamageTypes);
+      setConditions(allConditions);
+      setImmunities([
+          { label: 'Damage Types', options: allDamageTypes },
+          { label: 'Conditions', options: allConditions }
+        ]);
+    }
+  }, [allConditions, allDamageTypes, conditionsInitialized, damageTypesInitialized]);
 
   useEffect(() => {
-    const newFeatures = [...homebrewFeatures, ...sharedFeatures].sort(byName);
+    if (featuresInitialized) {
+      const groupedFeatures = [];
+      const groupNames = [...featureTypes];
+  
+      groupNames.forEach((groupName) => {
+        let groupFeatures = allFeatures.filter(
+          (feature) => feature.type === groupName
+        );
+        if (groupFeatures.length > 0) {
+          groupedFeatures.push({ label: groupName, options: groupFeatures });
+        }
+      });
 
-    const groupedFeatures = [];
-    const groupNames = ['', ...featureTypes];
-
-    groupNames.forEach((groupName) => {
-      let groupFeatures = newFeatures.filter(
-        (feature) => feature.type === groupName
-      );
-      if (groupFeatures.length > 0) {
-        groupedFeatures.push({ label: groupName, options: groupFeatures });
-      }
-    });
-    setFeatures(groupedFeatures);
-  }, [featureTypes, homebrewFeatures, sharedFeatures])
+      setFeatures(groupedFeatures);
+    }
+  }, [featureTypes, allFeatures, featuresInitialized])
 
   return [damageTypes, immunities, features, conditions]; 
 };

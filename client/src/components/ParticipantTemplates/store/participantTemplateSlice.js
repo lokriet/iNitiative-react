@@ -1,9 +1,4 @@
-import {
-  createEntityAdapter,
-  createSlice,
-  createSelector,
-  createAsyncThunk
-} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
   createThunks,
   parseItemOperationError
@@ -12,6 +7,9 @@ import { participantTemplateApi } from './participantTemplateApi';
 import { firebaseObtainIdToken } from '../../../store/firebase/firebaseMiddleware';
 import { isEmpty } from '../../../util/helper-methods';
 import { cleanUpAvatarUrls } from '../../../store/common/commonSlice';
+import ParticipantTemplate from './participantTemplateModel';
+import { createSelector } from 'redux-orm';
+import getOrm from '../../../store/orm/orm';
 
 const api = participantTemplateApi();
 const { fetchItems, fetchItem, addItem, updateItem } = createThunks(
@@ -19,23 +17,23 @@ const { fetchItems, fetchItem, addItem, updateItem } = createThunks(
   api
 );
 
-export const fetchTemplates = fetchItems;
-export const fetchEditedTemplate = (templateId) =>
-  fetchItem({ itemId: templateId });
+// thunks
+const fetchTemplates = fetchItems;
+const fetchEditedTemplate = (templateId) => fetchItem({ itemId: templateId });
 
-export const addTemplate = (_, templateValues, setSubmitting) =>
+const addTemplate = (templateValues, setSubmitting) =>
   addItem({
     item: templateValues,
     onOperationDone: () => setSubmitting(false)
   });
 
-export const updateTemplate = (templateId, templateValues, setSubmitting) =>
+const updateTemplate = (templateId, templateValues, setSubmitting) =>
   updateItem({
     item: { ...templateValues, _id: templateId },
     onOperationDone: () => setSubmitting(false)
   });
 
-export const deleteTemplate = createAsyncThunk(
+const deleteTemplate = createAsyncThunk(
   'participantTemplate/deleteItem',
   async (template, thunkApi) => {
     await thunkApi.dispatch(firebaseObtainIdToken());
@@ -57,18 +55,38 @@ export const deleteTemplate = createAsyncThunk(
   }
 );
 
-const entityAdapter = createEntityAdapter({
-  selectId: (item) => item._id,
-  sortComparer: (a, b) => a.name.localeCompare(b.name)
+// orm data reducers
+ParticipantTemplate.addReducers({
+  [fetchItems.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.delete();
+    action.payload.forEach((loadedItem) => ModelClass.parse(loadedItem));
+  },
+
+  [fetchItem.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.parse(action.payload);
+  },
+
+  [addItem.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.parse(action.payload);
+  },
+
+  [updateItem.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.parse(action.payload);
+  },
+
+  [deleteTemplate.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.withId(action.payload).delete();
+  }
 });
 
-const initialState = entityAdapter.getInitialState({
+// ui state reducers
+const initialState = {
   fetching: false,
   error: null,
   lastFetchTime: null,
   operationSuccess: false,
   editedItemId: null
-});
+};
 
 const operationFailed = (state, action) => {
   state.operationSuccess = false;
@@ -96,24 +114,18 @@ const participantTemplateSlice = createSlice({
     [addItem.fulfilled]: (state, action) => {
       state.operationSuccess = true;
       state.error = null;
-      entityAdapter.addOne(state, action.payload);
     },
     [addItem.rejected]: operationFailed,
 
     [updateItem.fulfilled]: (state, action) => {
       state.operationSuccess = true;
       state.error = null;
-      entityAdapter.updateOne(state, {
-        id: action.payload._id,
-        changes: { ...action.payload }
-      });
     },
     [updateItem.rejected]: operationFailed,
 
     [deleteTemplate.fulfilled]: (state, action) => {
       state.operationSuccess = true;
       state.error = null;
-      entityAdapter.removeOne(state, action.payload);
     },
     [deleteTemplate.rejected]: operationFailed,
 
@@ -122,7 +134,6 @@ const participantTemplateSlice = createSlice({
       state.fetching = false;
       state.error = null;
       state.lastFetchTime = new Date().getTime();
-      entityAdapter.setAll(state, action.payload);
     },
     [fetchItems.rejected]: (state, action) => {
       state.fetching = false;
@@ -134,7 +145,6 @@ const participantTemplateSlice = createSlice({
       state.fetching = false;
       state.error = null;
       state.editedItemId = action.payload._id;
-      entityAdapter.upsertOne(state, action.payload);
     },
     [fetchItem.rejected]: (state, action) => {
       state.fetching = false;
@@ -145,27 +155,59 @@ const participantTemplateSlice = createSlice({
   }
 });
 
+// actions
+export {
+  fetchTemplates,
+  fetchEditedTemplate,
+  addTemplate,
+  updateTemplate,
+  deleteTemplate
+};
+
 export const resetTemplateOperation =
   participantTemplateSlice.actions.resetOperation;
 
 export const resetEditedTemplate =
   participantTemplateSlice.actions.resetEditedTemplate;
 
-const entitySelectors = entityAdapter.getSelectors();
+// selectors
+const orm = getOrm();
 
-const selectAllParticipantTemplates = (state) =>
-  entitySelectors.selectAll(state.participantTemplate);
+const buildParticipantTemplate = (participantTemplateModel, templateId) => {
+  if (!participantTemplateModel) return null;
+
+  const result = { ...participantTemplateModel.ref };
+
+  result.immunities = {
+    damageTypes: participantTemplateModel.damageTypeImmunities.toRefArray(),
+    conditions: participantTemplateModel.conditionImmunities.toRefArray()
+  };
+
+  result.vulnerabilities = participantTemplateModel.vulnerabilities.toRefArray();
+  result.resistances = participantTemplateModel.resistances.toRefArray();
+  result.features = participantTemplateModel.features.toRefArray();
+
+  return result;
+};
 
 export const selectParticipantTemplatesByType = createSelector(
-  selectAllParticipantTemplates,
+  orm,
   (_, type) => type,
-  (allTemplates, type) => allTemplates.filter((item) => item.type === type)
+  (session, type) =>
+    session.ParticipantTemplate.filter((template) => template.type === type)
+      .orderBy((template) => template.name.toLowerCase())
+      .toModelArray()
+      .map(
+        (template) => buildParticipantTemplate(template)
+      )
 );
 
-export const selectEditedParticipantTemplate = (state) =>
-  entitySelectors.selectById(
-    state.participantTemplate,
-    state.participantTemplate.editedItemId
-  );
+export const selectEditedParticipantTemplate = createSelector(
+  orm,
+  (state) => state.participantTemplate.editedItemId,
+  (session, editedItemId) =>
+    buildParticipantTemplate(session.ParticipantTemplate.withId(editedItemId))
+);
 
+// reducer
 export default participantTemplateSlice.reducer;

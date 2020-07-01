@@ -1,6 +1,6 @@
 import { createItemsSlice } from './itemsSlice';
 import { combineReducers } from 'redux';
-import { createSelector } from 'redux-orm';
+import { createSelector as createOrmSelector } from 'redux-orm';
 import getOrm from '../../../store/orm/orm';
 import { capitalize } from '../../../util/helper-methods';
 
@@ -51,28 +51,34 @@ export const createMechanicsTypeSlice = (typeName, ModelClass) => {
   // selectors
   const orm = getOrm();
   const modelName = capitalize(typeName);
-  const selectAll = createSelector(orm, (session) =>
+
+  const selectAll = createOrmSelector(orm, (session) =>
     session[modelName].orderBy((item) => item.name.toLowerCase()).toRefArray()
   );
 
-  const selectHomebrew = createSelector(orm, (session) =>
-    session[modelName]
-      .filter((damageType) => damageType.isHomebrew)
+  const selectHomebrew = createOrmSelector(orm, (session) => {
+    return session[modelName]
+      .filter((item) => item.isHomebrew)
       .orderBy((item) => item.name.toLowerCase())
-      .toRefArray()
-  );
+      .toRefArray();
+  });
 
-  const selectShared = createSelector(orm, (session) =>
-    session[modelName]
-      .filter((damageType) => !damageType.isHomebrew)
+  const selectShared = createOrmSelector(orm, (session) => {
+    return session[modelName]
+      .filter((item) => !item.isHomebrew)
       .orderBy((item) => item.name.toLowerCase())
-      .toRefArray()
-  );
+      .toRefArray();
+  });
+
+  const selectIsAllInitialized = (state) =>
+    state[typeName].shared.lastFetchTime !== null &&
+    state[typeName].homebrew.lastFetchTime !== null;
 
   const selectors = {
     selectAll,
     selectHomebrew,
-    selectShared
+    selectShared,
+    selectIsAllInitialized
   };
 
   return { selectors, actions, reducer };

@@ -14,14 +14,18 @@ export const CommonModel = () => {
 
     static reducer(action, ModelClass, session) {
       if (action.type in this.reducers) {
-        console.log(`model ${this} run action ${action.type}`);
+        // console.log(`model ${this} run action ${action.type}`);
         this.reducers[action.type](action, ModelClass, session);
       }
-    };
+    }
+
+    static parse(data) {
+      return this.upsert(data);
+    }
   };
 
   result.options = {
     idAttribute: '_id'
   };
   return result;
-}
+};
