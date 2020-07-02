@@ -24,30 +24,25 @@ const byLocale = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase());
 
 const orm = getOrm();
 
-const selectSharedFeatureTypes = createSelector(orm, ({ Feature }) => {
-  const featureTypes = Feature.all()
-    .filter({ isHomebrew: false })
-    .toModelArray()
-    .map((feature) => feature.type);
-  return uniq(featureTypes).sort(byLocale);
-});
+const selectSharedFeatureTypes = createSelector(
+  orm,
+  featureSelectors.selectShared,
+  (session, sharedFeatures) => uniq(sharedFeatures.map(feature => feature.type)).sort(byLocale)
+)
+
 
 const selectAllFeatureTypes = createSelector(
   orm,
+  featureSelectors.selectAll,
   (_, includeEmpty) => includeEmpty,
-  ({ Feature }, includeEmpty) => {
-    let featureTypes = Feature.all()
-      .toModelArray()
-      .map((feature) => feature.type);
+  (session, allFeatures, includeEmpty) => {
+    let featureTypes = uniq(allFeatures.map(feature => feature.type)).sort(byLocale);
     if (!includeEmpty) {
-      featureTypes = featureTypes.filter(
-        (type) => type !== null && type !== ''
-      );
+      featureTypes = featureTypes.filter(type => type != null && type !== '');
     }
-    const result = uniq(featureTypes).sort(byLocale);
-    return result;
+    return featureTypes;
   }
-);
+)
 
 export const selectors = {
   ...featureSelectors,

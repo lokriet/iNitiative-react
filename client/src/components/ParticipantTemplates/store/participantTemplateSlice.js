@@ -173,40 +173,23 @@ export const resetEditedTemplate =
 // selectors
 const orm = getOrm();
 
-const buildParticipantTemplate = (participantTemplateModel, templateId) => {
-  if (!participantTemplateModel) return null;
-
-  const result = { ...participantTemplateModel.ref };
-
-  result.immunities = {
-    damageTypes: participantTemplateModel.damageTypeImmunities.toRefArray(),
-    conditions: participantTemplateModel.conditionImmunities.toRefArray()
-  };
-
-  result.vulnerabilities = participantTemplateModel.vulnerabilities.toRefArray();
-  result.resistances = participantTemplateModel.resistances.toRefArray();
-  result.features = participantTemplateModel.features.toRefArray();
-
-  return result;
-};
-
 export const selectParticipantTemplatesByType = createSelector(
   orm,
   (_, type) => type,
-  (session, type) =>
-    session.ParticipantTemplate.filter((template) => template.type === type)
+  ({ ParticipantTemplate }, type) =>
+    ParticipantTemplate.filter((template) => template.type === type)
       .orderBy((template) => template.name.toLowerCase())
       .toModelArray()
-      .map(
-        (template) => buildParticipantTemplate(template)
-      )
+      .map((template) => ParticipantTemplate.buildObject(template))
 );
 
 export const selectEditedParticipantTemplate = createSelector(
   orm,
   (state) => state.participantTemplate.editedItemId,
-  (session, editedItemId) =>
-    buildParticipantTemplate(session.ParticipantTemplate.withId(editedItemId))
+  ({ ParticipantTemplate }, editedItemId) =>
+    ParticipantTemplate.buildObject(
+      ParticipantTemplate.withId(editedItemId)
+    )
 );
 
 // reducer

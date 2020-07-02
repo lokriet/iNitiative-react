@@ -1,8 +1,4 @@
-import {
-  createEntityAdapter,
-  createSlice,
-  createAsyncThunk
-} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { encounterApi } from './encounterApi';
 import {
   createThunks,
@@ -10,8 +6,13 @@ import {
 } from '../../../store/common/listOperationThunks';
 import { firebaseObtainIdToken } from '../../../store/firebase/firebaseMiddleware';
 import { cleanUpAvatarUrls } from '../../../store/common/commonSlice';
+import { Encounter } from './encounterModel';
+import getOrm from '../../../store/orm/orm';
+import { createSelector as createOrmSelector } from 'redux-orm';
 
 const api = encounterApi();
+
+// thunks
 const { fetchItems, fetchItem, addItem } = createThunks('encounter', api);
 
 const fetchEncounters = fetchItems;
@@ -141,19 +142,92 @@ const updateChildItem = createAsyncThunk(
   }
 );
 
+// orm state slice
+Encounter.addReducers({
+  [fetchItems.fulfilled.type]: (action, ModelClass, session) => {
+    const {
+      Encounter,
+      EncounterMap,
+      EncounterParticipant,
+      AreaEffect,
+      ParticipantCoordinate
+    } = session;
+    Encounter.delete();
+    EncounterMap.delete();
+    EncounterParticipant.delete();
+    AreaEffect.delete();
+    ParticipantCoordinate.delete();
+
+    action.payload.forEach((loadedItem) => ModelClass.parse(loadedItem));
+  },
+
+  [fetchItem.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.parse(action.payload);
+  },
+
+  [fetchLatestEncounter.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.parse(action.payload);
+  },
+
+  [addItem.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.parse(action.payload);
+  },
+
+  [deleteEncounter.fulfilled.type]: (action, ModelClass, session) => {
+    ModelClass.withId(action.payload).delete();
+  },
+
+  [updateItem.fulfilled.type]: (action, ModelClass, session) => {
+    const options = action.payload.options;
+
+    if (options.editedEncounterAction === EditedEncounterAction.Update) {
+      ModelClass.withId(action.payload.encounterId).applyUpdate({
+        ...action.payload.partialUpdate,
+        updatedAt: new Date()
+      });
+    } else if (options.editedEncounterAction === EditedEncounterAction.Set) {
+      ModelClass.parse(action.payload.result);
+    }
+  },
+
+  [updateItem.rejected.type]: (action, ModelClass, session) => {
+    if (action.payload.options.applyChangesOnError) {
+      ModelClass.withId(action.payload.encounterId).applyUpdate({
+        ...action.payload.partialUpdate,
+        updatedAt: new Date()
+      });
+    }
+  },
+
+  [updateChildItem.fulfilled.type]: (action, ModelClass, session) => {
+    session.EncounterParticipant.withId(
+      action.payload.participantId
+    ).applyUpdate(action.payload.partialUpdate);
+
+    ModelClass.withId(action.payload.encounterId).applyUpdate({
+      updatedAt: new Date()
+    });
+  },
+
+  [updateChildItem.rejected.type]: (action, ModelClass, session) => {
+    session.EncounterParticipant.withId(
+      action.payload.participantId
+    ).applyUpdate(action.payload.partialUpdate);
+
+    ModelClass.withId(action.payload.encounterId).applyUpdate({
+      updatedAt: new Date()
+    });
+  }
+});
+
+// ui state slice
 const updateEncounterParticipant = (
   encounterId,
   participantId,
   partialUpdate
 ) => updateChildItem({ encounterId, participantId, partialUpdate });
 
-const entityAdapter = createEntityAdapter({
-  selectId: (item) => item._id,
-  sortComparer: (a, b) =>
-    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-});
-
-const initialState = entityAdapter.getInitialState({
+const initialState = {
   fething: false,
   fetchingError: null,
   operationError: null,
@@ -161,7 +235,7 @@ const initialState = entityAdapter.getInitialState({
   editedItemId: null,
   latestItemId: null,
   lastFetchTime: null
-});
+};
 
 const startFetching = (state, action) => {
   state.fetching = true;
@@ -171,30 +245,6 @@ const startFetching = (state, action) => {
 const operationFailed = (state, action) => {
   state.operationSuccess = false;
   state.operationError = action.payload.error;
-};
-
-const applyParticipantUpdate = (
-  state,
-  encounterId,
-  participantId,
-  partialUpdate
-) => {
-  const encounter = entityAdapter.getSelectors().selectById(state, encounterId);
-  let newParticipants = [...encounter.participants];
-  newParticipants = newParticipants
-    .map((item) =>
-      item._id === participantId.toString()
-        ? {...item, ...partialUpdate}
-        : item
-    );
-  const encounterPartialUpdate = {
-    participants: newParticipants,
-    updatedAt: new Date()
-  };
-  entityAdapter.updateOne(state, {
-    id: encounterId,
-    changes: encounterPartialUpdate
-  });
 };
 
 const encounterSlice = createSlice({
@@ -218,7 +268,6 @@ const encounterSlice = createSlice({
       state.fetching = false;
       state.fetchingError = null;
       state.lastFetchTime = new Date().getTime();
-      entityAdapter.setAll(state, action.payload);
     },
     [fetchItems.rejected]: (state, action) => {
       state.fetching = false;
@@ -230,7 +279,6 @@ const encounterSlice = createSlice({
       state.fetching = false;
       state.fetchingError = null;
       state.editedItemId = action.payload._id;
-      entityAdapter.upsertOne(state, action.payload);
     },
     [fetchItem.rejected]: (state, action) => {
       state.fetching = false;
@@ -242,7 +290,6 @@ const encounterSlice = createSlice({
       state.fetching = false;
       state.fetchingError = null;
       state.latestItemId = action.payload._id;
-      entityAdapter.upsertOne(state, action.payload);
     },
     [fetchLatestEncounter.rejected]: (state, action) => {
       state.fetching = false;
@@ -252,14 +299,12 @@ const encounterSlice = createSlice({
     [addItem.fulfilled]: (state, action) => {
       state.operationError = null;
       state.operationSuccess = true;
-      entityAdapter.addOne(state, action.payload);
     },
     [addItem.rejected]: operationFailed,
 
     [deleteEncounter.fulfilled]: (state, action) => {
       state.operationSuccess = true;
       state.operationError = null;
-      entityAdapter.removeOne(state, action.payload);
     },
     [deleteEncounter.rejected]: operationFailed,
 
@@ -270,75 +315,20 @@ const encounterSlice = createSlice({
         ? null
         : state.operationError;
       state.operationSuccess = true;
-
-      if (options.editedEncounterAction === EditedEncounterAction.Update) {
-        entityAdapter.updateOne(state, {
-          id: action.payload.encounterId,
-          changes: action.payload.partialUpdate
-        });
-        entityAdapter.updateOne(state, {
-          id: action.payload.encounterId,
-          changes: { updatedAt: new Date() }
-        });
-      } else if (options.editedEncounterAction === EditedEncounterAction.Set) {
-        entityAdapter.updateOne(state, {
-          id: action.payload.encounterId,
-          changes: action.payload.result
-        });
-      }
     },
     [updateItem.rejected]: (state, action) => {
       state.operationError = action.payload.error;
       state.operationSuccess = false;
-
-      if (action.payload.options.applyChangesOnError) {
-        entityAdapter.updateOne(state, {
-          id: action.payload.encounterId,
-          changes: action.payload.partialUpdate
-        });
-        entityAdapter.updateOne(state, {
-          id: action.payload.encounterId,
-          changes: { updatedAt: new Date() }
-        });
-      }
     },
 
-    [updateChildItem.fulfilled]: (state, action) => {
-      applyParticipantUpdate(
-        state,
-        action.payload.encounterId,
-        action.payload.participantId,
-        action.payload.partialUpdate
-      );
-    },
     [updateChildItem.rejected]: (state, action) => {
       state.operationError = action.payload.error;
       state.operationSuccess = false;
-
-      applyParticipantUpdate(
-        state,
-        action.payload.encounterId,
-        action.payload.participantId,
-        action.payload.partialUpdate
-      );
     },
 
     resetStore: (state, action) => initialState
   }
 });
-
-const entitySelectors = entityAdapter.getSelectors();
-
-const selectEditedEncounter = (state) =>
-  entitySelectors.selectById(state.encounter, state.encounter.editedItemId);
-
-const selectLatestEncounter = (state) =>
-  entitySelectors.selectById(state.encounter, state.encounter.latestItemId);
-
-const selectAll = (state) => entitySelectors.selectAll(state.encounter);
-
-// reducer
-export default encounterSlice.reducer;
 
 // actions
 export {
@@ -355,4 +345,25 @@ export const resetEditedEncounter = encounterSlice.actions.resetEditedEncounter;
 export const resetLatestEncounter = encounterSlice.actions.resetLatestEncounter;
 
 // selectors
-export { selectEditedEncounter, selectLatestEncounter, selectAll };
+const orm = getOrm();
+export const selectAll = createOrmSelector(orm, ({ Encounter }) =>
+  Encounter.orderBy(
+    (encounter) => new Date(encounter.updatedAt).getTime(),
+    'desc'
+  ).toRefArray()
+);
+
+export const selectEditedEncounter =
+  createOrmSelector(orm,
+  (state) => state.encounter.editedItemId,
+  ({Encounter}, editedEncounterId) =>
+    Encounter.buildObject(Encounter.withId(editedEncounterId)));
+
+export const selectLatestEncounter =
+  createOrmSelector(orm,
+  (state) => state.encounter.latestItemId,
+  ({Encounter}, latestEncounterId) =>
+    Encounter.buildObject(Encounter.withId(latestEncounterId)));
+
+// reducer
+export default encounterSlice.reducer;
