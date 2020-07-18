@@ -1,3 +1,14 @@
+
+/**
+ * Generator class to get a sequence of grid cell names:
+ * e.g. a b c ... z A ... Z aa ab ...
+ * 
+ * Usage:
+ * let stringIdGenerator = new StringIdGenerator();
+ * for (let i = 0; i < gridWidth; i++) {
+ *   horizontalIndices.push(stringIdGenerator.next());
+ * }
+ */
 export default class StringIdGenerator {
   // tslint:disable-next-line: variable-name
   _chars;

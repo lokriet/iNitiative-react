@@ -14,17 +14,19 @@ const middleware = [
   createFirebaseMiddleware()
 ];
 
+export const rootReducer = {
+  auth: authReducer,
+  damageType: damageTypeReducer,
+  condition: conditionReducer,
+  feature: featureReducer,
+  participantTemplate: participantTemplateReducer,
+  encounter: encounterReducer,
+  news: newsReducer,
+  firebase: firebaseReducer
+}
+
 const createStore = () => configureStore({
-  reducer: {
-    auth: authReducer,
-    damageType: damageTypeReducer,
-    condition: conditionReducer,
-    feature: featureReducer,
-    participantTemplate: participantTemplateReducer,
-    encounter: encounterReducer,
-    news: newsReducer,
-    firebase: firebaseReducer
-  },
+  reducer: rootReducer,
   middleware,
   devTools: process.env.NODE_ENV !== 'production'
 });
