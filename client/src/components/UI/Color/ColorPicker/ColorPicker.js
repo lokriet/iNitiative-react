@@ -31,21 +31,21 @@ const presetColors = [
   '#ff5505'
 ];
 
-const ColorPicker = props => {
+const ColorPicker = (props) => {
   const [currentSelection, setCurrentSelection] = useState(props.selectedColor);
 
   return (
     <div className={classes.Container}>
       <div className={classes.ColorsGrid}>
         <div
-          className={`${
-            currentSelection == null ? classes.Active : ''
-          } ${classes.ColorCell}`}
+          className={`${currentSelection == null ? classes.Active : ''} ${
+            classes.ColorCell
+          }`}
           onClick={() => setCurrentSelection(null)}
         >
           <FontAwesomeIcon icon={faBan} className={classes.NoColor} />
         </div>
-        {presetColors.map(presetColor => (
+        {presetColors.map((presetColor) => (
           <Color
             color={presetColor}
             key={presetColor}
@@ -61,14 +61,21 @@ const ColorPicker = props => {
         <input
           type="color"
           value={currentSelection || ''}
-          onChange={event => setCurrentSelection(event.target.value)}
+          onChange={(event) => setCurrentSelection(event.target.value)}
           name="color"
           id="color"
         />
       </ItemsRow>
       <ItemsRow>
-        <Button onClick={() => props.onSelected(currentSelection)}>Ok</Button>
-        <Button onClick={props.onCancel}>Cancel</Button>
+        <Button
+          onClick={() => props.onSelected(currentSelection)}
+          data-test="ok-button"
+        >
+          Ok
+        </Button>
+        <Button onClick={props.onCancel} data-test="cancel-button">
+          Cancel
+        </Button>
       </ItemsRow>
     </div>
   );

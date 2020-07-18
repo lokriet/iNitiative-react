@@ -1,5 +1,6 @@
 import { rootReducer } from '../store/createStore';
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import checkPropTypes from 'check-prop-types';
 
 /**
  * Create a testing store with imported reducers, middleware, and initial state.
