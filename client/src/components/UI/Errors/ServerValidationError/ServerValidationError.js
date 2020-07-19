@@ -22,7 +22,7 @@ const ServerValidationError = props => {
       errors = (
         <>
           {myErrors.map((error, index) => (
-            <Error key={index}>{error.msg}</Error>
+            <Error key={index} data-test='error-message'>{error.msg}</Error>
           ))}
         </>
       );
