@@ -30,7 +30,7 @@
   text-align: left;
   padding: 0.5rem;
   position: sticky;
-  top: 0;
+  top: 4rem;
   font-weight: 500;
   background-color: white;
   border-bottom: 2px solid #aaa;
@@ -48,4 +48,11 @@
 
 .SavingErrorIcon {
   color: #791010;
+}
+
+.FixedNextButton {
+  position: fixed;
+  top: 4rem;
+  left: 10px;
+  z-index: 5;
 }

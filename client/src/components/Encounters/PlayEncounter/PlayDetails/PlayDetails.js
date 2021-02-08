@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useScrollPosition } from '@n8tb1t/use-scroll-position';
 import {
   faPlay,
   faDiceD6,
   faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
+
 import {
   EditedEncounterAction,
   updateEncounterParticipant,
@@ -48,6 +50,7 @@ const compareParticipants = (a, b) => {
 const PlayDetails = () => {
   const [showDead, setShowDead] = useState(false);
   const [filteredParticipants, setFilteredParticipants] = useState([]);
+  const [showExtraNextButton, setShowExtraNextButton] = useState(false);
 
   const [damageTypes, combined, features, conditions] = useDropdownValues();
 
@@ -58,6 +61,13 @@ const PlayDetails = () => {
   );
 
   const dispatch = useDispatch();
+
+  useScrollPosition(({ currPos }) => {
+    const isShow = currPos.y < -120;
+    if (showExtraNextButton !== isShow) setShowExtraNextButton(isShow);
+  }
+  , [showExtraNextButton]
+  );
 
   useEffect(() => {
     if (editedEncounter) {
@@ -179,6 +189,11 @@ const PlayDetails = () => {
   } else {
     view = (
       <div className={classes.Container}>
+        { showExtraNextButton &&
+          <IconButton icon={faPlay} bordered onClick={handleNextMove} className={classes.FixedNextButton}>
+            Next
+          </IconButton>
+        } 
         <div className={classes.EncounterName}>
           {editedEncounter.name}
         </div>

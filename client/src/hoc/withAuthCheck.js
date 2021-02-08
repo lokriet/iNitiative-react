@@ -3,14 +3,15 @@ import React, { useCallback } from 'react';
 import {  useDispatch, useSelector } from 'react-redux';
 import Spinner from '../components/UI/Spinner/Spinner';
 import { useHistory } from 'react-router-dom';
-import { setAuthRedirectPath } from '../components/Auth/authSlice';
+import { setAuthRedirectPath, selectIsAuthenticated, selectIsAdmin } from '../components/Auth/authSlice';
 
 const withAuthCheck = (WrappedComponent) => {
   return (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const isAuthenticated = useSelector(state => state.auth.token != null);
+    const isAuthenticated = useSelector(selectIsAuthenticated);
+    const isAdmin = useSelector(selectIsAdmin);
     const initialAuthCheckDone = useSelector(state => state.auth.initialAuthCheckDone);
 
     const handleLogin = useCallback(() => {
@@ -32,7 +33,7 @@ const withAuthCheck = (WrappedComponent) => {
         </div>
       );
     } else {
-      return <WrappedComponent {...props} />;
+      return <WrappedComponent {...props} isAuthenticated={isAuthenticated} isAdmin={isAdmin} />;
     }
   };
 };
